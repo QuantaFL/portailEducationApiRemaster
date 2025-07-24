@@ -1,0 +1,23 @@
+<?php
+
+namespace App\Http\Requests;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class AssignementRequest extends FormRequest
+{
+    public function rules(): array
+    {
+        return [
+            'teacher_id' => ['required', 'exists:teachers'],
+            'class_model_id' => ['required', 'exists:class_models'],
+            'subject_id' => ['required', 'exists:subjects'],
+            'session_id' => ['required', 'exists:sessions'],
+        ];
+    }
+
+    public function authorize(): bool
+    {
+        return true;
+    }
+}

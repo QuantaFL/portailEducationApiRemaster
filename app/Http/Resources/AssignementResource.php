@@ -1,0 +1,31 @@
+<?php
+
+namespace App\Http\Resources;
+
+use App\Models\Assignement;
+use App\modules\teacher\ressources\TeacherResource;
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
+
+/** @mixin Assignement */
+class AssignementResource extends JsonResource
+{
+    public function toArray(Request $request): array
+    {
+        return [
+            'id' => $this->id,
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
+
+            'teacher_id' => $this->teacher_id,
+            'class_model_id' => $this->class_model_id,
+            'subject_id' => $this->subject_id,
+            'session_id' => $this->session_id,
+
+            'teacher' => new TeacherResource($this->whenLoaded('teacher')),
+            'classModel' => new ClassModelResource($this->whenLoaded('classModel')),
+            'subject' => new SubjectResource($this->whenLoaded('subject')),
+            'session' => new SessionResource($this->whenLoaded('session')),
+        ];
+    }
+}
