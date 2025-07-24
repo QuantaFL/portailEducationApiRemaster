@@ -1,0 +1,25 @@
+<?php
+
+namespace App\Http\Resources;
+
+use App\Models\Term;
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
+
+/** @mixin Term */
+class TermResource extends JsonResource
+{
+    public function toArray(Request $request): array
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
+
+            'session_id' => $this->session_id,
+
+            'session' => new SessionResource($this->whenLoaded('session')),
+        ];
+    }
+}
