@@ -20,8 +20,11 @@ class StudentResource extends JsonResource
 
             'class_model_id' => $this->class_model_id,
             'parent_id' => $this->parent_id,
+            'user_model_id' => $this->user_model_id,
 
             'classModel' => new ClassModelResource($this->whenLoaded('classModel')),
+            'parent' => $this->whenLoaded('parent'),
+            'userModel' => $this->whenLoaded('userModel'),
         ];
     }
 }
