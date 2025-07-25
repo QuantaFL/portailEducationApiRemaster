@@ -2,8 +2,8 @@
 
 namespace App\Modules\Teacher\Models;
 
-use App\Models\Subject;
-use App\Models\UserModel;
+use App\Modules\Subject\Models\Subject;
+use App\Modules\User\Models\UserModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
