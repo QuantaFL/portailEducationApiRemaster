@@ -5,7 +5,6 @@ namespace App\Modules\Parent\Models;
 use App\Modules\User\Models\UserModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ParentModel extends Model
 {
@@ -15,7 +14,7 @@ class ParentModel extends Model
         'user_model_id',
     ];
 
-    public function userModel(): BelongsTo
+    public function userModel()
     {
         return $this->belongsTo(UserModel::class);
     }
