@@ -23,12 +23,12 @@ class AssignementResource extends JsonResource
             'teacher_id' => $this->teacher_id,
             'class_model_id' => $this->class_model_id,
             'subject_id' => $this->subject_id,
-            'session_id' => $this->session_id,
+            'academic_year_id' => $this->academic_year_id,
 
             'teacher' => new TeacherResource($this->whenLoaded('teacher')),
             'classModel' => new ClassModelResource($this->whenLoaded('classModel')),
             'subject' => new SubjectResource($this->whenLoaded('subject')),
-            'session' => new AcademicYearResource($this->whenLoaded('academicYear')),
+            'academicYear' => new AcademicYearResource($this->whenLoaded('academicYear')),
         ];
     }
 }

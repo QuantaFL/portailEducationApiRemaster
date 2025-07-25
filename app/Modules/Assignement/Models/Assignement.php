@@ -2,8 +2,8 @@
 
 namespace App\Modules\Assignement\Models;
 
+use App\Modules\AcademicYear\Models\AcademicYear;
 use App\Modules\ClassModel\Models\ClassModel;
-use App\Modules\Session\Models\AcademicYear;
 use App\Modules\Subject\Models\Subject;
 use App\modules\teacher\models\Teacher;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
