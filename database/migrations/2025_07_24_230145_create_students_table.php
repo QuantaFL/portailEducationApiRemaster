@@ -10,6 +10,7 @@ return new class extends Migration {
         Schema::create('students', function (Blueprint $table) {
             $table->id();
             $table->string('matricule');
+            $table->string('academic_records');
             $table->foreignId('class_model_id')->constrained('class_models');
             $table->foreignId('parent_id')->constrained('parents');
             $table->foreignId('user_model_id')->constrained('user_models');
