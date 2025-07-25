@@ -5,6 +5,7 @@ namespace App\Modules\Grade\Ressources;
 use App\Modules\Assignement\Ressources\AssignementResource;
 use App\Modules\Grade\Models\Grade;
 use App\Modules\Student\Resources\StudentResource;
+use App\Modules\Term\Ressources\TermResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -21,9 +22,11 @@ class GradeResource extends JsonResource
 
             'assignement_id' => $this->assignement_id,
             'student_id' => $this->student_id,
+            'term_id' => $this->term_id,
 
             'assignement' => new AssignementResource($this->whenLoaded('assignement')),
             'student' => new StudentResource($this->whenLoaded('student')),
+            'term' => new TermResource($this->whenLoaded('term')),
         ];
     }
 }

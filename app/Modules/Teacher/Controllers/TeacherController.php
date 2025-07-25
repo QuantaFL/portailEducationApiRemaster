@@ -32,12 +32,7 @@ class TeacherController extends Controller
 
     public function update(TeacherRequest $request, Teacher $teacher)
     {
-        $teacherRequest = $request->validated();
-
-        $refUser = UserModel::findOrFail($teacher->user_model_id);
-
-        $refUser->update($teacherRequest['user']);
-       // $teacher->update($request->validated());
+        $teacher->update($request->validated());
 
         return response()->json(new TeacherResource($teacher));
     }

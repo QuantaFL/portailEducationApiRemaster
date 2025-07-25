@@ -4,7 +4,7 @@ namespace App\Modules\Assignement\Ressources;
 
 use App\Modules\Assignement\Models\Assignement;
 use App\Modules\ClassModel\Ressources\ClassModelResource;
-use App\Modules\Session\Ressources\SessionResource;
+use App\Modules\Session\Ressources\AcademicYearResource;
 use App\Modules\Subject\Ressources\SubjectResource;
 use App\modules\teacher\ressources\TeacherResource;
 use Illuminate\Http\Request;
@@ -28,7 +28,7 @@ class AssignementResource extends JsonResource
             'teacher' => new TeacherResource($this->whenLoaded('teacher')),
             'classModel' => new ClassModelResource($this->whenLoaded('classModel')),
             'subject' => new SubjectResource($this->whenLoaded('subject')),
-            'session' => new SessionResource($this->whenLoaded('session')),
+            'session' => new AcademicYearResource($this->whenLoaded('session')),
         ];
     }
 }

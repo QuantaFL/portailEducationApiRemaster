@@ -5,7 +5,7 @@ use App\Modules\ClassModel\Controllers\ClassModelController;
 use App\Modules\Grade\Controllers\GradeController;
 use App\Modules\Parent\Controllers\ParentController;
 use App\Modules\ReportCard\Controllers\ReportCardController;
-use App\Modules\Session\Controllers\SessionController;
+use App\Modules\AcademicYear\Controllers\AcademicYearController;
 use App\Modules\Student\Controllers\StudentController;
 use App\Modules\Subject\Controllers\SubjectController;
 use App\Modules\Teacher\Controllers\TeacherController;
@@ -22,7 +22,7 @@ Route::prefix('v1')->group(function () {
     Route::apiResource('teachers', TeacherController::class);
     Route::apiResource('students', StudentController::class);
     Route::apiResource('subjects', SubjectController::class);
-    Route::apiResource('academic-year', SessionController::class);
+    Route::apiResource('academic-years', AcademicYearController::class);
     Route::apiResource('terms', TermController::class);
     Route::apiResource('grades', GradeController::class);
     Route::apiResource('parents', ParentController::class);
