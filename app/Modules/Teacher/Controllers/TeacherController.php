@@ -3,9 +3,10 @@
 namespace App\Modules\Teacher\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\modules\teacher\models\Teacher;
-use App\modules\teacher\requests\TeacherRequest;
-use App\modules\teacher\ressources\TeacherResource;
+use App\Modules\Teacher\Models\Teacher;
+use App\Modules\Teacher\Requests\TeacherRequest;
+use App\Modules\Teacher\Ressources\TeacherResource;
+use App\Modules\User\Models\UserModel;
 
 class TeacherController extends Controller
 {
@@ -16,7 +17,12 @@ class TeacherController extends Controller
 
     public function store(TeacherRequest $request)
     {
-        return response()->json(new TeacherResource(Teacher::create($request->validated())));
+        $user = UserModel::create($request->user);
+        $teacher = new Teacher();
+        $teacher->hire_date = $request->hire_date;
+        $teacher->user_model_id = $user->id;
+        $teacher->save();
+        return response()->json(new TeacherResource($teacher));
     }
 
     public function show(Teacher $teacher)

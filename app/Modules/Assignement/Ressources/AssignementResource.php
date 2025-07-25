@@ -2,8 +2,8 @@
 
 namespace App\Modules\Assignement\Ressources;
 
-use App\Http\Resources\ClassModelResource;
 use App\Modules\Assignement\Models\Assignement;
+use App\Modules\ClassModel\Ressources\ClassModelResource;
 use App\Modules\Session\Ressources\SessionResource;
 use App\Modules\Subject\Ressources\SubjectResource;
 use App\modules\teacher\ressources\TeacherResource;

@@ -3,9 +3,9 @@
 namespace App\Modules\Student\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\StudentResource;
 use App\Modules\Student\Models\Student;
 use App\Modules\Student\Requests\StudentRequest;
+use App\Modules\Student\Resources\StudentResource;
 
 class StudentController extends Controller
 {

@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Modules\Student\Ressources;
+namespace App\Modules\Student\Resources;
 
-use App\Http\Resources\ClassModelResource;
+use App\Modules\ClassModel\Ressources\ClassModelResource;
 use App\Modules\Student\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;

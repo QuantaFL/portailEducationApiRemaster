@@ -3,9 +3,9 @@
 namespace App\Modules\ClassModel\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\ClassModelRequest;
-use App\Http\Resources\ClassModelResource;
 use App\Modules\ClassModel\Models\ClassModel;
+use App\Modules\ClassModel\Requests\ClassModelRequest;
+use App\Modules\ClassModel\Ressources\ClassModelResource;
 
 class ClassModelController extends Controller
 {

@@ -3,6 +3,7 @@
 namespace App\Modules\Parent\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Modules\Parent\Models\Parent;
 use App\Modules\Parent\Requests\ParentRequest;
 use App\Modules\Parent\Ressources\ParentResource;
 

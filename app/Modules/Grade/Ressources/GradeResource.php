@@ -2,9 +2,9 @@
 
 namespace App\Modules\Grade\Ressources;
 
-use App\Http\Resources\StudentResource;
 use App\Modules\Assignement\Ressources\AssignementResource;
 use App\Modules\Grade\Models\Grade;
+use App\Modules\Student\Resources\StudentResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
