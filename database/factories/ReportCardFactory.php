@@ -2,9 +2,9 @@
 
 namespace Database\Factories;
 
-use App\Models\ReportCard;
-use App\Models\Student;
-use App\Models\Term;
+use App\Modules\ReportCard\Models\ReportCard;
+use App\Modules\Student\Models\Student;
+use App\Modules\Term\Models\Term;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Carbon;
 
