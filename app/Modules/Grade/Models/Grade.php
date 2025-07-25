@@ -1,7 +1,9 @@
 <?php
 
-namespace App\Models;
+namespace App\Modules\Grade\Models;
 
+use App\Modules\Assignement\Models\Assignement;
+use App\Modules\Student\Models\Student;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
