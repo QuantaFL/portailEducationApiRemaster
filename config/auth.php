@@ -1,7 +1,6 @@
 <?php
 
 return [
-
     /*
     |--------------------------------------------------------------------------
     | Authentication Defaults
@@ -62,7 +61,7 @@ return [
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
-            'model' => env('AUTH_MODEL', \App\Modules\User\Models\User::class),
+            'model' => \App\Modules\User\Models\UserModel::class,
         ],
 
         // 'users' => [
@@ -111,5 +110,4 @@ return [
     */
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
-
 ];
