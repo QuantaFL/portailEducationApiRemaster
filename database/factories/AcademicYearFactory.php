@@ -2,7 +2,7 @@
 
 namespace Database\Factories;
 
-use App\Modules\Session\Models\AcademicYear;
+use App\Modules\AcademicYear\Models\AcademicYear;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Carbon;
 
