@@ -2,9 +2,9 @@
 
 namespace Database\Factories;
 
-use App\Models\Assignement;
-use App\Models\Grade;
-use App\Models\Student;
+use App\Modules\Assignement\Models\Assignement;
+use App\Modules\Grade\Models\Grade;
+use App\Modules\Student\Models\Student;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Carbon;
 
