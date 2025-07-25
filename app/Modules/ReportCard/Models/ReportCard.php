@@ -1,7 +1,9 @@
 <?php
 
-namespace App\Models;
+namespace App\Modules\ReportCard\Models;
 
+use App\Modules\Student\Models\Student;
+use App\Modules\Term\Models\Term;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
