@@ -18,7 +18,7 @@ class TermResource extends JsonResource
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
 
-            'session_id' => $this->session_id,
+            'academic_year_id' => $this->academic_year_id,
 
             'session' => new SessionResource($this->whenLoaded('session')),
         ];
