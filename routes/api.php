@@ -36,4 +36,5 @@ Route::prefix('v1')->group(function () {
     // Auth routes
     Route::post('auth/register', [\App\Modules\User\Controllers\AuthController::class, 'register']);
     Route::post('auth/login', [\App\Modules\User\Controllers\AuthController::class, 'login']);
+    Route::middleware('auth:api')->post('auth/change-password', [\App\Modules\User\Controllers\AuthController::class, 'changePassword']);
 });
