@@ -2,11 +2,11 @@
 
 namespace App\Modules\Session\Ressources;
 
-use App\Modules\Session\Models\Session;
+use App\Modules\Session\Models\AcademicYear;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-/** @mixin Session */
+/** @mixin AcademicYear */
 class SessionResource extends JsonResource
 {
     public function toArray(Request $request): array
