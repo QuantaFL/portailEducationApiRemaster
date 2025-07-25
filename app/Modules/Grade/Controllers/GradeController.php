@@ -4,37 +4,69 @@ namespace App\Modules\Grade\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Modules\Grade\Models\Grade;
-use App\Modules\Grade\Requests\GradeRequest;
-use App\Modules\Grade\Ressources\GradeResource;
+use App\Modules\Term\Models\Term;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class GradeController extends Controller
 {
-    public function index()
+    public function getGradesByTerm(Request $request)
     {
-        return response()->json(GradeResource::collection(Grade::all()));
+        $validator = Validator::make($request->all(), [
+            'term_id' => 'required|exists:terms,id',
+            'class_model_id' => 'required|exists:class_models,id',
+            'subject_id' => 'required|exists:subjects,id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 400);
+        }
+
+        $term = Term::find($request->term_id);
+        $today = now();
+
+        if ($today->isAfter($term->end_date)) {
+            return response()->json(['message' => 'Term has ended'], 400);
+        }
+
+        $grades = Grade::with(['studentSession.student.userModel', 'assignment.subject'])
+            ->where('term_id', $request->term_id)
+            ->whereHas('assignment', function ($query) use ($request) {
+                $query->where('class_model_id', $request->class_model_id)
+                    ->where('subject_id', $request->subject_id);
+            })
+            ->get();
+
+        return response()->json($grades);
     }
 
-    public function store(GradeRequest $request)
+    public function updateGrades(Request $request)
     {
-        return response()->json(new GradeResource(Grade::create($request->validated())));
-    }
+        $validator = Validator::make($request->all(), [
+            'grades' => 'required|array',
+            'grades.*.student_session_id' => 'required|exists:student_sessions,id',
+            'grades.*.term_id' => 'required|exists:terms,id',
+            'grades.*.assignement_id' => 'required|exists:assignements,id',
+            'grades.*.mark' => 'required|numeric|min:0|max:20',
+            'grades.*.type' => 'required|in:quiz,exam',
+        ]);
 
-    public function show(Grade $grade)
-    {
-        return response()->json(new GradeResource($grade));
-    }
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 400);
+        }
 
-    public function update(GradeRequest $request, Grade $grade)
-    {
-        $grade->update($request->validated());
+        foreach ($request->grades as $gradeData) {
+            Grade::updateOrCreate(
+                [
+                    'student_session_id' => $gradeData['student_session_id'],
+                    'term_id' => $gradeData['term_id'],
+                    'assignement_id' => $gradeData['assignement_id'],
+                    'type' => $gradeData['type'],
+                ],
+                ['mark' => $gradeData['mark']]
+            );
+        }
 
-        return response()->json(new GradeResource($grade));
-    }
-
-    public function destroy(Grade $grade)
-    {
-        $grade->delete();
-
-        return response()->json();
+        return response()->json(['message' => 'Grades updated successfully']);
     }
 }
