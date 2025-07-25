@@ -3,7 +3,7 @@
 namespace App\Modules\Grade\Models;
 
 use App\Modules\Assignement\Models\Assignement;
-use App\Modules\Student\Models\Student;
+use App\Modules\Student\Models\StudentSession;
 use App\Modules\Term\Models\Term;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -15,21 +15,23 @@ class Grade extends Model
 
     protected $fillable = [
         'mark',
+        'type',
         'assignement_id',
-        'student_id',
+        'student_session_id',
         'term_id',
     ];
 
-    public function assignement(): BelongsTo
+    public function assignment()
     {
         return $this->belongsTo(Assignement::class);
     }
 
-    public function student(): BelongsTo
+    public function studentSession()
     {
-        return $this->belongsTo(Student::class);
+        return $this->belongsTo(StudentSession::class);
     }
-    public function term(): BelongsTo
+
+    public function term() : BelongsTo
     {
         return $this->belongsTo(Term::class);
     }
