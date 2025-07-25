@@ -2,7 +2,7 @@
 
 namespace App\Modules\ClassModel\Models;
 
-use App\Modules\Session\Models\Session;
+use App\Modules\Session\Models\AcademicYear;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -19,6 +19,6 @@ class ClassModel extends Model
 
     public function session(): BelongsTo
     {
-        return $this->belongsTo(Session::class);
+        return $this->belongsTo(AcademicYear::class);
     }
 }
