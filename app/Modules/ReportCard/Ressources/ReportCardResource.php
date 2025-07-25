@@ -1,8 +1,10 @@
 <?php
 
-namespace App\Http\Resources;
+namespace App\Modules\ReportCard\Ressources;
 
-use App\Models\ReportCard;
+use App\Http\Resources\StudentResource;
+use App\Modules\ReportCard\Models\ReportCard;
+use App\Modules\Term\Ressources\TermResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
