@@ -17,8 +17,8 @@ class Teacher extends Model
         'user_model_id',
     ];
 
-    protected $with = ['userModel'];
-    public function userModel(): BelongsTo
+    protected $with = ['UserModel'];
+    public function UserModel(): BelongsTo
     {
         return $this->belongsTo(UserModel::class);
     }
