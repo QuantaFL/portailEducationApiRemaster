@@ -1,8 +1,11 @@
 <?php
 
-namespace App\Http\Resources;
+namespace App\Modules\Assignement\Ressources;
 
-use App\Models\Assignement;
+use App\Http\Resources\ClassModelResource;
+use App\Modules\Assignement\Models\Assignement;
+use App\Modules\Session\Ressources\SessionResource;
+use App\Modules\Subject\Ressources\SubjectResource;
 use App\modules\teacher\ressources\TeacherResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;

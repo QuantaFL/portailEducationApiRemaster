@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Models;
+namespace App\Modules\ClassModel\Models;
 
+use App\Modules\Session\Models\Session;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
