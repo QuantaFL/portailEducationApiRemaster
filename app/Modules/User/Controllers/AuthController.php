@@ -64,4 +64,26 @@ class AuthController extends Controller
             'token' => $token,
         ]);
     }
+
+    public function changePassword(Request $request)
+    {
+        $user = auth()->user();
+        if (!$user) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+        if (!$user->isFirstLogin) {
+            return response()->json(['error' => 'Password change not allowed'], 403);
+        }
+        $request->validate([
+            'old_password' => 'required|string',
+            'password' => 'required|string|min:6|confirmed',
+        ]);
+        if (!Hash::check($request->old_password, $user->password)) {
+            return response()->json(['error' => 'Old password is incorrect'], 422);
+        }
+        $user->password = Hash::make($request->password);
+        $user->isFirstLogin = false;
+        $user->save();
+        return response()->json(['message' => 'Password changed successfully']);
+    }
 }
