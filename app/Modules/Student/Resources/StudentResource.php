@@ -19,11 +19,11 @@ class StudentResource extends JsonResource
             'updated_at' => $this->updated_at,
 
             'class_model_id' => $this->class_model_id,
-            'parent_id' => $this->parent_id,
+            'parent_model_id' => $this->parent_model_id,
             'user_model_id' => $this->user_model_id,
 
             'classModel' => new ClassModelResource($this->whenLoaded('classModel')),
-            'parent' => $this->whenLoaded('parent'),
+            'parentModel' => $this->whenLoaded('parentModel'),
             'userModel' => $this->whenLoaded('userModel'),
         ];
     }

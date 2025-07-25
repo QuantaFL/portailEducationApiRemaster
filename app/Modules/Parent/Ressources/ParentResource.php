@@ -2,10 +2,10 @@
 
 namespace App\Modules\Parent\Ressources;
 
+use App\Modules\Parent\Models\ParentModel;
 use App\Modules\User\Ressources\UserModelResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use App\Modules\Parent\Models\ParentModel;
 
 /** @mixin ParentModel */
 class ParentResource extends JsonResource
@@ -14,10 +14,6 @@ class ParentResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
-
-            'user_model_id' => $this->user_model_id,
             'userModel' => new UserModelResource($this->whenLoaded('userModel')),
         ];
     }

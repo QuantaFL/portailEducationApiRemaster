@@ -2,9 +2,9 @@
 
 namespace App\Modules\Student\Models;
 
+use App\Modules\AcademicYear\Models\AcademicYear;
 use App\Modules\ClassModel\Models\ClassModel;
 use App\Modules\Parent\Models\ParentModel;
-use App\Modules\Session\Models\AcademicYear;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -16,7 +16,7 @@ class Student extends Model
 
     protected $fillable = [
         'matricule',
-        'parent_id',
+        'parent_model_id',
         'user_model_id',
     ];
 
