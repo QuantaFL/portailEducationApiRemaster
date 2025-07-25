@@ -12,7 +12,7 @@ class ParentController extends Controller
 {
     public function index()
     {
-        return response()->json(ParentResource::collection(Parent::all()));
+        return response()->json(ParentResource::collection(ParentModel::all()));
     }
 
     public function store(ParentRequest $request)
