@@ -1,33 +1,34 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Modules\Student\Controllers;
 
-use App\Http\Requests\StudentRequest;
+use App\Http\Controllers\Controller;
 use App\Http\Resources\StudentResource;
-use App\Models\Student;
+use App\Modules\Student\Models\Student;
+use App\Modules\Student\Requests\StudentRequest;
 
 class StudentController extends Controller
 {
     public function index()
     {
-        return StudentResource::collection(Student::all());
+        return response()->json(StudentResource::collection(Student::all()));
     }
 
     public function store(StudentRequest $request)
     {
-        return new StudentResource(Student::create($request->validated()));
+        return response()->json(new StudentResource(Student::create($request->validated())));
     }
 
     public function show(Student $student)
     {
-        return new StudentResource($student);
+        return response()->json(new StudentResource($student));
     }
 
     public function update(StudentRequest $request, Student $student)
     {
         $student->update($request->validated());
 
-        return new StudentResource($student);
+        return response()->json(new StudentResource($student));
     }
 
     public function destroy(Student $student)
