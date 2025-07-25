@@ -16,7 +16,9 @@ class UserModelController extends Controller
 
     public function store(UserModelRequest $request)
     {
-        $user = UserModel::create($request->validated());
+        $data = $request->validated();
+        $data['isFirstLogin'] = true;
+        $user = UserModel::create($data);
         $user->load('role');
         return response()->json(new UserModelResource($user));
     }
