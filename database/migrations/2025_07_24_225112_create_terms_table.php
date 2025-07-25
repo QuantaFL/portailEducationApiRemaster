@@ -11,6 +11,8 @@ return new class extends Migration {
             $table->id();
             $table->string('name');
             $table->foreignId('academic_year_id')->constrained('academic_years');
+            $table->date('start_date');
+            $table->date('end_date');
             $table->timestamps();
         });
     }
