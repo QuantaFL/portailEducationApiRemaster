@@ -26,4 +26,8 @@ Route::prefix('v1')->group(function () {
     Route::apiResource('parents', ParentController::class);
     Route::apiResource('classes', ClassModelController::class);
     Route::apiResource('report-cards', ReportCardController::class);
+
+    // Auth routes
+    Route::post('auth/register', [\App\Modules\User\Controllers\AuthController::class, 'register']);
+    Route::post('auth/login', [\App\Modules\User\Controllers\AuthController::class, 'login']);
 });
