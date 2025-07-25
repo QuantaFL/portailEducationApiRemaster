@@ -3,7 +3,7 @@
 namespace App\Modules\Assignement\Models;
 
 use App\Modules\ClassModel\Models\ClassModel;
-use App\Modules\Session\Models\Session;
+use App\Modules\Session\Models\AcademicYear;
 use App\Modules\Subject\Models\Subject;
 use App\modules\teacher\models\Teacher;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -38,6 +38,6 @@ class Assignement extends Model
 
     public function session(): BelongsTo
     {
-        return $this->belongsTo(Session::class);
+        return $this->belongsTo(AcademicYear::class);
     }
 }
