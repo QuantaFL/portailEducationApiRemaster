@@ -13,10 +13,10 @@ class Term extends Model
 
     protected $fillable = [
         'name',
-        'session_id',
+        'academic_year_id',
     ];
 
-    public function session(): BelongsTo
+    public function AcademicYear(): BelongsTo
     {
         return $this->belongsTo(AcademicYear::class);
     }
