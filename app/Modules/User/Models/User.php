@@ -7,6 +7,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
+
+/**
+ *@deprecated
+ * DEPRECATED DO NOT USE THIS ONE
+ * NE PAS UTILISER CE USER IL NE FAIT PAS PARTI DE NOTRE PROJET
+ * ATTENTION 1,2,3
+ * REVEIL TOI
+ */
 class User extends Authenticatable
 {
     use HasFactory, Notifiable;

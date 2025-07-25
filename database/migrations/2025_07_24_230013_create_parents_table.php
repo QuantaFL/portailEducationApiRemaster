@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        Schema::create('parent_models', function (Blueprint $table) {
+        Schema::create('parents', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_model_id')->constrained('user_models');
             $table->timestamps();

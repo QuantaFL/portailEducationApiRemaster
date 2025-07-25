@@ -2,7 +2,7 @@
 
 namespace App\Modules\Term\Ressources;
 
-use App\Modules\Session\Ressources\SessionResource;
+use App\Modules\AcademicYear\Ressources\AcademicYearResource;
 use App\Modules\Term\Models\Term;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -20,7 +20,7 @@ class TermResource extends JsonResource
 
             'academic_year_id' => $this->academic_year_id,
 
-            'session' => new SessionResource($this->AcademicYear),
+            'academic_year' => new AcademicYearResource($this->whenLoaded('session')),
         ];
     }
 }

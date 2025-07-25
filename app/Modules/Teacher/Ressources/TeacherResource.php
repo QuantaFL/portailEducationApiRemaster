@@ -20,7 +20,7 @@ class TeacherResource extends JsonResource
 
             'user_model_id' => $this->user_model_id,
 
-            'userModel' => new UserModelResource($this->userModel),
+            'userModel' => new UserModelResource($this->whenLoaded('userModel')),
         ];
     }
 }

@@ -11,7 +11,7 @@ return new class extends Migration {
             $table->id();
             $table->string('average_grade');
             $table->string('honors');
-            $table->foreignId('student_id')->constrained('students');
+            $table->foreignId('student_session_id')->constrained('student_sessions');
             $table->foreignId('term_id')->constrained('terms');
             $table->string('path');
             $table->string('rank');

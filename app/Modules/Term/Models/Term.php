@@ -2,7 +2,7 @@
 
 namespace App\Modules\Term\Models;
 
-use App\Modules\Session\Models\AcademicYear;
+use App\Modules\AcademicYear\Models\AcademicYear;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -16,7 +16,7 @@ class Term extends Model
         'academic_year_id',
     ];
 
-    public function AcademicYear(): BelongsTo
+    public function session(): BelongsTo
     {
         return $this->belongsTo(AcademicYear::class);
     }

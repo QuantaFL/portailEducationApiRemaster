@@ -14,11 +14,5 @@ class ClassModel extends Model
     protected $fillable = [
         'name',
         'level',
-        'session_id',
     ];
-
-    public function session(): BelongsTo
-    {
-        return $this->belongsTo(AcademicYear::class);
-    }
 }

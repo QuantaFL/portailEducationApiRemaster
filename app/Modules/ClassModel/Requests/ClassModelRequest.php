@@ -11,7 +11,6 @@ class ClassModelRequest extends FormRequest
         return [
             'name' => ['required'],
             'level' => ['required'],
-            'session_id' => ['required', 'exists:sessions'],
         ];
     }
 

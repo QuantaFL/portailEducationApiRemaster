@@ -12,6 +12,7 @@ return new class extends Migration {
             $table->string('matricule');
             $table->foreignId('class_model_id')->constrained('class_models');
             $table->foreignId('parent_id')->constrained('parents');
+            $table->foreignId('user_model_id')->constrained('user_models');
             $table->timestamps();
         });
     }

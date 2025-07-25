@@ -4,7 +4,7 @@ namespace Database\Factories;
 
 use App\Modules\Assignement\Models\Assignement;
 use App\Modules\ClassModel\Models\ClassModel;
-use App\Modules\Session\Models\Session;
+use App\Modules\Session\Models\AcademicYear;
 use App\Modules\Subject\Models\Subject;
 use App\modules\teacher\models\Teacher;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -23,7 +23,7 @@ class AssignementFactory extends Factory
             'teacher_id' => Teacher::factory(),
             'class_model_id' => ClassModel::factory(),
             'subject_id' => Subject::factory(),
-            'session_id' => Session::factory(),
+            'session_id' => AcademicYear::factory(),
         ];
     }
 }

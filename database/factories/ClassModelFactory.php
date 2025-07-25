@@ -3,7 +3,7 @@
 namespace Database\Factories;
 
 use App\Modules\ClassModel\Models\ClassModel;
-use App\Modules\Session\Models\Session;
+use App\Modules\Session\Models\AcademicYear;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Carbon;
 
@@ -19,7 +19,7 @@ class ClassModelFactory extends Factory
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
 
-            'session_id' => Session::factory(),
+            'session_id' => AcademicYear::factory(),
         ];
     }
 }

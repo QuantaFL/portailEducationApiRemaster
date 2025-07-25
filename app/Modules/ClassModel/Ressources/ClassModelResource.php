@@ -3,7 +3,7 @@
 namespace App\Modules\ClassModel\Ressources;
 
 use App\Modules\ClassModel\Models\ClassModel;
-use App\Modules\Session\Ressources\SessionResource;
+use App\Modules\Session\Ressources\AcademicYearResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -18,10 +18,6 @@ class ClassModelResource extends JsonResource
             'level' => $this->level,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-
-            'session_id' => $this->session_id,
-
-            'session' => new SessionResource($this->whenLoaded('session')),
         ];
     }
 }
