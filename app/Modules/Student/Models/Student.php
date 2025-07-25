@@ -2,13 +2,11 @@
 
 namespace App\Modules\Student\Models;
 
-use App\Modules\AcademicYear\Models\AcademicYear;
-use App\Modules\ClassModel\Models\ClassModel;
 use App\Modules\Parent\Models\ParentModel;
+use App\Modules\User\Models\UserModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Student extends Model
 {
@@ -16,17 +14,19 @@ class Student extends Model
 
     protected $fillable = [
         'matricule',
+        'academic_records',
+        'class_model_id',
         'parent_model_id',
         'user_model_id',
     ];
 
-    public function parent(): BelongsTo
+    public function parentModel(): BelongsTo
     {
         return $this->belongsTo(ParentModel::class);
     }
 
-    public function sessions(): BelongsToMany
+    public function userModel()
     {
-        return $this->belongsToMany(AcademicYear::class, 'student_session', 'student_id', 'academic_year_id');
+        return $this->belongsTo(UserModel::class);
     }
 }
