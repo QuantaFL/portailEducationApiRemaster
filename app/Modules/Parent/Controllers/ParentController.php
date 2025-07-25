@@ -44,7 +44,7 @@ class ParentController extends Controller
         return response()->json(new ParentResource($parent));
     }
 
-    public function destroy(Parent $parent)
+    public function destroy(ParentModel $parent)
     {
         $parent->delete();
 
