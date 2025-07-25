@@ -10,8 +10,6 @@ use App\Modules\Student\Controllers\StudentController;
 use App\Modules\Subject\Controllers\SubjectController;
 use App\Modules\Teacher\Controllers\TeacherController;
 use App\Modules\Term\Controllers\TermController;
-use App\Modules\User\Models\UserModel;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 //Route::get('/user', function (Request $request) {

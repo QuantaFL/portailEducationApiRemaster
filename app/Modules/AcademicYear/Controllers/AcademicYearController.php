@@ -3,9 +3,9 @@
 namespace App\Modules\AcademicYear\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Modules\Session\Models\AcademicYear;
-use App\Modules\Session\Requests\AcademicYearRequest;
-use App\Modules\Session\Ressources\AcademicYearResource;
+use App\Modules\AcademicYear\Models\AcademicYear;
+use App\Modules\AcademicYear\Requests\AcademicYearRequest;
+use App\Modules\AcademicYear\Ressources\AcademicYearResource;
 
 class AcademicYearController extends Controller
 {
