@@ -48,7 +48,7 @@ class GradeController extends Controller
             'grades' => 'required|array',
             'grades.*.student_session_id' => 'required|exists:student_sessions,id',
             'grades.*.term_id' => 'required|exists:terms,id',
-            'grades.*.assignement_id' => 'required|exists:assignements,id',
+            'grades.*.assignement_id' => 'required|exists:assignments,id',
             'grades.*.mark' => 'required|numeric|min:0|max:20',
             'grades.*.type' => 'required|in:quiz,exam',
         ]);
@@ -58,15 +58,25 @@ class GradeController extends Controller
         }
 
         foreach ($request->grades as $gradeData) {
-            Grade::updateOrCreate(
-                [
+            if (isset($gradeData['id'])) {
+                Grade::where('id', $gradeData['id'])->update([
+                    'mark' => $gradeData['mark'],
+                    'type' => $gradeData['type'],
+                    'assignement_id' => $gradeData['assignement_id'],
                     'student_session_id' => $gradeData['student_session_id'],
                     'term_id' => $gradeData['term_id'],
-                    'assignement_id' => $gradeData['assignement_id'],
-                    'type' => $gradeData['type'],
-                ],
-                ['mark' => $gradeData['mark']]
-            );
+                ]);
+            } else {
+                Grade::updateOrCreate(
+                    [
+                        'student_session_id' => $gradeData['student_session_id'],
+                        'term_id' => $gradeData['term_id'],
+                        'assignement_id' => $gradeData['assignement_id'],
+                        'type' => $gradeData['type'],
+                    ],
+                    ['mark' => $gradeData['mark']]
+                );
+            }
         }
 
         return response()->json(['message' => 'Grades updated successfully']);
