@@ -2,10 +2,10 @@
 
 namespace Database\Factories;
 
-use App\Models\Assignement;
-use App\Models\ClassModel;
-use App\Models\Session;
-use App\Models\Subject;
+use App\Modules\Assignement\Models\Assignement;
+use App\Modules\ClassModel\Models\ClassModel;
+use App\Modules\Session\Models\Session;
+use App\Modules\Subject\Models\Subject;
 use App\modules\teacher\models\Teacher;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Carbon;
