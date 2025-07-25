@@ -1,8 +1,10 @@
 <?php
 
-namespace App\Http\Resources;
+namespace App\Modules\Grade\Ressources;
 
-use App\Models\Grade;
+use App\Http\Resources\StudentResource;
+use App\Modules\Assignement\Ressources\AssignementResource;
+use App\Modules\Grade\Models\Grade;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
