@@ -2,8 +2,8 @@
 
 namespace Database\Factories;
 
-use App\Models\Session;
-use App\Models\Term;
+use App\Modules\Session\Models\Session;
+use App\Modules\Term\Models\Term;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Carbon;
 
