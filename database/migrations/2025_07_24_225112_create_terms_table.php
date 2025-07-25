@@ -10,7 +10,7 @@ return new class extends Migration {
         Schema::create('terms', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->foreignId('academic_year_id')->constrained('sessions');
+            $table->foreignId('academic_year_id')->constrained('academic_year');
             $table->timestamps();
         });
     }
