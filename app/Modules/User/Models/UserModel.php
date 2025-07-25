@@ -2,37 +2,39 @@
 
 namespace App\Modules\User\Models;
 
-use App\Modules\Role\Models\RoleModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
+/**
+ * Modèle représentant un utilisateur.
+ *
+ * Ce modèle gère les informations de l'utilisateur telles que le prénom, le nom, la date de naissance, l'email, le mot de passe, l'adresse et le téléphone.
+ */
 class UserModel extends Authenticatable implements JWTSubject
 {
-    use HasFactory, Notifiable;
+    use HasFactory;
 
+    /**
+     * @var string[]
+     */
     protected $fillable = [
-        'name',
+        'first_name',
+        'last_name',
+        'birthday',
         'email',
         'password',
-        'role_id',
-    ];
-
-    protected $hidden = [
-        'password',
-        'remember_token',
+        'adress',
+        'phone',
+        'role_id', // Ajouté pour permettre l'enregistrement du rôle
+        'isFirstLogin',
     ];
 
     protected $casts = [
-        'email_verified_at' => 'datetime',
+        'isFirstLogin' => 'boolean',
     ];
 
-    public function role()
-    {
-        return $this->belongsTo(RoleModel::class);
-    }
-
+    // Méthodes requises par JWTSubject
     public function getJWTIdentifier()
     {
         return $this->getKey();
@@ -40,6 +42,21 @@ class UserModel extends Authenticatable implements JWTSubject
 
     public function getJWTCustomClaims()
     {
-        return [];
+        return [
+            'id' => $this->id,
+            'first_name' => $this->first_name,
+            'last_name' => $this->last_name,
+            'birthday' => $this->birthday,
+            'email' => $this->email,
+            'adress' => $this->adress,
+            'phone' => $this->phone,
+            'role' => $this->role ? $this->role->name : null,
+            'isFirstLogin' => $this->isFirstLogin,
+        ];
+    }
+
+    public function role()
+    {
+        return $this->belongsTo(RoleModel::class, 'role_id');
     }
 }
