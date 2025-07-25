@@ -9,10 +9,10 @@ class SessionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'label' => ['required'],
-            'start_date' => ['required'],
-            'end_date' => ['required'],
-            'status' => ['required'],
+            'label',
+            'start_date' => ['required','digits:4'],
+            'end_date' => ['required','digits:4'],
+            'status'
         ];
     }
 
