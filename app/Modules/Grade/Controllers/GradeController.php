@@ -5,7 +5,9 @@ namespace App\Modules\Grade\Controllers;
 use App\Http\Controllers\Controller;
 use App\Modules\Grade\Models\Grade;
 use App\Modules\Term\Models\Term;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Validator;
 
 class GradeController extends Controller
@@ -29,9 +31,9 @@ class GradeController extends Controller
             return response()->json(['message' => 'Term has ended'], 400);
         }
 
-        $grades = Grade::with(['studentSession.student.userModel', 'assignment.subject'])
+        $grades = Grade::with(['studentSession.student.userModel', 'assignement.subject'])
             ->where('term_id', $request->term_id)
-            ->whereHas('assignment', function ($query) use ($request) {
+            ->whereHas('assignement', function ($query) use ($request) {
                 $query->where('class_model_id', $request->class_model_id)
                     ->where('subject_id', $request->subject_id);
             })
@@ -40,7 +42,7 @@ class GradeController extends Controller
         return response()->json($grades);
     }
 
-    public function updateGrades(Request $request)
+    public function updateGrades(Request $request) : JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'grades' => 'required|array',

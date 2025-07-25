@@ -21,7 +21,7 @@ class Grade extends Model
         'term_id',
     ];
 
-    public function assignment()
+    public function assignement()
     {
         return $this->belongsTo(Assignement::class);
     }
