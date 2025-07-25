@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Modules\Parent\Models\ParentModel;
 use App\Modules\Parent\Requests\ParentRequest;
 use App\Modules\Parent\Ressources\ParentResource;
+use App\Modules\User\Models\UserModel;
 
 class ParentController extends Controller
 {
@@ -16,7 +17,12 @@ class ParentController extends Controller
 
     public function store(ParentRequest $request)
     {
-        return response()->json(new ParentResource(Parent::create($request->validated())));
+        $user = UserModel::create($request->user);
+        $parentModel = new ParentModel();
+      //  $parentModel->hire_date = $request->hire_date;
+        $parentModel->user_model_id = $user->id;
+        $parentModel->save();
+        return response()->json(new ParentResource($parentModel));
     }
 
     public function show(Parent $parent)
