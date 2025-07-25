@@ -20,6 +20,11 @@ class UserModelResource extends JsonResource
             'password' => $this->password,
             'adress' => $this->adress,
             'phone' => $this->phone,
+            'role_id' => $this->role_id,
+            'role' => $this->role ? [
+                'id' => $this->role->id,
+                'name' => $this->role->name,
+            ] : null,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];
