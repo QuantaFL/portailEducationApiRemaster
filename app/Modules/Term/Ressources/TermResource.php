@@ -20,7 +20,7 @@ class TermResource extends JsonResource
 
             'academic_year_id' => $this->academic_year_id,
 
-            'session' => new SessionResource($this->whenLoaded('session')),
+            'session' => new SessionResource($this->AcademicYear),
         ];
     }
 }
