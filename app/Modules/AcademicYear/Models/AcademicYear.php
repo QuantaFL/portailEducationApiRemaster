@@ -20,6 +20,6 @@ class AcademicYear extends Model
 
     public function students(): BelongsToMany
     {
-        return $this->belongsToMany(Student::class, 'student_session', 'session_id', 'student_id');
+        return $this->belongsToMany(Student::class, 'student_session', 'academic_year_id', 'student_id');
     }
 }

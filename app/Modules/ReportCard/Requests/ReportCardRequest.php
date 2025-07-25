@@ -11,7 +11,7 @@ class ReportCardRequest extends FormRequest
         return [
             'average_grade' => ['required'],
             'honors' => ['required'],
-            'student_id' => ['required', 'exists:students'],
+            'student_session_id' => ['required', 'exists:student_sessions'],
             'term_id' => ['required', 'exists:terms'],
             'path' => ['required'],
             'rank' => ['required'],

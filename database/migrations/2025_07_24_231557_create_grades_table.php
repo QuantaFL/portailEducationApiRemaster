@@ -10,6 +10,7 @@ return new class extends Migration {
         Schema::create('grades', function (Blueprint $table) {
             $table->id();
             $table->decimal('mark');
+            $table->enum('type', ['exam', 'quiz']);
             $table->foreignId('assignement_id')->constrained('assignements');
             $table->foreignId('student_session_id')->constrained('student_sessions');
             $table->foreignId('term_id')->constrained('terms');

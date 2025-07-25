@@ -27,6 +27,6 @@ class Student extends Model
 
     public function sessions(): BelongsToMany
     {
-        return $this->belongsToMany(AcademicYear::class, 'student_session', 'student_id', 'session_id');
+        return $this->belongsToMany(AcademicYear::class, 'student_session', 'student_id', 'academic_year_id');
     }
 }

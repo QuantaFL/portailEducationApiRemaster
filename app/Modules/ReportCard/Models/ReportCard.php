@@ -15,7 +15,7 @@ class ReportCard extends Model
     protected $fillable = [
         'average_grade',
         'honors',
-        'student_id',
+        'student_session_id',
         'term_id',
         'path',
         'rank',
@@ -23,7 +23,7 @@ class ReportCard extends Model
 
     public function student(): BelongsTo
     {
-        return $this->belongsTo(Student::class);
+        return $this->belongsTo(Student::class, 'student_session_id', 'id');
     }
 
     public function term(): BelongsTo

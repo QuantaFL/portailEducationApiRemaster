@@ -7,9 +7,9 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        Schema::create('student_session', function (Blueprint $table) {
+        Schema::create('student_sessions', function (Blueprint $table) {
             $table->foreignId('student_id')->constrained('students');
-            $table->foreignUuid('academic_years')->constrained('academic_years');
+            $table->foreignUuid('academic_year_id')->constrained('academic_years');
             $table->foreignId('class_model_id')->constrained('classes');
         });
     }
