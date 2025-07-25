@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Http\Resources;
+namespace App\Modules\User\Ressources;
 
-use App\Models\UserModel;
+use App\Modules\User\Models\UserModel;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 

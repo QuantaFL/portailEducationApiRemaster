@@ -2,7 +2,7 @@
 
 namespace Database\Factories;
 
-use App\Models\UserModel;
+use App\Modules\User\Models\UserModel;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Carbon;
 
