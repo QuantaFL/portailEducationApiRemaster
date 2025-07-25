@@ -13,13 +13,6 @@ use App\Modules\Term\Controllers\TermController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 
-Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/grades', [GradeController::class, 'getGradesByTerm']);
-    Route::post('/grades', [GradeController::class, 'updateGrades']);
-    Route::get('/user', function (Request $request) {
-        return $request->user();
-    });
-});
 
 Route::prefix('v1')->group(function () {
     Route::apiResource('assignements', AssignementController::class);
@@ -32,6 +25,8 @@ Route::prefix('v1')->group(function () {
     Route::apiResource('parents', ParentController::class);
     Route::apiResource('classes', ClassModelController::class);
     Route::apiResource('report-cards', ReportCardController::class);
+    Route::get('/grades', [GradeController::class, 'getGradesByTerm']);
+    Route::post('/grades', [GradeController::class, 'updateGrades']);
 
     // Auth routes
     Route::post('auth/register', [\App\Modules\User\Controllers\AuthController::class, 'register']);
