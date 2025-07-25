@@ -21,7 +21,7 @@ class GradeResource extends JsonResource
             'updated_at' => $this->updated_at,
 
             'assignement_id' => $this->assignement_id,
-            'student_id' => $this->student_id,
+            'student_session_id' => $this->student_session_id,
             'term_id' => $this->term_id,
 
             'assignement' => new AssignementResource($this->whenLoaded('assignement')),
