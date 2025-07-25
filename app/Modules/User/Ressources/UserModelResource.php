@@ -27,6 +27,7 @@ class UserModelResource extends JsonResource
             ] : null,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+            'isFirstLogin' => $this->isFirstLogin === null ? true : (bool)$this->isFirstLogin,
         ];
     }
 }
