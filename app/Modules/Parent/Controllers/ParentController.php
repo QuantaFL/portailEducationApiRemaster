@@ -25,7 +25,7 @@ class ParentController extends Controller
         return response()->json(new ParentResource($parentModel));
     }
 
-    public function show(Parent $parent)
+    public function show(ParentModel $parent)
     {
         return response()->json(new ParentResource($parent));
     }
