@@ -22,7 +22,7 @@ Route::prefix('v1')->group(function () {
     Route::apiResource('teachers', TeacherController::class);
     Route::apiResource('students', StudentController::class);
     Route::apiResource('subjects', SubjectController::class);
-    Route::apiResource('sessions', SessionController::class);
+    Route::apiResource('academic-year', SessionController::class);
     Route::apiResource('terms', TermController::class);
     Route::apiResource('grades', GradeController::class);
     Route::apiResource('parents', ParentController::class);
