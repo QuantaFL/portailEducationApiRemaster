@@ -2,8 +2,8 @@
 
 namespace App\Modules\Teacher\Ressources;
 
-use App\Http\Resources\UserModelResource;
 use App\modules\teacher\models\Teacher;
+use App\Modules\User\Ressources\UserModelResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
