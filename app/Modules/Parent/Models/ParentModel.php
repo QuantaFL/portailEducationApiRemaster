@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Models;
+namespace App\Modules\Parent\Models;
 
+use App\Modules\User\Models\UserModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Parent extends Model
+class ParentModel extends Model
 {
     use HasFactory;
 
