@@ -48,3 +48,41 @@ This documentation was created as a temporary support tool **until Swagger (Open
     "user_model_id": 6
 }
 `
+**Parent Module** 
+***POST*** 
+``
+    {
+    "user":{
+    "first_name": "parent",
+    "last_name": "parent",
+    "birthday": "1992-07-14",
+    "email": "mamadou.ndiaye@example.sn",
+    "password": "Secur@1234",
+    "adress": "Sacré-Cœur 3, Dakar",
+    "phone": "+221771234567"
+    }
+ }
+``
+**Response**(if success)
+**Session Module**
+***POST***
+`
+    {
+
+    "start_date": "2028",
+    "end_date": "2029"
+    }
+`
+**if success**
+``
+ {
+        "id": 3,
+        "label": "2028-2029",
+        "start_date": "2028",
+        "end_date": "2029",
+        "status": "en_cours",
+        "created_at": "2025-07-25T17:52:53.000000Z",
+        "updated_at": "2025-07-25T17:52:53.000000Z"
+    }
+]
+``
