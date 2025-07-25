@@ -21,6 +21,7 @@ class AuthController extends Controller
             'password' => 'required|string|min:6',
             'adress' => 'nullable|string',
             'phone' => 'nullable|string',
+            'role_id' => 'required|exists:role_models,id',
         ]);
 
         if ($validator->fails()) {
@@ -35,12 +36,14 @@ class AuthController extends Controller
             'password' => Hash::make($request->password),
             'adress' => $request->adress,
             'phone' => $request->phone,
+            'role_id' => $request->role_id,
         ]);
+        $user->load('role');
 
         $token = JWTAuth::fromUser($user);
 
         return response()->json([
-            'user' => $user,
+            'user' => new \App\Modules\User\Ressources\UserModelResource($user),
             'token' => $token,
         ], 201);
     }
@@ -53,10 +56,12 @@ class AuthController extends Controller
             return response()->json(['error' => 'Invalid credentials'], 401);
         }
 
+        $user = auth()->user();
+        $user->load('role');
+
         return response()->json([
-            'user' => auth()->user(),
+            'user' => new \App\Modules\User\Ressources\UserModelResource($user),
             'token' => $token,
         ]);
     }
 }
-
