@@ -16,15 +16,15 @@ class TermSeeder extends Seeder
         Term::create([
             'name' => 'Term 1',
             'academic_year_id' => 1,
-            'start_date' => '2024-09-01',
-            'end_date' => '2025-01-31',
+            'start_date' => '2025-09-01',
+            'end_date' => '2026-01-31',
         ]);
 
         Term::create([
             'name' => 'Term 2',
             'academic_year_id' => 1,
-            'start_date' => '2025-02-01',
-            'end_date' => '2025-06-30',
+            'start_date' => '2026-02-01',
+            'end_date' => '2026-06-30',
         ]);
     }
 }
