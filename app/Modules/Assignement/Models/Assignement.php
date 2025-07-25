@@ -1,7 +1,10 @@
 <?php
 
-namespace App\Models;
+namespace App\Modules\Assignement\Models;
 
+use App\Modules\ClassModel\Models\ClassModel;
+use App\Modules\Session\Models\Session;
+use App\Modules\Subject\Models\Subject;
 use App\modules\teacher\models\Teacher;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
