@@ -19,7 +19,7 @@ class ParentResource extends JsonResource
 
             'user_model_id' => $this->user_model_id,
 
-            'userModel' => new UserModelResource($this->whenLoaded('userModel')),
+            'userModel' => new UserModelResource($this->userModel),
         ];
     }
 }

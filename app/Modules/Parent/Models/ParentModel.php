@@ -14,7 +14,7 @@ class ParentModel extends Model
     protected $fillable = [
         'user_model_id',
     ];
-    protected $with = ['userModel'];
+    protected $with = ['UserModel'];
 
     public function UserModel(): BelongsTo
     {
