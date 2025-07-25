@@ -16,6 +16,7 @@ class UserModelRequest extends FormRequest
             'password' => ['required'],
             'adress' => ['required'],
             'phone' => ['required'],
+            'role_id' => ['required', 'exists:role_models,id'],
         ];
     }
 
