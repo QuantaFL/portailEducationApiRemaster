@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Carbon;
 use Parent;
 
-class ParentFactory extends Factory
+class ParentModelFactory extends Factory
 {
     protected $model = Parent::class;
 
