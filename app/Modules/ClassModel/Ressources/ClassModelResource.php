@@ -3,7 +3,6 @@
 namespace App\Modules\ClassModel\Ressources;
 
 use App\Modules\ClassModel\Models\ClassModel;
-use App\Modules\Session\Ressources\AcademicYearResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
