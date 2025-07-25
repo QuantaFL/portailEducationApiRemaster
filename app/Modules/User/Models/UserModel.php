@@ -2,34 +2,37 @@
 
 namespace App\Modules\User\Models;
 
+use App\Modules\Role\Models\RoleModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
-/**
- * Modèle représentant un utilisateur.
- *
- * Ce modèle gère les informations de l'utilisateur telles que le prénom, le nom, la date de naissance, l'email, le mot de passe, l'adresse et le téléphone.
- */
 class UserModel extends Authenticatable implements JWTSubject
 {
-    use HasFactory;
+    use HasFactory, Notifiable;
 
-    /**
-     * @var string[]
-     */
     protected $fillable = [
-        'first_name',
-        'last_name',
-        'birthday',
+        'name',
         'email',
         'password',
-        'adress',
-        'phone',
-        'role_id', // Ajouté pour permettre l'enregistrement du rôle
+        'role_id',
     ];
 
-    // Méthodes requises par JWTSubject
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+    ];
+
+    public function role()
+    {
+        return $this->belongsTo(RoleModel::class);
+    }
+
     public function getJWTIdentifier()
     {
         return $this->getKey();
@@ -37,20 +40,6 @@ class UserModel extends Authenticatable implements JWTSubject
 
     public function getJWTCustomClaims()
     {
-        return [
-            'id' => $this->id,
-            'first_name' => $this->first_name,
-            'last_name' => $this->last_name,
-            'birthday' => $this->birthday,
-            'email' => $this->email,
-            'adress' => $this->adress,
-            'phone' => $this->phone,
-            'role' => $this->role ? $this->role->name : null,
-        ];
-    }
-
-    public function role()
-    {
-        return $this->belongsTo(RoleModel::class, 'role_id');
+        return [];
     }
 }
