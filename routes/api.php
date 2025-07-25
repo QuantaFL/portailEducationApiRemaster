@@ -11,10 +11,16 @@ use App\Modules\Subject\Controllers\SubjectController;
 use App\Modules\Teacher\Controllers\TeacherController;
 use App\Modules\Term\Controllers\TermController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 
-//Route::get('/user', function (Request $request) {
-//    return $request->user();
-//})->middleware('auth:sanctum');
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/grades', [GradeController::class, 'getGradesByTerm']);
+    Route::post('/grades', [GradeController::class, 'updateGrades']);
+    Route::get('/user', function (Request $request) {
+        return $request->user();
+    });
+});
+
 Route::prefix('v1')->group(function () {
     Route::apiResource('assignements', AssignementController::class);
     Route::apiResource('teachers', TeacherController::class);
