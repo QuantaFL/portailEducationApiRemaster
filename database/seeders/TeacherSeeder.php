@@ -15,7 +15,7 @@ class TeacherSeeder extends Seeder
     {
         Teacher::create([
             'hire_date' => '2020-09-01',
-            'user_model_id' => 3,
+            'user_model_id' => 2,
         ]);
     }
 }

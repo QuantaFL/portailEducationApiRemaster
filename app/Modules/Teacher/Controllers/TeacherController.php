@@ -8,6 +8,11 @@ use App\Modules\Teacher\Requests\TeacherRequest;
 use App\Modules\Teacher\Ressources\TeacherResource;
 use App\Modules\User\Models\UserModel;
 
+use Illuminate\Foundation\Http\FormRequest;
+use App\Modules\Assignement\Models\Assignement;
+use App\Modules\ClassModel\Ressources\ClassModelResource;
+use Illuminate\Support\Facades\Request;
+
 class TeacherController extends Controller
 {
     public function index()
@@ -48,5 +53,20 @@ class TeacherController extends Controller
         $teacher->delete();
 
         return response()->json();
+    }
+
+    public function getClasses(\Illuminate\Http\Request $request, $teacherId)
+    {
+        $academicYearId = $request->query('academic_year_id');
+        if (!$academicYearId) {
+            return response()->json(['message' => 'academic_year_id is required'], 400);
+        }
+        $classIds = Assignement::where('teacher_id', $teacherId)
+            ->where('academic_year_id', $academicYearId)
+            ->pluck('class_model_id')
+            ->unique()
+            ->toArray();
+        $classes = \App\Modules\ClassModel\Models\ClassModel::whereIn('id', $classIds)->get();
+        return response()->json(ClassModelResource::collection($classes));
     }
 }

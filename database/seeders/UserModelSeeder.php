@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Modules\User\Models\UserModel;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -21,30 +20,54 @@ class UserModelSeeder extends Seeder
             'password' => Hash::make('password'),
             'role_id' => 1, // Assuming role_id 1 is for admin
             'birthday' => '2000-01-01',
-            'adress' => '123 Admin St',
-            'phone' => '111-222-3333',
+            'adress' => 'Dakar, Senegal',
+            'phone' => '771234567',
         ]);
 
+        // Teacher User
         UserModel::create([
-            'first_name' => 'Student',
-            'last_name' => 'User',
-            'email' => 'student@example.com',
-            'password' => Hash::make('password'),
-            'role_id' => 2, // Assuming role_id 2 is for student
-            'birthday' => '2005-05-05',
-            'adress' => '456 Student Ave',
-            'phone' => '444-555-6666',
-        ]);
-
-        UserModel::create([
-            'first_name' => 'Teacher',
-            'last_name' => 'User',
+            'first_name' => 'Fatou',
+            'last_name' => 'Diop',
             'email' => 'teacher@example.com',
             'password' => Hash::make('password'),
             'role_id' => 3, // Assuming role_id 3 is for teacher
             'birthday' => '1990-10-10',
-            'adress' => '789 Teacher Rd',
-            'phone' => '777-888-9999',
+            'adress' => 'Thies, Senegal',
+            'phone' => '779876543',
         ]);
+
+        // Parent Users
+        $parentFirstNames = ['Aissatou', 'Moussa', 'Fatou', 'Oumar', 'Khady', 'Pape', 'Aminata', 'Modou', 'Cheikh', 'Mariama', 'Ousmane', 'Ndeye', 'Ibrahima', 'Sokhna', 'Demba', 'Coumba', 'Lamine', 'Adama', 'Maimouna', 'Aliou'];
+        $parentLastNames = ['Diallo', 'Ba', 'Faye', 'Gueye', 'Ndiaye', 'Diop', 'Sow', 'Thiam', 'Fall', 'Cisse', 'Diagne', 'Mbaye', 'Sarr', 'Ndour', 'Diedhiou', 'Camara', 'Dramé', 'Keita', 'Touré', 'Sy'];
+
+        for ($i = 0; $i < 60; $i++) { // Create 60 parent users
+            UserModel::create([
+                'first_name' => $parentFirstNames[$i % count($parentFirstNames)],
+                'last_name' => $parentLastNames[$i % count($parentLastNames)],
+                'email' => 'parent' . ($i + 1) . '@example.com',
+                'password' => Hash::make('password'),
+                'role_id' => 4, // Assuming role_id 4 is for parent
+                'birthday' => '197' . ($i % 9) . '-0' . (($i % 11) + 1) . '-1' . (($i % 9) + 1),
+                'adress' => 'Dakar, Senegal',
+                'phone' => '77' . str_pad(rand(0, 9999999), 7, '0', STR_PAD_LEFT),
+            ]);
+        }
+
+        // Student Users
+        $studentFirstNames = ['Mamadou', 'Aissatou', 'Omar', 'Khady', 'Pape', 'Aminata', 'Modou', 'Fatou', 'Cheikh', 'Mariama', 'Ousmane', 'Ndeye', 'Ibrahima', 'Sokhna', 'Demba', 'Coumba', 'Lamine', 'Adama', 'Maimouna', 'Aliou'];
+        $studentLastNames = ['Diallo', 'Ba', 'Faye', 'Gueye', 'Ndiaye', 'Diop', 'Sow', 'Thiam', 'Fall', 'Cisse', 'Diagne', 'Mbaye', 'Sarr', 'Ndour', 'Diedhiou', 'Camara', 'Dramé', 'Keita', 'Touré', 'Sy'];
+
+        for ($i = 0; $i < 60; $i++) { // Create 60 student users
+            UserModel::create([
+                'first_name' => $studentFirstNames[$i % count($studentFirstNames)],
+                'last_name' => $studentLastNames[$i % count($studentLastNames)],
+                'email' => 'student' . ($i + 1) . '@example.com',
+                'password' => Hash::make('password'),
+                'role_id' => 2, // Assuming role_id 2 is for student
+                'birthday' => '200' . ($i % 9) . '-0' . (($i % 11) + 1) . '-1' . (($i % 9) + 1),
+                'adress' => 'Dakar, Senegal',
+                'phone' => '77' . str_pad(rand(0, 9999999), 7, '0', STR_PAD_LEFT),
+            ]);
+        }
     }
 }

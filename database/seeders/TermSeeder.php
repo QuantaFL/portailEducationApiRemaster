@@ -21,7 +21,7 @@ class TermSeeder extends Seeder
         ]);
 
         Term::create([
-            'name' => 'Term 2',
+            'name' => 'Semestre 2',
             'academic_year_id' => 1,
             'start_date' => '2026-02-01',
             'end_date' => '2026-06-30',
