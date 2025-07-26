@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Modules\Subject\Models\Subject;
 use App\Modules\Subject\Requests\SubjectRequest;
 use App\Modules\Subject\Ressources\SubjectResource;
+use Illuminate\Support\Facades\DB;
 
 class SubjectController extends Controller
 {
@@ -16,6 +17,16 @@ class SubjectController extends Controller
 
     public function store(SubjectRequest $request)
     {
+        $exists = DB::table('subjects')
+            ->where('name', $request->name)
+            ->where('level', $request->level)
+            ->exists();
+        if ($exists) {
+            return response()->json([
+                "message" => "La matière '{$request->name}' existe déjà pour le niveau {$request->level}."
+            ], 409);
+        }
+
         return response()->json(new SubjectResource(Subject::create($request->validated())));
     }
 
