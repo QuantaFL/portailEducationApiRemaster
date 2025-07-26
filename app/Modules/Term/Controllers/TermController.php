@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Modules\Term\Models\Term;
 use App\Modules\Term\Requests\TermRequest;
 use App\Modules\Term\Ressources\TermResource;
+use App\Modules\AcademicYear\Models\AcademicYear;
 
 class TermController extends Controller
 {
@@ -36,5 +37,25 @@ class TermController extends Controller
         $term->delete();
 
         return response()->json();
+    }
+
+    public function getCurrentTerm()
+    {
+        $currentAcademicYear = \App\Modules\AcademicYear\Models\AcademicYear::getCurrentAcademicYear();
+
+        if (!$currentAcademicYear) {
+            return response()->json(['message' => 'No current academic year found.'], 404);
+        }
+
+        $currentTerm = $currentAcademicYear->terms()
+            ->where('start_date', '<=', now())
+            ->where('end_date', '>=', now())
+            ->first();
+
+        if (!$currentTerm) {
+            return response()->json(['message' => 'No current term found for the current academic year.'], 404);
+        }
+
+        return response()->json(new TermResource($currentTerm));
     }
 }

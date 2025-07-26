@@ -2,6 +2,7 @@
 
 namespace App\Modules\Student\Models;
 
+use App\Modules\AcademicYear\Models\AcademicYear;
 use App\Modules\Student\Models\Student;
 use App\Modules\ClassModel\Models\ClassModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -14,12 +15,17 @@ class StudentSession extends Model
     protected $fillable = [
         'student_id',
         'academic_year_id',
-        'class_model_id'
+        'class_model_id',
     ];
 
-    public function student()
+    public function student(): BelongsTo
     {
         return $this->belongsTo(Student::class);
+    }
+
+    public function academicYear()
+    {
+        return $this->belongsTo(AcademicYear::class);
     }
 
     public function classModel()

@@ -12,7 +12,9 @@ use App\Modules\User\Models\UserModel;
 use App\Modules\Assignement\Models\Assignement;
 use App\Modules\ClassModel\Ressources\ClassModelResource;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Request;
+use Illuminate\Http\Request;
+use App\Modules\AcademicYear\Controllers\AcademicYearController;
+use App\Modules\Term\Controllers\TermController;
 
 class TeacherController extends Controller
 {
@@ -76,7 +78,7 @@ class TeacherController extends Controller
     }
     public function getClasses(Request $request, $teacherId)
     {
-        $academicYear = ACademicYear::getCurrentAcademicYear();
+        $academicYear = AcademicYear::getCurrentAcademicYear();
         if (!$academicYear) {
             return response()->json(['message' => 'academic_year_id is required'], 400);
         }
@@ -112,7 +114,9 @@ class TeacherController extends Controller
         $assignedSubjects = Assignement::where('teacher_id', $teacher->id)
             ->with('subject')
             ->get()
-            ->pluck('subject.name')
+            ->pluck(function ($assignement) {
+                return optional($assignement->subject)->name;
+            })
             ->unique()
             ->values()
             ->toArray();

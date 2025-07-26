@@ -5,6 +5,9 @@ namespace App\Modules\Grade\Controllers;
 use App\Http\Controllers\Controller;
 use App\Modules\Grade\Models\Grade;
 use App\Modules\Term\Models\Term;
+use App\Modules\AcademicYear\Models\AcademicYear;
+use App\Modules\Student\Models\StudentSession;
+use App\Modules\Assignement\Models\Assignement;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -76,5 +79,48 @@ class GradeController extends Controller
         ->update(['status' => 'submitted']); // Assuming a 'status' column exists in the grades table
 
         return response()->json(['message' => 'Notes submitted successfully for the term.']);
+    }
+
+    public function getStudentGradesInClassForTerm($classId, $termId, $studentId)
+    {
+        $currentAcademicYear = \App\Modules\AcademicYear\Models\AcademicYear::getCurrentAcademicYear();
+
+        if (!$currentAcademicYear) {
+            return response()->json(['message' => 'No current academic year found.'], 404);
+        }
+
+        $studentSession = \App\Modules\Student\Models\StudentSession::where('student_id', $studentId)
+            ->where('class_model_id', $classId)
+            ->where('academic_year_id', $currentAcademicYear->id)
+            ->first();
+
+        if (!$studentSession) {
+            return response()->json(['message' => 'Student session not found for the given student, class, and academic year.'], 404);
+        }
+
+        $assignments = \App\Modules\Assignement\Models\Assignement::where('class_model_id', $classId)
+            ->where('term_id', $termId)
+            ->with('subject')
+            ->get();
+
+        $grades = [];
+        foreach ($assignments as $assignment) {
+            $grade = Grade::where('assignement_id', $assignment->id)
+                ->where('student_session_id', $studentSession->id)
+                ->where('term_id', $termId)
+                ->first();
+
+            $grades[] = [
+                'id' => $grade ? $grade->id : null,
+                'mark' => $grade ? $grade->mark : null,
+                'type' => $grade ? $grade->type : null,
+                'subject_name' => $assignment->subject->name,
+                'assignement_id' => $assignment->id,
+                'student_session_id' => $studentSession->id,
+                'term_id' => (int) $termId,
+            ];
+        }
+
+        return response()->json($grades);
     }
 }

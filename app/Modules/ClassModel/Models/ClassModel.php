@@ -2,6 +2,7 @@
 
 namespace App\Modules\ClassModel\Models;
 
+use App\Modules\AcademicYear\Models\AcademicYear;
 use App\Modules\AcademicYear\Models\StatusAcademicYearEnum;
 use App\Modules\Student\Models\StudentSession;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -11,21 +12,22 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class ClassModel extends Model
 {
     use HasFactory;
-    protected $with = ['latestStudentSession'];
+    protected $with = ['currentAcademicYearStudentSessions'];
 
     protected $fillable = [
         'name',
         'level',
     ];
 
-    public function latestStudentSession(): HasMany
+    public function currentAcademicYearStudentSessions(): HasMany
     {
-        $currentAcademicYear = StudentSession::where('status', 'active')
-            ->orderByDesc('academic_year')
-            ->value('academic_year');
+        $currentAcademicYear = AcademicYear::getCurrentAcademicYear();
+
+        if (!$currentAcademicYear) {
+            return $this->hasMany(StudentSession::class)->whereRaw('1 = 0'); // Return empty relation if no current academic year
+        }
 
         return $this->hasMany(StudentSession::class)
-            ->where('academic_year', $currentAcademicYear)
-            ->where('status', StatusAcademicYearEnum::EN_COURS->value);
+            ->where('academic_year_id', $currentAcademicYear->id);
     }
 }

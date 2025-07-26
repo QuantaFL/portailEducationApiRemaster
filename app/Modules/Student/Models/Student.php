@@ -35,7 +35,7 @@ class Student extends Model
         return $this->belongsTo(UserModel::class);
     }
 
-    public function studentSession()
+    public function studentSessions()
     {
         return $this->hasMany(StudentSession::class);
     }

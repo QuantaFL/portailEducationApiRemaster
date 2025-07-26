@@ -15,7 +15,7 @@ class ClassModelResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'level' => $this->level,
-            'latest_student_session' => $this->whenLoaded('latestStudentSession'),
+            'current_academic_year_student_sessions' => $this->whenLoaded('currentAcademicYearStudentSessions'),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];
