@@ -10,8 +10,8 @@ class GradeRequest extends FormRequest
     {
         return [
             'mark' => ['required', 'numeric'],
-            'assignement_id' => ['required', 'exists:assignements'],
-            'student_session_id' => ['required', 'exists:student_session'],
+            'assignement_id' => ['required', 'exists:assignments'],
+            'student_session_id' => ['required', 'exists:student_sessions'],
             'term_id' => ['required', 'exists:terms,id'],
         ];
     }
