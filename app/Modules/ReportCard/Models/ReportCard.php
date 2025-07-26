@@ -2,7 +2,7 @@
 
 namespace App\Modules\ReportCard\Models;
 
-use App\Modules\Student\Models\Student;
+use App\Modules\Student\Models\StudentSession;
 use App\Modules\Term\Models\Term;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -21,9 +21,19 @@ class ReportCard extends Model
         'rank',
     ];
 
-    public function student(): BelongsTo
+    protected $appends = ['pdf_url'];
+
+    public function getPdfUrlAttribute(): ?string
     {
-        return $this->belongsTo(Student::class, 'student_session_id', 'id');
+        if ($this->path) {
+            return asset('storage/' . str_replace('public/', '', $this->path));
+        }
+        return null;
+    }
+
+    public function studentSession(): BelongsTo
+    {
+        return $this->belongsTo(StudentSession::class);
     }
 
     public function term(): BelongsTo
