@@ -14,6 +14,7 @@ class Teacher extends Model
         'hire_date',
         'user_model_id',
     ];
+    protected $with = ['userModel'];
 
     public function userModel()
     {
