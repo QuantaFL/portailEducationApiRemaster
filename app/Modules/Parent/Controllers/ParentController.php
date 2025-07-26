@@ -32,7 +32,14 @@ class ParentController extends Controller
 
     public function update(ParentRequest $request, ParentModel $parent)
     {
-        $parent->update($request->validated());
+        $parentRequest = $request->validated();
+
+        $refUser = UserModel::findOrFail($parent->user_model_id);
+
+        $refUser->update($parentRequest['user']);
+
+        // parentModel has no personal fields; in this case, only the user fields are updated
+
 
         return response()->json(new ParentResource($parent));
     }
