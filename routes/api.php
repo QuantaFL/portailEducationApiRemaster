@@ -15,6 +15,10 @@ use Illuminate\Http\Request;
 
 
 Route::prefix('v1')->group(function () {
+    Route::get('academic-years/current', [AcademicYearController::class, 'getCurrentAcademicYear']);
+    Route::get('terms/current', [TermController::class, 'getCurrentTerm']);
+    Route::get('academic-years/{academicYear}/terms', [AcademicYearController::class, 'getTermsByAcademicYear']);
+    Route::get('academic-years/{academicYear}', [AcademicYearController::class, 'getAcademicYearById']);
     Route::apiResource('assignements', AssignementController::class);
     Route::apiResource('teachers', TeacherController::class);
     Route::apiResource('students', StudentController::class);
@@ -27,6 +31,7 @@ Route::prefix('v1')->group(function () {
     Route::apiResource('report-cards', ReportCardController::class);
     Route::get('/grades', [GradeController::class, 'getGradesByTerm']);
     Route::post('/grades', [GradeController::class, 'updateGrades']);
+    Route::get('teachers/{teacher}/classes', [TeacherController::class, 'getClasses']);
 
     // Auth routes
     Route::post('auth/register', [\App\Modules\User\Controllers\AuthController::class, 'register']);
