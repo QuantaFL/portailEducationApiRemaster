@@ -11,7 +11,7 @@ return new class extends Migration {
             $table->id();
             $table->string('name');
             $table->string('level');
-            $table->string('coefficient');
+            $table->integer('coefficient');
             $table->timestamps();
         });
     }
