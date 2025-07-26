@@ -23,7 +23,6 @@ class StudentSeeder extends Seeder
                 Student::create([
                     'matricule' => 'STU' . str_pad($studentUserStartId, 3, '0', STR_PAD_LEFT),
                     'academic_records' => 'Good',
-                    'class_model_id' => $classModel->id,
                     'parent_model_id' => $parentModelStartId,
                     'user_model_id' => $studentUserStartId,
                 ]);
