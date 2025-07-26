@@ -61,11 +61,15 @@ class TeacherController extends Controller
         if (!$academicYearId) {
             return response()->json(['message' => 'academic_year_id is required'], 400);
         }
+
         $classIds = Assignement::where('teacher_id', $teacherId)
-            ->where('academic_year_id', $academicYearId)
-            ->pluck('class_model_id')
+            ->join('terms', 'assignments.term_id', '=', 'terms.id')
+            ->join('academic_years', 'terms.academic_year_id', '=', 'academic_years.id')
+            ->where('academic_years.id', $academicYearId)
+            ->pluck('assignments.class_model_id')
             ->unique()
             ->toArray();
+
         $classes = \App\Modules\ClassModel\Models\ClassModel::whereIn('id', $classIds)->get();
         return response()->json(ClassModelResource::collection($classes));
     }
