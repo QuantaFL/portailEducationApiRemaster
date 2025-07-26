@@ -7,6 +7,7 @@ use App\Modules\User\Models\UserModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Storage;
 
 class Student extends Model
 {
@@ -42,5 +43,10 @@ class Student extends Model
     public function latestStudentSession()
     {
         return $this->hasOne(StudentSession::class)->latestOfMany();
+    }
+
+    public function getAcademicRecordsUrlAttribute()
+    {
+        return $this->academic_records ? Storage::disk('public')->url($this->academic_records) : null;
     }
 }
