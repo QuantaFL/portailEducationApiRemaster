@@ -2,6 +2,7 @@
 
 namespace App\Modules\ReportCard\Services;
 
+use App\Jobs\CalculateReportCardRanksJob;
 use App\Jobs\GenerateReportCardPdfJob;
 use App\Modules\AcademicYear\Models\AcademicYear;
 use App\Modules\ClassModel\Models\ClassModel;
@@ -49,8 +50,8 @@ class ReportCardGeneratorService
                 [
                     'average_grade' => $reportCardData['overall_average'],
                     'honors' => $reportCardData['overall_appreciation'],
-                    'path' => '', // Le chemin du PDF sera mis à jour après la génération
-                    'rank' => '', // Le rang sera calculé après la génération de tous les bulletins
+                    'path' => '',
+                    'rank' => '',
                 ]
             );
 
@@ -59,8 +60,10 @@ class ReportCardGeneratorService
                 'detailed_data' => $reportCardData,
             ];
 
-            GenerateReportCardPdfJob::dispatch($reportCard->id, $reportCardData);
+            GenerateReportCardPdfJob::dispatchSync($reportCard->id, $reportCardData);
         }
+
+        CalculateReportCardRanksJob::dispatchSync($classModelId, $termId);
 
         return $generatedReportCards;
     }
@@ -147,11 +150,14 @@ class ReportCardGeneratorService
         if ($average === null) {
             return 'N/A';
         }
+        if($average >=19) return 'Le Meilleur de Tous';
         if ($average >= 18) return 'Excellent';
         if ($average >= 16) return 'Très bien';
         if ($average >= 14) return 'Bien';
         if ($average >= 12) return 'Assez bien';
         if ($average >= 10) return 'Passable';
-        return 'Insuffisant';
+        if($average >= 8) return 'Insuffisant';
+        if($average >= 6) return 'Mediocre';
+        return 'Très Mediocre';
     }
 }
