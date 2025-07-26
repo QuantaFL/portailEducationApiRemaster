@@ -18,6 +18,10 @@ class Term extends Model
         'status',
     ];
 
+    protected $with = [
+        'academicYear',
+    ];
+
     protected $casts = [
         'start_date' => 'datetime',
         'end_date' => 'datetime',

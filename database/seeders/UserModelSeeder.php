@@ -22,6 +22,7 @@ class UserModelSeeder extends Seeder
             'birthday' => '2000-01-01',
             'adress' => 'Dakar, Senegal',
             'phone' => '771234567',
+            'gender' => 'M',
         ]);
 
         // Teacher User
@@ -34,6 +35,7 @@ class UserModelSeeder extends Seeder
             'birthday' => '1990-10-10',
             'adress' => 'Thies, Senegal',
             'phone' => '779876543',
+            'gender' => 'F',
         ]);
 
         // Parent Users
@@ -50,6 +52,7 @@ class UserModelSeeder extends Seeder
                 'birthday' => '197' . ($i % 9) . '-0' . (($i % 11) + 1) . '-1' . (($i % 9) + 1),
                 'adress' => 'Dakar, Senegal',
                 'phone' => '77' . str_pad(rand(0, 9999999), 7, '0', STR_PAD_LEFT),
+                'gender' => (rand(0, 1) == 0) ? 'M' : 'F',
             ]);
         }
 
@@ -67,6 +70,7 @@ class UserModelSeeder extends Seeder
                 'birthday' => '200' . ($i % 9) . '-0' . (($i % 11) + 1) . '-1' . (($i % 9) + 1),
                 'adress' => 'Dakar, Senegal',
                 'phone' => '77' . str_pad(rand(0, 9999999), 7, '0', STR_PAD_LEFT),
+                'gender' => (rand(0, 1) == 0) ? 'M' : 'F',
             ]);
         }
     }
