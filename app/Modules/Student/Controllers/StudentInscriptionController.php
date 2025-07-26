@@ -68,9 +68,9 @@ class StudentInscriptionController extends Controller
             'academic_year_id' => $request->academic_year_id,
         ]);
 
-        // Upload du justificatif et stockage dans Student
-        if ($request->hasFile('justificatif')) {
-            $path = $request->file('justificatif')->store('justificatifs', 'public');
+        // Upload du justificatif (academic-records) et stockage dans Student
+        if ($request->hasFile('academic-records')) {
+            $path = $request->file('academic-records')->store('justificatifs', 'public');
             $student->academic_records = $path;
             $student->save();
         }
@@ -81,7 +81,7 @@ class StudentInscriptionController extends Controller
         return response()->json([
             'student' => new StudentResource($student),
             'student_session' => new StudentSessionResource($studentSession),
-            'justificatif_url' => $student->academic_records_url,
+            'academic_records_url' => $student->academic_records_url,
         ], 201);
     }
 }
