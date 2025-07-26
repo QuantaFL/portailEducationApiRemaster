@@ -19,4 +19,3 @@ class StudentSessionResource extends JsonResource
         ];
     }
 }
-
