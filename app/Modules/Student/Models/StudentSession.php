@@ -14,7 +14,7 @@ class StudentSession extends Model
     protected $fillable = [
         'student_id',
         'academic_year_id',
-        'class_model_id',
+        'class_model_id'
     ];
 
     public function student()

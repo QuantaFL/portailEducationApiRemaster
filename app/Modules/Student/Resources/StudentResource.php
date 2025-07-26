@@ -23,6 +23,7 @@ class StudentResource extends JsonResource
             "latest_student_session" => $this->whenLoaded('latestStudentSession'),
             'parentModel' => $this->whenLoaded('parentModel'),
             'userModel' => $this->whenLoaded('userModel'),
+            'academic_records_url' => $this->academic_records_url,
         ];
     }
 }
