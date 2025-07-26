@@ -7,6 +7,7 @@ use App\Modules\Student\Models\Student;
 use App\Modules\ClassModel\Models\ClassModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class StudentSession extends Model
 {
