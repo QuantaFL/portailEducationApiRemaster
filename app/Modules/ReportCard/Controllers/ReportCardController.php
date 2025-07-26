@@ -47,10 +47,11 @@ class ReportCardController extends Controller
                 $request->class_model_id,
                 $request->term_id
             );
-            return response()->json([
-                'message' => 'Bulletins generated successfully',
-                'data' => $generatedReportCards
-            ]);
+
+            $reportCardIds = collect($generatedReportCards)->pluck('report_card_model.id')->toArray();
+            $reloadedReportCards = ReportCard::whereIn('id', $reportCardIds)->get();
+
+            return response()->json(ReportCardResource::collection($reloadedReportCards));
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 400);
         }
