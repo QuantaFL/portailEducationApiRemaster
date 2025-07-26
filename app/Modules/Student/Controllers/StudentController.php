@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Modules\Student\Models\Student;
 use App\Modules\Student\Requests\StudentRequest;
 use App\Modules\Student\Resources\StudentResource;
+use App\Modules\User\Models\UserModel;
 
 class StudentController extends Controller
 {
@@ -16,7 +17,18 @@ class StudentController extends Controller
 
     public function store(StudentRequest $request)
     {
-        return response()->json(new StudentResource(Student::create($request->validated())));
+        $userData = $request->validated('user');
+        $user = UserModel::create($userData);
+
+        $studentData = $request->validated();
+        $student = Student::create([
+            'matricule' => $studentData['matricule'],
+            'academic_records' => $studentData['academic_records'],
+            'parent_model_id' => $studentData['parent_id'],
+            'user_model_id' => $user->id,
+        ]);
+
+        return response()->json(new StudentResource($student));
     }
 
     public function show(Student $student)

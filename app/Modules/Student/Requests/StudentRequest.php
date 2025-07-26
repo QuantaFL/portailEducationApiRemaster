@@ -12,6 +12,7 @@ class StudentRequest extends FormRequest
         return [
             'matricule' => ['required'],
             'parent_id' => ['required', 'exists:parents'],
+            'academic_records' => ['required', 'string'],
             'user' => ['required', 'array'],
             'user.first_name' => ['required', 'string'],
             'user.last_name' => ['required', 'string'],
