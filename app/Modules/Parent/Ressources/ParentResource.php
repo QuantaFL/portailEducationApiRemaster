@@ -14,7 +14,7 @@ class ParentResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'userModel' => new UserModelResource($this->whenLoaded('userModel')),
+            'userModel' => new UserModelResource($this->UserModel),
         ];
     }
 }
