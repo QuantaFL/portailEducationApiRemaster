@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Modules\ClassModel\Models\ClassModel;
 use App\Modules\Student\Models\Student;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -13,12 +14,22 @@ class StudentSeeder extends Seeder
      */
     public function run(): void
     {
-        Student::create([
-            'matricule' => 'STU001',
-            'academic_records' => 'Good',
-            'class_model_id' => 1,
-            'parent_model_id' => 1,
-            'user_model_id' => 2,
-        ]);
+        $classModels = ClassModel::all();
+        $studentUserStartId = 63; // Assuming student user_model_ids start from 63
+        $parentModelStartId = 1; // Assuming parent_model_ids start from 1
+
+        foreach ($classModels as $classModel) {
+            for ($i = 0; $i < 5; $i++) {
+                Student::create([
+                    'matricule' => 'STU' . str_pad($studentUserStartId, 3, '0', STR_PAD_LEFT),
+                    'academic_records' => 'Good',
+                    'class_model_id' => $classModel->id,
+                    'parent_model_id' => $parentModelStartId,
+                    'user_model_id' => $studentUserStartId,
+                ]);
+                $studentUserStartId++;
+                $parentModelStartId++;
+            }
+        }
     }
 }

@@ -7,9 +7,6 @@ use App\Modules\AcademicYear\Models\AcademicYear;
 use App\Modules\AcademicYear\Models\StatusAcademicYearEnum;
 use App\Modules\AcademicYear\Requests\AcademicYearRequest;
 use App\Modules\AcademicYear\Ressources\AcademicYearResource;
-use App\Modules\Term\Models\Term;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
 
 class AcademicYearController extends Controller
 {
@@ -111,5 +108,50 @@ class AcademicYearController extends Controller
         $session->delete();
 
         return response()->json();
+    }
+
+    public function getCurrentAcademicYear()
+    {
+        $currentYear = AcademicYear::where('status', 'current')->first();
+
+        if (!$currentYear) {
+            return response()->json(['message' => 'No current academic year found'], 404);
+        }
+
+        return response()->json(new AcademicYearResource($currentYear));
+    }
+    public function getActiveAcademicYears()
+    {
+        $activeYears = AcademicYear::where('status', 'active')->get();
+
+        if ($activeYears->isEmpty()) {
+            return response()->json(['message' => 'No active academic years found'], 404);
+        }
+
+        return response()->json(AcademicYearResource::collection($activeYears));
+    }
+
+    public function getAcademicYearById($id)
+    {
+        $academicYear = AcademicYear::find($id);
+
+        if (!$academicYear) {
+            return response()->json(['message' => 'Academic year not found'], 404);
+        }
+
+        return response()->json(new AcademicYearResource($academicYear));
+    }
+
+    public function getTermsByAcademicYear($academicYearId)
+    {
+        $academicYear = AcademicYear::find($academicYearId);
+
+        if (!$academicYear) {
+            return response()->json(['message' => 'Academic year not found'], 404);
+        }
+
+        $terms = $academicYear->terms;
+
+        return response()->json(TermResource::collection($terms));
     }
 }

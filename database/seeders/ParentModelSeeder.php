@@ -13,8 +13,10 @@ class ParentModelSeeder extends Seeder
      */
     public function run(): void
     {
-        ParentModel::create([
-            'user_model_id' => 1,
-        ]);
+        for ($i = 0; $i < 60; $i++) { // Create 60 parent models
+            ParentModel::create([
+                'user_model_id' => $i + 3, // Parent user_model_ids start from 3
+            ]);
+        }
     }
 }
