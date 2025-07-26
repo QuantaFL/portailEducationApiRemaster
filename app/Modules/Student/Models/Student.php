@@ -18,6 +18,11 @@ class Student extends Model
         'parent_model_id',
         'user_model_id',
     ];
+    protected $with = [
+        'parentModel',
+        'userModel',
+        'latestStudentSession',
+    ];
 
     public function parentModel(): BelongsTo
     {
