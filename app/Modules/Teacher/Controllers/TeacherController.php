@@ -3,14 +3,15 @@
 namespace App\Modules\Teacher\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Modules\AcademicYear\Models\AcademicYear;
+use App\Modules\ClassModel\Models\ClassModel;
 use App\Modules\Teacher\Models\Teacher;
 use App\Modules\Teacher\Requests\TeacherRequest;
 use App\Modules\Teacher\Ressources\TeacherResource;
 use App\Modules\User\Models\UserModel;
-
-use Illuminate\Foundation\Http\FormRequest;
 use App\Modules\Assignement\Models\Assignement;
 use App\Modules\ClassModel\Ressources\ClassModelResource;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Request;
 
 class TeacherController extends Controller
@@ -55,22 +56,42 @@ class TeacherController extends Controller
         return response()->json();
     }
 
-    public function getClasses(\Illuminate\Http\Request $request, $teacherId)
+    public function getTeacherSubjects(Request $request, $teacherId)
     {
-        $academicYearId = $request->query('academic_year_id');
-        if (!$academicYearId) {
+        $academicYear = ACademicYear::getCurrentAcademicYear();
+        if (!$academicYear) {
+            return response()->json(['message' => 'academic_year_id is required'], 400);
+        }
+
+        $subjects = Assignement::where('teacher_id', $teacherId)
+            ->join('terms', 'assignments.term_id', '=', 'terms.id')
+            ->join('academic_years', 'terms.academic_year_id', '=', 'academic_years.id')
+            ->where('academic_years.id', $academicYear->id)
+            ->with('subject')
+            ->get()
+            ->pluck('subject');
+
+        Log::info('Subjects found for teacher ' . $teacherId . ': ' . $subjects->count());
+        return response()->json($subjects);
+    }
+    public function getClasses(Request $request, $teacherId)
+    {
+        $academicYear = ACademicYear::getCurrentAcademicYear();
+        if (!$academicYear) {
             return response()->json(['message' => 'academic_year_id is required'], 400);
         }
 
         $classIds = Assignement::where('teacher_id', $teacherId)
             ->join('terms', 'assignments.term_id', '=', 'terms.id')
             ->join('academic_years', 'terms.academic_year_id', '=', 'academic_years.id')
-            ->where('academic_years.id', $academicYearId)
+            ->where('academic_years.id', $academicYear->id)
             ->pluck('assignments.class_model_id')
             ->unique()
             ->toArray();
+        Log::info('Class IDs for teacher ' . $teacherId);
 
-        $classes = \App\Modules\ClassModel\Models\ClassModel::whereIn('id', $classIds)->get();
+        $classes = ClassModel::whereIn('id', $classIds)->get();
+        Log::info('Classes found for teacher ' . $teacherId . ': ' . $classes->count());
         return response()->json(ClassModelResource::collection($classes));
     }
 
@@ -100,8 +121,19 @@ class TeacherController extends Controller
             'id' => $teacher->id,
             'name' => $user->name,
             'email' => $user->email,
-            'phone' => $user->phone_number, // Assuming 'phone_number' exists on UserModel
+            'phone' => $user->phone_number,
             'assigned_subjects' => $assignedSubjects,
         ]);
+    }
+
+    public function getTeacherByUserId($userId)
+    {
+        $teacher = Teacher::where('user_model_id', $userId)->first();
+
+        if (!$teacher) {
+            return response()->json(['message' => 'Teacher not found for this user ID.'], 404);
+        }
+
+        return response()->json(new TeacherResource($teacher));
     }
 }

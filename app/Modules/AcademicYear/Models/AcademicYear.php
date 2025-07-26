@@ -17,6 +17,11 @@ class AcademicYear extends Model
         'status',
     ];
 
+    public static function getCurrentAcademicYear(): AcademicYear
+    {
+        return self::where('status', 'en_cours')->first();
+    }
+
     public function terms()
     {
         return $this->hasMany(Term::class);

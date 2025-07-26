@@ -35,12 +35,13 @@ Route::prefix('v1')->group(function () {
     Route::post('classes/{class_id}/notes/submit', [GradeController::class, 'submitTermNotes']);
     Route::get('teachers/{teacher}/classes', [TeacherController::class, 'getClasses']);
     Route::get('assignements/by-term-and-class', [AssignementController::class, 'getByTermAndClass']);
-    // Inscription étudiant (élève + parent + justificatif)
     Route::post('student/inscription', [\App\Modules\Student\Controllers\StudentInscriptionController::class, 'store']);
+    Route::get('teachers/{teacher}/subjects', [TeacherController::class, 'getTeacherSubjects']);
 
     // Auth routes
     Route::post('auth/register', [\App\Modules\User\Controllers\AuthController::class, 'register']);
     Route::post('auth/login', [\App\Modules\User\Controllers\AuthController::class, 'login']);
     Route::middleware('auth:api')->post('auth/change-password', [\App\Modules\User\Controllers\AuthController::class, 'changePassword']);
     Route::middleware('auth:api')->get('teacher/profile', [TeacherController::class, 'getTeacherProfile']);
+    Route::get('teachers/users/{id}', [TeacherController::class, 'getTeacherByUserId']);
 });

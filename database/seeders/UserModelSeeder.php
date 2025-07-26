@@ -30,7 +30,7 @@ class UserModelSeeder extends Seeder
             'last_name' => 'Diop',
             'email' => 'teacher@example.com',
             'password' => Hash::make('password'),
-            'role_id' => 3,
+            'role_id' => 2,
             'birthday' => '1990-10-10',
             'adress' => 'Thies, Senegal',
             'phone' => '779876543',
@@ -46,7 +46,7 @@ class UserModelSeeder extends Seeder
                 'last_name' => $parentLastNames[$i % count($parentLastNames)],
                 'email' => 'parent' . ($i + 1) . '@example.com',
                 'password' => Hash::make('password'),
-                'role_id' => 4, // Assuming role_id 4 is for parent
+                'role_id' => 3, // Assuming role_id 4 is for parent
                 'birthday' => '197' . ($i % 9) . '-0' . (($i % 11) + 1) . '-1' . (($i % 9) + 1),
                 'adress' => 'Dakar, Senegal',
                 'phone' => '77' . str_pad(rand(0, 9999999), 7, '0', STR_PAD_LEFT),
@@ -63,7 +63,7 @@ class UserModelSeeder extends Seeder
                 'last_name' => $studentLastNames[$i % count($studentLastNames)],
                 'email' => 'student' . ($i + 1) . '@example.com',
                 'password' => Hash::make('password'),
-                'role_id' => 2,
+                'role_id' => 4,
                 'birthday' => '200' . ($i % 9) . '-0' . (($i % 11) + 1) . '-1' . (($i % 9) + 1),
                 'adress' => 'Dakar, Senegal',
                 'phone' => '77' . str_pad(rand(0, 9999999), 7, '0', STR_PAD_LEFT),
