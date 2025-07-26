@@ -9,10 +9,10 @@ class AcademicYearRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'label' => ['required'],
+            'label',
             'start_date' => ['required'],
             'end_date' => ['required'],
-            'status' => ['required'],
+            'status' ,
         ];
     }
 
