@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Modules\ReportCard\Models\ReportCard;
 use App\Modules\ReportCard\Requests\ReportCardRequest;
 use App\Modules\ReportCard\Ressources\ReportCardResource;
+use App\Modules\ReportCard\Requests\GenerateReportCardsRequest;
+use App\Modules\ReportCard\Services\ReportCardGeneratorService;
 
 class ReportCardController extends Controller
 {
@@ -36,5 +38,21 @@ class ReportCardController extends Controller
         $reportCard->delete();
 
         return response()->json();
+    }
+
+    public function generateReportCards(GenerateReportCardsRequest $request, ReportCardGeneratorService $reportCardGeneratorService)
+    {
+        try {
+            $generatedReportCards = $reportCardGeneratorService->generateReportCardsForClassAndTerm(
+                $request->class_model_id,
+                $request->term_id
+            );
+            return response()->json([
+                'message' => 'Bulletins generated successfully',
+                'data' => $generatedReportCards
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
+        }
     }
 }
