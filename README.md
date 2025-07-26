@@ -1,61 +1,155 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Portail Éducation API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Description du Projet
 
-## About Laravel
+Ce projet est une API RESTful développée avec Laravel, conçue pour gérer les données d'un portail éducatif. Elle permet la gestion des années académiques, des classes, des étudiants, des enseignants, des matières, des notes, des bulletins de notes, et d'autres entités liées à un système scolaire. L'API intègre des fonctionnalités avancées telles que la génération asynchrone de bulletins de notes au format PDF et le calcul des classements des étudiants.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Fonctionnalités
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+*   **Gestion des Utilisateurs et Rôles**: Authentification, gestion des profils (étudiants, parents, enseignants, administrateurs).
+*   **Gestion Académique**:
+    *   Années académiques et trimestres/semestres.
+    *   Classes et sessions d'étudiants.
+    *   Matières et coefficients.
+*   **Gestion des Notes et Évaluations**:
+    *   Enregistrement des notes par matière et par trimestre.
+    *   Calcul des moyennes générales et par matière.
+*   **Génération de Bulletins de Notes**:
+    *   Génération asynchrone de bulletins de notes au format PDF.
+    *   Calcul automatique des classements des étudiants.
+    *   Stockage des PDF générés.
+*   **Affectations (Assignments)**: Liaison entre enseignants, classes, matières et trimestres.
+*   **API RESTful**: Points de terminaison clairs et bien définis pour toutes les opérations CRUD.
+*   **Système de File d'Attente (Queue)**: Utilisation de queues pour les tâches de fond (génération de PDF, calculs complexes) afin d'améliorer la réactivité de l'API.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Technologies Utilisées
 
-## Learning Laravel
+*   **PHP**: Langage de programmation principal.
+*   **Laravel Framework**: Cadre de développement web pour PHP.
+*   **Composer**: Gestionnaire de dépendances pour PHP.
+*   **Node.js & npm/Yarn**: Pour les dépendances frontend (Vite) et la compilation des assets.
+*   **SQLite**: Base de données par défaut pour le développement (peut être configurée pour MySQL, PostgreSQL, etc.).
+*   **DomPDF**: Bibliothèque pour la génération de PDF.
+*   **Laravel Queue**: Pour la gestion des tâches asynchrones.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Prérequis
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+Avant de commencer, assurez-vous d'avoir les éléments suivants installés sur votre machine :
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+*   PHP >= 8.2
+*   Composer
+*   Node.js >= 18
+*   npm ou Yarn
+*   Un serveur web (Apache, Nginx) ou le serveur de développement intégré de Laravel.
+*   SQLite (généralement inclus avec PHP, ou un autre SGBD comme MySQL/PostgreSQL).
 
-## Laravel Sponsors
+## Installation
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+Suivez ces étapes pour configurer le projet localement :
 
-### Premium Partners
+1.  **Cloner le dépôt** :
+    ```bash
+    git clone https://github.com/votre-utilisateur/portailEducationApi.git
+    cd portailEducationApi
+    ```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+2.  **Installer les dépendances PHP** :
+    ```bash
+    composer install
+    ```
 
-## Contributing
+3.  **Installer les dépendances JavaScript** :
+    ```bash
+    npm install # ou yarn install
+    ```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+4.  **Configurer l'environnement** :
+    Copiez le fichier `.env.example` et renommez-le en `.env`.
+    ```bash
+    cp .env.example .env
+    ```
+    Générez une clé d'application :
+    ```bash
+    php artisan key:generate
+    ```
+    Assurez-vous que votre fichier `.env` contient les configurations de base de données appropriées. Par défaut, SQLite est configuré. Si vous utilisez SQLite, assurez-vous que le fichier `database/database.sqlite` existe (vous pouvez le créer avec `touch database/database.sqlite`).
 
-## Code of Conduct
+5.  **Exécuter les migrations de base de données et les seeders** :
+    ```bash
+    php artisan migrate:fresh --seed
+    ```
+    Cette commande va créer les tables de la base de données et les remplir avec des données de test.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+6.  **Lier le stockage public** :
+    ```bash
+    php artisan storage:link
+    ```
+    Ceci est nécessaire pour que les PDF générés soient accessibles via une URL publique.
 
-## Security Vulnerabilities
+7.  **Compiler les assets frontend** (si nécessaire, pour les vues Blade utilisées par DomPDF) :
+    ```bash
+    npm run build # ou yarn build
+    ```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+8.  **Démarrer le serveur de développement Laravel** :
+    ```bash
+    php artisan serve
+    ```
+    L'API sera accessible à `http://127.0.0.1:8000` (ou un autre port).
 
-## License
+9.  **Démarrer le gestionnaire de file d'attente (Queue Worker)** :
+    Pour que les tâches asynchrones (génération de PDF, calcul de rang) fonctionnent, vous devez démarrer un worker de file d'attente.
+    ```bash
+    php artisan queue:work
+    ```
+    Il est recommandé d'utiliser un outil comme Supervisor en production pour gérer ce processus.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Utilisation
+
+Une fois l'API installée et le serveur démarré, vous pouvez interagir avec elle via des requêtes HTTP (GET, POST, PUT, DELETE).
+
+**Exemples de points de terminaison (à titre indicatif) :**
+
+*   `GET /api/report-cards` : Récupérer tous les bulletins de notes.
+*   `POST /api/report-cards/generate` : Générer des bulletins de notes pour une classe et un trimestre donnés.
+    *   Corps de la requête (JSON) : `{"class_model_id": 1, "term_id": 1}`
+
+Consultez le fichier `routes/api.php` pour la liste complète des points de terminaison disponibles.
+
+## Structure du Projet
+
+Le projet suit la structure standard de Laravel, avec des modules organisés pour une meilleure maintenabilité :
+
+*   `app/Http/Controllers`: Contrôleurs HTTP.
+*   `app/Jobs`: Tâches de fond (ex: `GenerateReportCardPdfJob`, `CalculateReportCardRanksJob`).
+*   `app/Models`: Modèles Eloquent.
+*   `app/Modules`: Contient les modules spécifiques à l'application (AcademicYear, Assignement, ClassModel, Grade, Parent, ReportCard, Student, Subject, Teacher, Term, User), chacun avec ses propres Controllers, Models, Requests, Ressources et Services.
+*   `database/migrations`: Migrations de base de données.
+*   `database/seeders`: Seeders pour peupler la base de données avec des données de test.
+*   `resources/views/reports`: Vues Blade utilisées pour la génération de PDF (ex: `bulletin.blade.php`).
+*   `routes/api.php`: Définition des routes de l'API.
+*   `storage/app/public/report_cards`: Emplacement où les PDF des bulletins sont stockés.
+
+## Tests
+
+Pour exécuter les tests unitaires et fonctionnels :
+
+```bash
+php artisan test
+```
+
+## Contribution
+
+Les contributions sont les bienvenues ! Veuillez suivre les étapes suivantes :
+
+1.  Fork le dépôt.
+2.  Créez une nouvelle branche (`git checkout -b feature/ma-nouvelle-fonctionnalite`).
+3.  Effectuez vos modifications.
+4.  Assurez-vous que les tests passent.
+5.  Commitez vos changements (`git commit -am 'feat: ajouter ma nouvelle fonctionnalité'`).
+6.  Poussez vers la branche (`git push origin feature/ma-nouvelle-fonctionnalite`).
+7.  Créez une Pull Request.
+
+## Licence
+
+Ce projet est sous licence MIT. Voir le fichier [LICENSE](LICENSE) pour plus de détails.

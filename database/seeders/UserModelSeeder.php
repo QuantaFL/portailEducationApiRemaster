@@ -18,31 +18,29 @@ class UserModelSeeder extends Seeder
             'last_name' => 'User',
             'email' => 'admin@example.com',
             'password' => Hash::make('password'),
-            'role_id' => 1, // Assuming role_id 1 is for admin
+            'role_id' => 1,
             'birthday' => '2000-01-01',
             'adress' => 'Dakar, Senegal',
             'phone' => '771234567',
             'gender' => 'M',
         ]);
 
-        // Teacher User
         UserModel::create([
             'first_name' => 'Fatou',
             'last_name' => 'Diop',
             'email' => 'teacher@example.com',
             'password' => Hash::make('password'),
-            'role_id' => 3, // Assuming role_id 3 is for teacher
+            'role_id' => 3,
             'birthday' => '1990-10-10',
             'adress' => 'Thies, Senegal',
             'phone' => '779876543',
             'gender' => 'F',
         ]);
 
-        // Parent Users
         $parentFirstNames = ['Aissatou', 'Moussa', 'Fatou', 'Oumar', 'Khady', 'Pape', 'Aminata', 'Modou', 'Cheikh', 'Mariama', 'Ousmane', 'Ndeye', 'Ibrahima', 'Sokhna', 'Demba', 'Coumba', 'Lamine', 'Adama', 'Maimouna', 'Aliou'];
         $parentLastNames = ['Diallo', 'Ba', 'Faye', 'Gueye', 'Ndiaye', 'Diop', 'Sow', 'Thiam', 'Fall', 'Cisse', 'Diagne', 'Mbaye', 'Sarr', 'Ndour', 'Diedhiou', 'Camara', 'Dramé', 'Keita', 'Touré', 'Sy'];
 
-        for ($i = 0; $i < 60; $i++) { // Create 60 parent users
+        for ($i = 0; $i < 60; $i++) {
             UserModel::create([
                 'first_name' => $parentFirstNames[$i % count($parentFirstNames)],
                 'last_name' => $parentLastNames[$i % count($parentLastNames)],
@@ -56,17 +54,16 @@ class UserModelSeeder extends Seeder
             ]);
         }
 
-        // Student Users
         $studentFirstNames = ['Mamadou', 'Aissatou', 'Omar', 'Khady', 'Pape', 'Aminata', 'Modou', 'Fatou', 'Cheikh', 'Mariama', 'Ousmane', 'Ndeye', 'Ibrahima', 'Sokhna', 'Demba', 'Coumba', 'Lamine', 'Adama', 'Maimouna', 'Aliou'];
         $studentLastNames = ['Diallo', 'Ba', 'Faye', 'Gueye', 'Ndiaye', 'Diop', 'Sow', 'Thiam', 'Fall', 'Cisse', 'Diagne', 'Mbaye', 'Sarr', 'Ndour', 'Diedhiou', 'Camara', 'Dramé', 'Keita', 'Touré', 'Sy'];
 
-        for ($i = 0; $i < 60; $i++) { // Create 60 student users
+        for ($i = 0; $i < 60; $i++) {
             UserModel::create([
                 'first_name' => $studentFirstNames[$i % count($studentFirstNames)],
                 'last_name' => $studentLastNames[$i % count($studentLastNames)],
                 'email' => 'student' . ($i + 1) . '@example.com',
                 'password' => Hash::make('password'),
-                'role_id' => 2, // Assuming role_id 2 is for student
+                'role_id' => 2,
                 'birthday' => '200' . ($i % 9) . '-0' . (($i % 11) + 1) . '-1' . (($i % 9) + 1),
                 'adress' => 'Dakar, Senegal',
                 'phone' => '77' . str_pad(rand(0, 9999999), 7, '0', STR_PAD_LEFT),
