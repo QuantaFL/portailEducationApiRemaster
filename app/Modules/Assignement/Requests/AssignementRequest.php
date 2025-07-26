@@ -12,7 +12,6 @@ class AssignementRequest extends FormRequest
             'teacher_id' => ['required', 'exists:teachers'],
             'class_model_id' => ['required', 'exists:class_models'],
             'subject_id' => ['required', 'exists:subjects'],
-            'term_id' => ['required', 'exists:terms'],
         ];
     }
 
