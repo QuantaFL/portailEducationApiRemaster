@@ -22,11 +22,11 @@ class TeacherController extends Controller
 
     public function store(TeacherRequest $request)
     {
-        $user = UserModel::create($request->user);
-        $teacher = new Teacher();
-        $teacher->hire_date = $request->hire_date;
-        $teacher->user_model_id = $user->id;
-        $teacher->save();
+        $user = UserModel::create($request->validated('user'));
+        $teacher = Teacher::create([
+            'hire_date' => $request->validated('hire_date'),
+            'user_model_id' => $user->id,
+        ]);
         return response()->json(new TeacherResource($teacher));
     }
 

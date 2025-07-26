@@ -17,11 +17,10 @@ class ParentController extends Controller
 
     public function store(ParentRequest $request)
     {
-        $user = UserModel::create($request->user);
-        $parentModel = new ParentModel();
-        //  $parentModel->hire_date = $request->hire_date;
-        $parentModel->user_model_id = $user->id;
-        $parentModel->save();
+        $user = UserModel::create($request->validated('user'));
+        $parentModel = ParentModel::create([
+            'user_model_id' => $user->id,
+        ]);
         return response()->json(new ParentResource($parentModel));
     }
 
