@@ -29,6 +29,7 @@ Route::prefix('v1')->group(function () {
     Route::apiResource('parents', ParentController::class);
     Route::apiResource('classes', ClassModelController::class);
     Route::apiResource('report-cards', ReportCardController::class);
+    Route::post('report-cards/generate', [ReportCardController::class, 'generateReportCards']);
     Route::get('/grades', [GradeController::class, 'getGradesByTerm']);
     Route::post('/grades', [GradeController::class, 'updateGrades']);
     Route::get('teachers/{teacher}/classes', [TeacherController::class, 'getClasses']);
