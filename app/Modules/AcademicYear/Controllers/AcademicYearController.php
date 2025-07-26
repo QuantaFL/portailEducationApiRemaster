@@ -4,8 +4,12 @@ namespace App\Modules\AcademicYear\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Modules\AcademicYear\Models\AcademicYear;
+use App\Modules\AcademicYear\Models\StatusAcademicYearEnum;
 use App\Modules\AcademicYear\Requests\AcademicYearRequest;
 use App\Modules\AcademicYear\Ressources\AcademicYearResource;
+use App\Modules\Term\Models\Term;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class AcademicYearController extends Controller
 {
@@ -13,10 +17,81 @@ class AcademicYearController extends Controller
     {
         return response()->json(AcademicYearResource::collection(AcademicYear::all()));
     }
-
+    //TODO:rollback if terms are not save in database
     public function store(AcademicYearRequest $request)
     {
-        return response()->json(new AcademicYearResource(AcademicYear::create($request->validated())));
+        $start = (int) $request->start_date;
+        $end = (int) $request->end_date;
+        $currentYear = now()->year;
+
+        $exists = DB::table('academic_years')
+            ->where('start_date', $start)
+            ->where('end_date', $end)
+            ->exists();
+
+        if ($exists) {
+            return response()->json([
+                "message"=> 'Une session avec cette période existe déjà.',
+            ],400);
+
+        }
+
+        if ($start < $currentYear) {
+
+            return response()->json([
+                "message"=>  'L\'année de début doit être supérieure ou égale à l\'année en cours (' . $currentYear . ').',
+            ],400);
+
+        }
+
+        if ($start >= $end) {
+
+            return response()->json([
+                "message" => 'L\'année de fin doit être supérieure à celle de début.',
+            ],400);
+
+        }
+
+        if (($end - $start) !== 1) {
+            return response()->json([
+                "message" => 'Une année académique doit durer exactement 1 an.',
+            ],400);
+
+        }
+        DB::table('academic_years')->update([
+            'status' => StatusAcademicYearEnum::TERMINE
+        ]);
+
+
+        $label = $start . '-' . $end;
+        $statusACDMY = StatusAcademicYearEnum::EN_COURS;
+        $createdACDMY =  AcademicYear::create([
+            "label"=>$label,
+            "start_date"=>$request->start_date,
+            "end_date"=>$request->end_date,
+            "status"=>$statusACDMY
+        ]);
+        $start_date = Carbon::parse($request->start_date)->startOfDay();
+        $end_date = Carbon::parse($request->end_date)->startOfDay();
+        $term1 = Term::create([
+            "name"=>"Semestre 1",
+            'academic_year_id'=>$createdACDMY->id,
+            "start_date"=>$start_date,
+            "end_date"=>$end_date
+        ]);
+        $term2 = Term::create([
+            "name"=>"Semestre 2",
+            'academic_year_id'=>$createdACDMY->id,
+            "start_date"=>$start_date,
+            "end_date"=>$end_date
+        ]);
+        return response()->json([
+           "academic_year"=> new AcademicYearResource($createdACDMY),
+            "terms"=>[
+                "term1"=>$term1,
+                "term2"=>$term2,
+            ]
+        ]);
     }
 
     public function show(AcademicYear $session)
