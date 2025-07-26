@@ -32,6 +32,7 @@ Route::prefix('v1')->group(function () {
     Route::post('report-cards/generate', [ReportCardController::class, 'generateReportCards']);
     Route::get('/grades', [GradeController::class, 'getGradesByTerm']);
     Route::post('/grades', [GradeController::class, 'updateGrades']);
+    Route::post('classes/{class_id}/notes/submit', [GradeController::class, 'submitTermNotes']);
     Route::get('teachers/{teacher}/classes', [TeacherController::class, 'getClasses']);
     Route::get('assignements/by-term-and-class', [AssignementController::class, 'getByTermAndClass']);
 
@@ -39,4 +40,5 @@ Route::prefix('v1')->group(function () {
     Route::post('auth/register', [\App\Modules\User\Controllers\AuthController::class, 'register']);
     Route::post('auth/login', [\App\Modules\User\Controllers\AuthController::class, 'login']);
     Route::middleware('auth:api')->post('auth/change-password', [\App\Modules\User\Controllers\AuthController::class, 'changePassword']);
+    Route::middleware('auth:api')->get('teacher/profile', [TeacherController::class, 'getTeacherProfile']);
 });

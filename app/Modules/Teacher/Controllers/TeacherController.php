@@ -73,4 +73,35 @@ class TeacherController extends Controller
         $classes = \App\Modules\ClassModel\Models\ClassModel::whereIn('id', $classIds)->get();
         return response()->json(ClassModelResource::collection($classes));
     }
+
+    public function getTeacherProfile(Request $request)
+    {
+        $user = $request->user();
+
+        if (!$user) {
+            return response()->json(['message' => 'Unauthenticated.'], 401);
+        }
+
+        $teacher = Teacher::where('user_model_id', $user->id)->first();
+
+        if (!$teacher) {
+            return response()->json(['message' => 'Teacher profile not found.'], 404);
+        }
+
+        $assignedSubjects = Assignement::where('teacher_id', $teacher->id)
+            ->with('subject')
+            ->get()
+            ->pluck('subject.name')
+            ->unique()
+            ->values()
+            ->toArray();
+
+        return response()->json([
+            'id' => $teacher->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'phone' => $user->phone_number, // Assuming 'phone_number' exists on UserModel
+            'assigned_subjects' => $assignedSubjects,
+        ]);
+    }
 }

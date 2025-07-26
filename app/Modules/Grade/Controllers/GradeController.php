@@ -57,4 +57,24 @@ class GradeController extends Controller
 
         return response()->json(['message' => 'Grades updated successfully']);
     }
+
+    public function submitTermNotes(Request $request, $class_id): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'term_id' => 'required|exists:terms,id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+
+        // Update the status of grades for the given class and term to 'submitted'
+        Grade::whereHas('assignement', function ($query) use ($class_id) {
+            $query->where('class_model_id', $class_id);
+        })
+        ->where('term_id', $request->term_id)
+        ->update(['status' => 'submitted']); // Assuming a 'status' column exists in the grades table
+
+        return response()->json(['message' => 'Notes submitted successfully for the term.']);
+    }
 }
