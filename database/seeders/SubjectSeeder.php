@@ -47,12 +47,12 @@ class SubjectSeeder extends Seeder
             ['name' => 'Arabe', 'coefficient' => 1],
             ['name' => 'Informatique', 'coefficient' => 2],
         ];
-        $lyceeSVariants = ['Seconde S', 'Première S1', 'Première S2', 'Première S3', 'Première S4', 'Terminale S1', 'Terminale S2', 'Terminale S3', 'Terminale S4'];
+        $lyceeSVariants = ['Seconde S', 'Première S', 'Terminale S1', 'Terminale S2'];
         foreach ($lyceeSVariants as $variant) {
             foreach ($lyceeSSubjects as $subject) {
                 Subject::create([
                     'name' => $subject['name'],
-                    'level' => 'Lycée S',
+                    'level' => $variant,
                     'coefficient' => $subject['coefficient'],
                 ]);
             }
@@ -68,12 +68,12 @@ class SubjectSeeder extends Seeder
             ['name' => 'Mathématiques', 'coefficient' => 2],
             ['name' => 'Informatique', 'coefficient' => 1],
         ];
-        $lyceeLVariants = ['Seconde L', 'Première L1', 'Première L2', 'Terminale L1', 'Terminale L2'];
+        $lyceeLVariants = ['Seconde L', 'Première L', 'Terminale L'];
         foreach ($lyceeLVariants as $variant) {
             foreach ($lyceeLSubjects as $subject) {
                 Subject::create([
                     'name' => $subject['name'],
-                    'level' => 'Lycée L',
+                    'level' => $variant,
                     'coefficient' => $subject['coefficient'],
                 ]);
             }
