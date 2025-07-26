@@ -12,7 +12,7 @@ return new class extends Migration {
             $table->foreignId('teacher_id')->constrained('teachers');
             $table->foreignId('class_model_id')->constrained('class_models');
             $table->foreignId('subject_id')->constrained('subjects');
-            $table->foreignId('academic_year_id')->constrained('academic_years');
+            $table->foreignId('term_id')->constrained('terms');
             $table->timestamps();
         });
     }

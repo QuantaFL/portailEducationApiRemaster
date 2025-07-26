@@ -18,7 +18,6 @@ class AssignementSeeder extends Seeder
         $classes = ClassModel::all();
         foreach ($classes as $class) {
             $subjectQuery = Subject::query();
-            // For Lycee S and L, match both level and variant in class name
             if (str_starts_with($class->level, 'Lycée')) {
                 if (str_contains($class->name, 'S')) {
                     $subjectQuery->where('level', 'Lycée S');
@@ -28,7 +27,6 @@ class AssignementSeeder extends Seeder
                     $subjectQuery->where('level', $class->level);
                 }
             } else {
-                // For Collège and others, just match level
                 $subjectQuery->where('level', $class->level);
             }
             $subject = $subjectQuery->inRandomOrder()->first();
@@ -37,7 +35,7 @@ class AssignementSeeder extends Seeder
                     'teacher_id' => 1,
                     'class_model_id' => $class->id,
                     'subject_id' => $subject->id,
-                    'academic_year_id' => 1,
+                    'term_id' => 1,
                 ]);
             }
         }

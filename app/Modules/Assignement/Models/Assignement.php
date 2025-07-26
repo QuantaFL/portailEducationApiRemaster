@@ -6,6 +6,7 @@ use App\Modules\AcademicYear\Models\AcademicYear;
 use App\Modules\ClassModel\Models\ClassModel;
 use App\Modules\Subject\Models\Subject;
 use App\Modules\Teacher\Models\Teacher;
+use App\Modules\Term\Models\Term;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -18,7 +19,7 @@ class Assignement extends Model
         'teacher_id',
         'class_model_id',
         'subject_id',
-        'academic_year_id',
+        'term_id',
     ];
 
     public function teacher()
@@ -36,8 +37,8 @@ class Assignement extends Model
         return $this->belongsTo(Subject::class);
     }
 
-    public function academicYear()
+    public function term()
     {
-        return $this->belongsTo(AcademicYear::class);
+        return $this->belongsTo(Term::class);
     }
 }

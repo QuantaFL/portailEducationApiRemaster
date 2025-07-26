@@ -4,6 +4,7 @@ namespace App\Modules\Grade\Models;
 
 use App\Modules\Assignement\Models\Assignement;
 use App\Modules\Student\Models\StudentSession;
+use App\Modules\Subject\Models\Subject;
 use App\Modules\Term\Models\Term;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -34,5 +35,10 @@ class Grade extends Model
     public function term() : BelongsTo
     {
         return $this->belongsTo(Term::class);
+    }
+
+    public function subject(): BelongsTo
+    {
+        return $this->belongsTo(Subject::class);
     }
 }

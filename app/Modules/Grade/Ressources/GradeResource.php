@@ -25,7 +25,8 @@ class GradeResource extends JsonResource
             'term_id' => $this->term_id,
 
             'assignement' => new AssignementResource($this->whenLoaded('assignement')),
-            'student' => new StudentResource($this->whenLoaded('student')),
+            'student_session' => $this->whenLoaded('studentSession'),
+            'subject' => new StudentResource($this->whenLoaded('subject')),
             'term' => new TermResource($this->whenLoaded('term')),
         ];
     }

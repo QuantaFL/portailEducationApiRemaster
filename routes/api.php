@@ -32,6 +32,7 @@ Route::prefix('v1')->group(function () {
     Route::get('/grades', [GradeController::class, 'getGradesByTerm']);
     Route::post('/grades', [GradeController::class, 'updateGrades']);
     Route::get('teachers/{teacher}/classes', [TeacherController::class, 'getClasses']);
+    Route::get('assignements/by-term-and-class', [AssignementController::class, 'getByTermAndClass']);
 
     // Auth routes
     Route::post('auth/register', [\App\Modules\User\Controllers\AuthController::class, 'register']);

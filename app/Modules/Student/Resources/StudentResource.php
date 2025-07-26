@@ -17,12 +17,10 @@ class StudentResource extends JsonResource
             'matricule' => $this->matricule,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-
-            'class_model_id' => $this->class_model_id,
             'parent_model_id' => $this->parent_model_id,
             'user_model_id' => $this->user_model_id,
 
-            'classModel' => new ClassModelResource($this->whenLoaded('classModel')),
+            "latest_student_session" => $this->whenLoaded('latestStudentSession'),
             'parentModel' => $this->whenLoaded('parentModel'),
             'userModel' => $this->whenLoaded('userModel'),
         ];

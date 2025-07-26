@@ -15,7 +15,6 @@ class Student extends Model
     protected $fillable = [
         'matricule',
         'academic_records',
-        'class_model_id',
         'parent_model_id',
         'user_model_id',
     ];
@@ -28,5 +27,15 @@ class Student extends Model
     public function userModel()
     {
         return $this->belongsTo(UserModel::class);
+    }
+
+    public function studentSession()
+    {
+        return $this->hasMany(StudentSession::class);
+    }
+
+    public function latestStudentSession()
+    {
+        return $this->hasOne(StudentSession::class)->latestOfMany();
     }
 }

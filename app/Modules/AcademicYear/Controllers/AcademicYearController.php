@@ -7,6 +7,10 @@ use App\Modules\AcademicYear\Models\AcademicYear;
 use App\Modules\AcademicYear\Models\StatusAcademicYearEnum;
 use App\Modules\AcademicYear\Requests\AcademicYearRequest;
 use App\Modules\AcademicYear\Ressources\AcademicYearResource;
+use App\Modules\Term\Models\Term;
+use App\Modules\Term\Ressources\TermResource;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class AcademicYearController extends Controller
 {

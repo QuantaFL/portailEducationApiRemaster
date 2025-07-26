@@ -2,8 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Modules\AcademicYear\Models\AcademicYear;
+use App\Modules\Student\Models\Student;
 use App\Modules\Student\Models\StudentSession;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class StudentSessionSeeder extends Seeder
@@ -13,10 +14,16 @@ class StudentSessionSeeder extends Seeder
      */
     public function run(): void
     {
-        StudentSession::create([
-            'student_id' => 1,
-            'academic_year_id' => 1,
-            'class_model_id' => 1,
-        ]);
+        $students = Student::all();
+        $academicYears = AcademicYear::all();
+        foreach ($students as $student) {
+            foreach ($academicYears as $academicYear) {
+                StudentSession::create([
+                    'student_id' => $student->id,
+                    'academic_year_id' => $academicYear->id,
+                    'class_model_id' => rand(1, 10),
+                ]);
+            }
+        }
     }
 }

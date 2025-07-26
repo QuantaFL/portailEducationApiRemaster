@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Modules\Assignement\Models\Assignement;
 use App\Modules\Assignement\Requests\AssignementRequest;
 use App\Modules\Assignement\Ressources\AssignementResource;
+use Illuminate\Http\Request;
 
 class AssignementController extends Controller
 {
@@ -36,5 +37,17 @@ class AssignementController extends Controller
         $assignement->delete();
 
         return response()->json();
+    }
+
+    public function getByTermAndClass(Request $request)
+    {
+        $termId = $request->input('term_id');
+        $classModelId = $request->input('class_model_id');
+
+        $assignements = Assignement::where('term_id', $termId)
+            ->where('class_model_id', $classModelId)
+            ->get();
+
+        return response()->json(AssignementResource::collection($assignements));
     }
 }
