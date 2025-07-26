@@ -17,7 +17,7 @@ class AcademicYear extends Model
         'status',
     ];
 
-    public static function getCurrentAcademicYear(): AcademicYear
+    public static function getCurrentAcademicYear(): ?AcademicYear
     {
         return self::where('status', 'en_cours')->first();
     }

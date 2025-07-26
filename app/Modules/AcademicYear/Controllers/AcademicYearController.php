@@ -116,7 +116,7 @@ class AcademicYearController extends Controller
 
     public function getCurrentAcademicYear()
     {
-        $currentYear = AcademicYear::where('status', 'current')->first();
+        $currentYear = AcademicYear::where('status', 'en_cours')->first();
 
         if (!$currentYear) {
             return response()->json(['message' => 'No current academic year found'], 404);

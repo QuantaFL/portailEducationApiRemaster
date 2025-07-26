@@ -15,7 +15,7 @@ use Illuminate\Http\Request;
 
 
 Route::prefix('v1')->group(function () {
-    Route::get('academic-years/current', [AcademicYearController::class, 'getCurrentAcademicYear']);
+    Route::get('academic-year/current', [AcademicYearController::class, 'getCurrentAcademicYear']);
     Route::get('terms/current', [TermController::class, 'getCurrentTerm']);
     Route::get('academic-years/{academicYear}/terms', [AcademicYearController::class, 'getTermsByAcademicYear']);
     Route::get('academic-years/{academicYear}', [AcademicYearController::class, 'getAcademicYearById']);
@@ -25,9 +25,10 @@ Route::prefix('v1')->group(function () {
     Route::apiResource('subjects', SubjectController::class);
     Route::apiResource('academic-years', AcademicYearController::class);
     Route::apiResource('terms', TermController::class);
-    Route::apiResource('grades', GradeController::class);
+    Route::get('grades/class/{classId}/term/{termId}/students/{studentId}', [GradeController::class, 'getStudentGradesInClassForTerm']);
     Route::apiResource('parents', ParentController::class);
-    Route::apiResource('classes', ClassModelController::class);
+    Route::apiResource('class-models', ClassModelController::class);
+Route::get('classes/{classId}/students', [ClassModelController::class, 'getStudentsByClass']);
     Route::apiResource('report-cards', ReportCardController::class);
     Route::post('report-cards/generate', [ReportCardController::class, 'generateReportCards']);
     Route::get('/grades', [GradeController::class, 'getGradesByTerm']);
@@ -42,6 +43,6 @@ Route::prefix('v1')->group(function () {
     Route::post('auth/register', [\App\Modules\User\Controllers\AuthController::class, 'register']);
     Route::post('auth/login', [\App\Modules\User\Controllers\AuthController::class, 'login']);
     Route::middleware('auth:api')->post('auth/change-password', [\App\Modules\User\Controllers\AuthController::class, 'changePassword']);
-    Route::middleware('auth:api')->get('teacher/profile', [TeacherController::class, 'getTeacherProfile']);
+    Route::get('teacher/profile', [TeacherController::class, 'getTeacherProfile']);
     Route::get('teachers/users/{id}', [TeacherController::class, 'getTeacherByUserId']);
 });

@@ -7,6 +7,7 @@ use App\Modules\ClassModel\Ressources\ClassModelResource;
 use App\Modules\AcademicYear\Ressources\AcademicYearResource;
 use App\Modules\Subject\Ressources\SubjectResource;
 use App\modules\teacher\ressources\TeacherResource;
+use App\Modules\Term\Ressources\TermResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -28,7 +29,7 @@ class AssignementResource extends JsonResource
             'teacher' => new TeacherResource($this->whenLoaded('teacher')),
             'classModel' => new ClassModelResource($this->whenLoaded('classModel')),
             'subject' => new SubjectResource($this->whenLoaded('subject')),
-            'term' => new AcademicYearResource($this->whenLoaded('term')),
+            'term' => new TermResource($this->whenLoaded('term')),
         ];
     }
 }
