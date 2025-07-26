@@ -4,6 +4,9 @@
 .phpunit.result.cache
 /.fleet
 /.idea
+.env
+/.env
+*.env
 /.nova
 /.phpunit.cache
 /.vscode
