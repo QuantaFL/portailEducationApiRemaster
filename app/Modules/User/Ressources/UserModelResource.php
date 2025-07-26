@@ -17,7 +17,6 @@ class UserModelResource extends JsonResource
             'last_name' => $this->last_name,
             'birthday' => $this->birthday,
             'email' => $this->email,
-            'password' => $this->password,
             'adress' => $this->adress,
             'phone' => $this->phone,
             'role_id' => $this->role_id,
