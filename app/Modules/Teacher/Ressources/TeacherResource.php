@@ -18,7 +18,6 @@ class TeacherResource extends JsonResource
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'user_model_id' => $this->user_model_id,
-
             'subjects' => $this->whenLoaded('subjects'),
             'assigned_classes' => $this->whenLoaded('assignedClasses'),
             'userModel' => new UserModelResource($this->userModel),
