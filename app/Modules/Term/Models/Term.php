@@ -18,8 +18,18 @@ class Term extends Model
         'status',
     ];
 
+    protected $casts = [
+        'start_date' => 'datetime',
+        'end_date' => 'datetime',
+    ];
+
     public function academicYear()
     {
         return $this->belongsTo(AcademicYear::class);
+    }
+
+    public function isEnded(): bool
+    {
+        return now()->isAfter($this->end_date);
     }
 }

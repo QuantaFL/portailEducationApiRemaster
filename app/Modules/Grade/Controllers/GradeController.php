@@ -12,22 +12,11 @@ use Illuminate\Support\Facades\Validator;
 
 class GradeController extends Controller
 {
-    public function getGradesByTerm(Request $request)
+    public function getGradesByTerm(\App\Modules\Grade\Requests\GetGradesByTermRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'term_id' => 'required|exists:terms,id',
-            'class_model_id' => 'required|exists:class_models,id',
-            'subject_id' => 'required|exists:subjects,id',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 400);
-        }
-
         $term = Term::find($request->term_id);
-        $today = now();
 
-        if ($today->isAfter($term->end_date)) {
+        if ($term->isEnded()) {
             return response()->json(['message' => 'Term has ended'], 400);
         }
 
@@ -42,21 +31,8 @@ class GradeController extends Controller
         return response()->json($grades);
     }
 
-    public function updateGrades(Request $request) : JsonResponse
+    public function updateGrades(\App\Modules\Grade\Requests\UpdateGradesRequest $request) : JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'grades' => 'required|array',
-            'grades.*.student_session_id' => 'required|exists:student_sessions,id',
-            'grades.*.term_id' => 'required|exists:terms,id',
-            'grades.*.assignement_id' => 'required|exists:assignments,id',
-            'grades.*.mark' => 'required|numeric|min:0|max:20',
-            'grades.*.type' => 'required|in:quiz,exam',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 400);
-        }
-
         foreach ($request->grades as $gradeData) {
             if (isset($gradeData['id'])) {
                 Grade::where('id', $gradeData['id'])->update([
