@@ -49,4 +49,12 @@ class Student extends Model
     {
         return $this->academic_records ? Storage::disk('public')->url($this->academic_records) : null;
     }
+
+    public static function generateMatricule(): string
+    {
+        $year = date('Y');
+        $lastStudent = self::orderBy('id', 'desc')->first();
+        $nextId = $lastStudent ? $lastStudent->id + 1 : 1;
+        return 'MAT-' . $year . '-' . str_pad($nextId, 5, '0', STR_PAD_LEFT);
+    }
 }
