@@ -6,7 +6,7 @@ use App\Modules\Assignement\Models\Assignement;
 use App\Modules\ClassModel\Ressources\ClassModelResource;
 use App\Modules\AcademicYear\Ressources\AcademicYearResource;
 use App\Modules\Subject\Ressources\SubjectResource;
-use App\modules\teacher\ressources\TeacherResource;
+use App\Modules\Teacher\Ressources\TeacherResource;
 use App\Modules\Term\Ressources\TermResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;

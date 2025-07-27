@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Modules\AcademicYear\Models\AcademicYear;
 use App\Modules\Assignement\Models\Assignement;
 use App\Modules\ClassModel\Models\ClassModel;
 use App\Modules\Subject\Models\Subject;
@@ -18,10 +19,10 @@ class AssignementSeeder extends Seeder
     {
         $classes = ClassModel::all();
         $teachers = Teacher::all();
-        $terms = Term::all();
+        $academicYears = AcademicYear::all();
 
-        if ($classes->isEmpty() || $teachers->isEmpty() || $terms->isEmpty()) {
-            $this->command->info('Skipping AssignementSeeder: Not enough data in Classes, Teachers, or Terms.');
+        if ($classes->isEmpty() || $teachers->isEmpty() || $academicYears->isEmpty()) {
+            $this->command->info('Skipping AssignementSeeder: Not enough data in Classes, Teachers, or Academic Years.');
             return;
         }
 
@@ -51,15 +52,14 @@ class AssignementSeeder extends Seeder
                 continue;
             }
 
-            foreach ($terms as $term) {
+            foreach ($academicYears as $academicYear) {
                 foreach ($subjects as $subject) {
                     $teacher = $teachers->random();
-
                     Assignement::create([
                         'teacher_id' => $teacher->id,
                         'class_model_id' => $class->id,
                         'subject_id' => $subject->id,
-                        'term_id' => $term->id,
+                        'academic_year_id' => $academicYear->id,
                     ]);
                 }
             }

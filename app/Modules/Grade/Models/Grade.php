@@ -22,6 +22,8 @@ class Grade extends Model
         'term_id',
     ];
 
+    protected $with = ['assignement', 'studentSession', 'term', 'subject'];
+
     public function assignement()
     {
         return $this->belongsTo(Assignement::class);
