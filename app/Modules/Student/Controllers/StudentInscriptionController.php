@@ -21,12 +21,8 @@ class StudentInscriptionController extends Controller
 {
     public function store(StudentInscriptionRequest $request)
     {
-        // Générer un mot de passe aléatoire pour le parent
         $parentPassword = bin2hex(random_bytes(4));
-        // Générer un mot de passe aléatoire pour l'étudiant
         $studentPassword = bin2hex(random_bytes(4));
-
-        // Création ou récupération du compte utilisateur pour le parent
         $parentUser = UserModel::where('email', $request->parent_email)->first();
         $parentJustCreated = false;
         if (!$parentUser) {
@@ -43,12 +39,9 @@ class StudentInscriptionController extends Controller
             ]);
             $parentJustCreated = true;
         }
-        // Création ou récupération du modèle parent
         $parentModel = ParentModel::firstOrCreate([
             'user_model_id' => $parentUser->id,
         ]);
-
-        // Création ou récupération du compte utilisateur pour l'élève
         $studentUser = UserModel::where('email', $request->student_email)->first();
         $studentJustCreated = false;
         if (!$studentUser) {
@@ -65,33 +58,23 @@ class StudentInscriptionController extends Controller
             ]);
             $studentJustCreated = true;
         }
-
-        // Générer le matricule automatiquement
         $matricule = Student::generateMatricule();
-
-        // Création de l'élève
         $student = Student::create([
             'matricule' => $matricule,
             'parent_model_id' => $parentModel->id,
             'user_model_id' => $studentUser->id,
             'academic_records' => $request->input('academic-records', ''),
         ]);
-
-        // Création de la session d'inscription
         $studentSession = StudentSession::create([
             'student_id' => $student->id,
             'class_model_id' => $request->class_model_id,
             'academic_year_id' => $request->academic_year_id,
         ]);
-
-        // Upload du justificatif (academic-records) et stockage dans Student
         if ($request->hasFile('academic-records')) {
             $path = $request->file('academic-records')->store('justificatifs', 'public');
             $student->academic_records = $path;
             $student->save();
         }
-
-        // Après la création des comptes, envoyer les emails uniquement si nouvel utilisateur
         if ($parentJustCreated) {
             Mail::to($parentUser->email)->send(new UserWelcomeMail(
                 $parentUser->first_name . ' ' . $parentUser->last_name,
