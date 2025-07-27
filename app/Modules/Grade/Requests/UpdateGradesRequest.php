@@ -10,11 +10,11 @@ class UpdateGradesRequest extends FormRequest
     {
         return [
             'grades' => 'required|array',
-            'grades.*.student_session_id' => 'required|exists:student_sessions,id',
-            'grades.*.term_id' => 'required|exists:terms,id',
-            'grades.*.assignement_id' => 'required|exists:assignments,id',
+            'grades.*.student_session_id' => 'required|integer|exists:student_sessions,id',
+            'grades.*.assignement_id' => 'required|integer|exists:assignments,id',
+            'grades.*.term_id' => 'required|integer|exists:terms,id',
+            'grades.*.type' => 'required|string',
             'grades.*.mark' => 'required|numeric|min:0|max:20',
-            'grades.*.type' => 'required|in:quiz,exam',
         ];
     }
 

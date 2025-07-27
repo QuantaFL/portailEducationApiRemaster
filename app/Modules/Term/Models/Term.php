@@ -36,4 +36,18 @@ class Term extends Model
     {
         return now()->isAfter($this->end_date);
     }
+
+    public static function getCurrentTerm()
+    {
+        $currentAcademicYear = AcademicYear::getCurrentAcademicYear();
+
+        if (!$currentAcademicYear) {
+            return null;
+        }
+
+        return $currentAcademicYear->terms()
+            ->where('start_date', '<=', now())
+            ->where('end_date', '>=', now())
+            ->first();
+    }
 }

@@ -41,7 +41,7 @@ class TermController extends Controller
 
     public function getCurrentTerm()
     {
-        $currentAcademicYear = \App\Modules\AcademicYear\Models\AcademicYear::getCurrentAcademicYear();
+        $currentAcademicYear = AcademicYear::getCurrentAcademicYear();
 
         if (!$currentAcademicYear) {
             return response()->json(['message' => 'No current academic year found.'], 404);
