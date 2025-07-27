@@ -12,6 +12,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Validator;
+use App\Modules\Grade\Requests\UpdateGradesRequest;
 
 class GradeController extends Controller
 {
@@ -34,31 +35,62 @@ class GradeController extends Controller
         return response()->json($grades);
     }
 
-    public function updateGrades(\App\Modules\Grade\Requests\UpdateGradesRequest $request) : JsonResponse
+    /**
+     * Batch update or create grades for students and assignments.
+     * Accepts partial payloads and validates each grade.
+     * Uses a transaction for atomicity.
+     *
+     * @param UpdateGradesRequest $request
+     * @return JsonResponse
+     *
+     * Example usage:
+     * POST /api/v1/grades
+     * {
+     *   "grades": [
+     *     { "student_session_id": 1, "assignement_id": 2, "term_id": 3, "type": "exam", "mark": 15.5 },
+     *     ...
+     *   ]
+     * }
+     */
+    public function updateGrades(UpdateGradesRequest $request): JsonResponse
     {
-        foreach ($request->grades as $gradeData) {
-            if (isset($gradeData['id'])) {
-                Grade::where('id', $gradeData['id'])->update([
-                    'mark' => $gradeData['mark'],
-                    'type' => $gradeData['type'],
-                    'assignement_id' => $gradeData['assignement_id'],
-                    'student_session_id' => $gradeData['student_session_id'],
-                    'term_id' => $gradeData['term_id'],
-                ]);
-            } else {
-                Grade::updateOrCreate(
-                    [
-                        'student_session_id' => $gradeData['student_session_id'],
-                        'term_id' => $gradeData['term_id'],
-                        'assignement_id' => $gradeData['assignement_id'],
-                        'type' => $gradeData['type'],
-                    ],
-                    ['mark' => $gradeData['mark']]
-                );
-            }
-        }
+        $validated = $request->validated();
+        $grades = $validated['grades'];
+        $errors = [];
 
-        return response()->json(['message' => 'Grades updated successfully']);
+        \DB::beginTransaction();
+        try {
+            foreach ($grades as $i => $gradeData) {
+                try {
+                    \App\Modules\Grade\Models\Grade::updateOrCreate(
+                        [
+                            'student_session_id' => $gradeData['student_session_id'],
+                            'term_id' => $gradeData['term_id'],
+                            'assignement_id' => $gradeData['assignement_id'],
+                            'type' => $gradeData['type'],
+                        ],
+                        ['mark' => $gradeData['mark']]
+                    );
+                } catch (\Exception $e) {
+                    $errors[$i] = $e->getMessage();
+                }
+            }
+            if ($errors) {
+                \DB::rollBack();
+                return response()->json([
+                    'message' => 'Some grades could not be updated.',
+                    'errors' => $errors
+                ], 422);
+            }
+            \DB::commit();
+            return response()->json(['message' => 'Grades updated successfully']);
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            return response()->json([
+                'message' => 'Failed to update grades.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function submitTermNotes(Request $request, $class_id): JsonResponse
@@ -71,7 +103,6 @@ class GradeController extends Controller
             return response()->json($validator->errors(), 422);
         }
 
-        // Update the status of grades for the given class and term to 'submitted'
         Grade::whereHas('assignement', function ($query) use ($class_id) {
             $query->where('class_model_id', $class_id);
         })
@@ -81,15 +112,61 @@ class GradeController extends Controller
         return response()->json(['message' => 'Notes submitted successfully for the term.']);
     }
 
-    public function getStudentGradesInClassForTerm($classId, $termId, $studentId)
+    /**
+     * Returns all grades for each assignment for a student in a class and term.
+     *
+     * For each assignment in the class and term, this endpoint returns ALL grades (e.g., exam, quiz, etc.)
+     * for the given student. If there are multiple grades for an assignment (e.g., both an exam and a quiz),
+     * each will be included as a separate object in the response array.
+     *
+     * Each grade object contains:
+     *   - id: Grade ID (null if no grade exists for this assignment)
+     *   - mark: The grade mark (null if no grade exists)
+     *   - type: The type of grade (e.g., 'exam', 'quiz', etc.)
+     *   - assignement: The full assignment object (with subject info)
+     *   - student_session: The student session object
+     *   - term: The term object
+     *   - academic_year: The academic year object
+     *   - status: The grade status (or 'not_submitted' if no grade exists)
+     *
+     * If no grade exists for an assignment, a default/null entry is included for that assignment.
+     *
+     * Example response:
+     * [
+     *   {
+     *     "id": 123,
+     *     "mark": 15.5,
+     *     "type": "exam",
+     *     "assignement": { ... },
+     *     "student_session": { ... },
+     *     "term": { ... },
+     *     "academic_year": { ... },
+     *     "status": "submitted"
+     *   },
+     *   {
+     *     "id": 124,
+     *     "mark": 12.0,
+     *     "type": "quiz",
+     *     ...
+     *   },
+     *   ...
+     * ]
+     */
+    public function getStudentGradesInClassForTerm($classId, $studentId)
     {
-        $currentAcademicYear = \App\Modules\AcademicYear\Models\AcademicYear::getCurrentAcademicYear();
+        $currentAcademicYear = AcademicYear::getCurrentAcademicYear();
 
         if (!$currentAcademicYear) {
             return response()->json(['message' => 'No current academic year found.'], 404);
         }
 
-        $studentSession = \App\Modules\Student\Models\StudentSession::where('student_id', $studentId)
+        $currentTerm = Term::getCurrentTerm();
+        if (!$currentTerm) {
+            return response()->json(['message' => 'No current term found.'], 404);
+        }
+        $termId = $currentTerm->id;
+
+        $studentSession = StudentSession::where('student_id', $studentId)
             ->where('class_model_id', $classId)
             ->where('academic_year_id', $currentAcademicYear->id)
             ->first();
@@ -98,29 +175,121 @@ class GradeController extends Controller
             return response()->json(['message' => 'Student session not found for the given student, class, and academic year.'], 404);
         }
 
-        $assignments = \App\Modules\Assignement\Models\Assignement::where('class_model_id', $classId)
+        $assignments = Assignement::where('class_model_id', $classId)
             ->where('term_id', $termId)
             ->with('subject')
             ->get();
 
         $grades = [];
         foreach ($assignments as $assignment) {
-            $grade = Grade::where('assignement_id', $assignment->id)
+            // Get ALL grades for this assignment and student session (not just the first)
+            $assignmentGrades = Grade::where('assignement_id', $assignment->id)
                 ->where('student_session_id', $studentSession->id)
                 ->where('term_id', $termId)
-                ->first();
+                ->get();
 
-            $grades[] = [
-                'id' => $grade ? $grade->id : null,
-                'mark' => $grade ? $grade->mark : null,
-                'type' => $grade ? $grade->type : null,
-                'subject_name' => $assignment->subject->name,
-                'assignement_id' => $assignment->id,
-                'student_session_id' => $studentSession->id,
-                'term_id' => (int) $termId,
-            ];
+            // If no grades, still push a null/default entry for this assignment
+            if ($assignmentGrades->isEmpty()) {
+                $grades[] = [
+                    'id' => null,
+                    'mark' => null,
+                    'type' => null,
+                    'assignement' => $assignment,
+                    'student_session' => $studentSession,
+                    'term' => $currentTerm,
+                    'academic_year' => $currentAcademicYear,
+                    'status' => 'not_submitted',
+                ];
+            } else {
+                foreach ($assignmentGrades as $grade) {
+                    $grades[] = [
+                        'id' => $grade->id,
+                        'mark' => $grade->mark,
+                        'type' => $grade->type,
+                        'assignement' => $assignment,
+                        'student_session' => $studentSession,
+                        'term' => $currentTerm,
+                        'academic_year' => $currentAcademicYear,
+                        'status' => $grade->status ?? 'not_submitted',
+                    ];
+                }
+            }
         }
 
         return response()->json($grades);
+    }
+
+    /**
+     * Get a matrix of all students in a class and all assignments for the current term/subject,
+     * with grades (or null) for each student-assignment pair.
+     *
+     * @param Request $request
+     * @param int $classId
+     * @return JsonResponse
+     *
+     * Example usage:
+     * GET /api/v1/classes/1/grades-matrix?term_id=2&subject_id=3
+     *
+     * Response:
+     * [
+     *   {
+     *     "student": { ... },
+     *     "assignments": [
+     *       { "assignment": { ... }, "grade": { ... } | null },
+     *       ...
+     *     ]
+     *   },
+     *   ...
+     * ]
+     */
+    public function getGradesMatrix(Request $request, int $classId): JsonResponse
+    {
+        $request->validate([
+            'term_id' => 'required|integer|exists:terms,id',
+            'subject_id' => 'required|integer|exists:subjects,id',
+        ]);
+
+        $termId = $request->input('term_id');
+        $subjectId = $request->input('subject_id');
+
+        $class = \App\Modules\ClassModel\Models\ClassModel::with(['currentAcademicYearStudentSessions.student'])->findOrFail($classId);
+        $students = $class->currentAcademicYearStudentSessions;
+
+        $assignments = \App\Modules\Assignement\Models\Assignement::where('class_model_id', $classId)
+            ->where('term_id', $termId)
+            ->where('subject_id', $subjectId)
+            ->get();
+
+        $studentSessionIds = $students->pluck('id')->all();
+        $assignmentIds = $assignments->pluck('id')->all();
+
+        // Eager load all grades for this class/term/subject
+        $grades = \App\Modules\Grade\Models\Grade::whereIn('student_session_id', $studentSessionIds)
+            ->whereIn('assignement_id', $assignmentIds)
+            ->where('term_id', $termId)
+            ->get();
+
+        $gradesByStudentAndAssignment = [];
+        foreach ($grades as $grade) {
+            $gradesByStudentAndAssignment[$grade->student_session_id][$grade->assignement_id] = $grade;
+        }
+
+        $result = [];
+        foreach ($students as $studentSession) {
+            $studentAssignments = [];
+            foreach ($assignments as $assignment) {
+                $grade = $gradesByStudentAndAssignment[$studentSession->id][$assignment->id] ?? null;
+                $studentAssignments[] = [
+                    'assignment' => $assignment,
+                    'grade' => $grade,
+                ];
+            }
+            $result[] = [
+                'student' => $studentSession->student,
+                'student_session_id' => $studentSession->id,
+                'assignments' => $studentAssignments,
+            ];
+        }
+        return response()->json($result);
     }
 }

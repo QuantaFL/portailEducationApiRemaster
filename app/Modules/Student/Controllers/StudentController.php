@@ -7,6 +7,7 @@ use App\Modules\Student\Models\Student;
 use App\Modules\Student\Requests\StudentRequest;
 use App\Modules\Student\Resources\StudentResource;
 use App\Modules\User\Models\UserModel;
+use Illuminate\Http\Request;
 
 class StudentController extends Controller
 {
@@ -48,5 +49,12 @@ class StudentController extends Controller
         $student->delete();
 
         return response()->json();
+    }
+
+    public function bulk(Request $request)
+    {
+        $ids = $request->input('ids', []);
+        $students = Student::whereIn('id', $ids)->get();
+        return response()->json(StudentResource::collection($students));
     }
 }
