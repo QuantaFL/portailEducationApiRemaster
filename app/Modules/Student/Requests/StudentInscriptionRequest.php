@@ -13,7 +13,6 @@ class StudentInscriptionRequest extends FormRequest
             'parent_first_name' => ['required', 'string'],
             'parent_last_name' => ['required', 'string'],
             'parent_email' => ['required', 'email', 'max:255'],
-            'parent_password' => ['required', 'string', 'min:6'],
             'parent_phone' => ['required', 'string'],
             'parent_adress' => ['nullable', 'string'],
             'parent_birthday' => ['required', 'date'],
@@ -22,10 +21,8 @@ class StudentInscriptionRequest extends FormRequest
             'student_first_name' => ['required', 'string'],
             'student_last_name' => ['required', 'string'],
             'student_email' => ['required', 'email', 'max:255'],
-            'student_password' => ['required', 'string', 'min:6'],
             'student_phone' => ['required', 'string'],
             'student_adress' => ['nullable', 'string'],
-            'student_matricule' => ['required', 'string'],
             'student_birthday' => ['required', 'date'],
             'student_gender' => ['required', 'string'],
             // Session
