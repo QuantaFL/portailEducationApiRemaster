@@ -3,6 +3,7 @@
 namespace App\Modules\Assignement\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Modules\AcademicYear\Models\AcademicYear;
 use App\Modules\AcademicYear\Models\StatusAcademicYearEnum;
 use App\Modules\Assignement\Models\Assignement;
 use App\Modules\Assignement\Requests\AssignementRequest;
@@ -50,15 +51,12 @@ class AssignementController extends Controller
         return response()->json();
     }
 
-    public function getByTermAndClass(Request $request)
+    public function getAssignmentsForTeacher($id)
     {
-        $termId = $request->input('term_id');
-        $classModelId = $request->input('class_model_id');
-
-        $assignements = Assignement::where('term_id', $termId)
-            ->where('class_model_id', $classModelId)
+        $currentAcademicYear = AcademicYear::getCurrentAcademicYear();
+        $assignments = Assignement::where('teacher_id', $id)
+            ->where('academic_year_id', $currentAcademicYear?->id)
             ->get();
-
-        return response()->json(AssignementResource::collection($assignements));
+        return response()->json(AssignementResource::collection($assignments));
     }
 }

@@ -11,6 +11,7 @@ use App\Modules\Term\Models\Term;
 use App\Modules\Term\Ressources\TermResource;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class AcademicYearController extends Controller
 {
@@ -117,7 +118,7 @@ class AcademicYearController extends Controller
     public function getCurrentAcademicYear()
     {
         $currentYear = AcademicYear::where('status', 'en_cours')->first();
-
+//        $currentYearALl = AcademicYear::all();
         if (!$currentYear) {
             return response()->json(['message' => 'No current academic year found'], 404);
         }
