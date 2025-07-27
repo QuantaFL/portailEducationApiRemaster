@@ -14,15 +14,14 @@ class TeacherSeeder extends Seeder
      */
     public function run(): void
     {
-        $teacher = Teacher::create([
-            'hire_date' => '2020-09-01',
-            'user_model_id' => 2,
-        ]);
-
-        // Récupérer quelques matières existantes
-        $subjects = Subject::inRandomOrder()->limit(3)->get();
-
-        // Attacher les matières à l'enseignant
-        $teacher->subjects()->attach($subjects->pluck('id'));
+    $subjects = Subject::all();
+        for ($i = 2; $i <= 11; $i++) {
+            $teacher = Teacher::create([
+                'hire_date' => now()->subYears(rand(1, 10))->format('Y-m-d'),
+                'user_model_id' => $i,
+            ]);
+            $teacherSubjects = $subjects->random(rand(2, min(4, $subjects->count())));
+            $teacher->subjects()->attach($teacherSubjects->pluck('id'));
+        }
     }
 }

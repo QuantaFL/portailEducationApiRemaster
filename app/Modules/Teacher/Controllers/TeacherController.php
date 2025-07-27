@@ -84,10 +84,8 @@ class TeacherController extends Controller
         }
 
         $classIds = Assignement::where('teacher_id', $teacherId)
-            ->join('terms', 'assignments.term_id', '=', 'terms.id')
-            ->join('academic_years', 'terms.academic_year_id', '=', 'academic_years.id')
-            ->where('academic_years.id', $academicYear->id)
-            ->pluck('assignments.class_model_id')
+            ->where('academic_year_id', $academicYear->id)
+            ->pluck('class_model_id')
             ->unique()
             ->toArray();
         Log::info('Class IDs for teacher ' . $teacherId);

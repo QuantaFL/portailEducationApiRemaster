@@ -48,4 +48,12 @@ class SubjectController extends Controller
 
         return response()->json();
     }
+
+    public function getSubjectsByIds()
+    {
+        $ids = request()->input('ids', []);
+        $subjects = Subject::whereIn('id', $ids)->get();
+        return response()->json(SubjectResource::collection($subjects));
+    }
+
 }
