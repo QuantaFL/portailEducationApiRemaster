@@ -19,33 +19,32 @@ class StudentInscriptionController extends Controller
 {
     public function store(StudentInscriptionRequest $request)
     {
-        // Vérifier si l'utilisateur parent existe déjà
-        $parentUser = UserModel::where('email', $request->parent_email)->first();
-        if (!$parentUser) {
-            // Création du compte utilisateur pour le parent
-            $parentUser = UserModel::create([
-                'first_name' => $request->parent_first_name,
-                'last_name' => $request->parent_last_name,
-                'birthday' => $request->parent_birthday,
-                'gender' => $request->parent_gender,
-                'email' => $request->parent_email,
-                'password' => Hash::make($request->parent_password),
-                'phone' => $request->parent_phone,
-                'adress' => $request->parent_adress ?? null,
-                'role_id' => $request->parent_role_id ?? null,
-            ]);
-        }
-        $parentModel = ParentModel::create([
+        // Création ou récupération du compte utilisateur pour le parent
+        $parentUser = UserModel::firstOrCreate([
+            'email' => $request->parent_email
+        ], [
+            'first_name' => $request->parent_first_name,
+            'last_name' => $request->parent_last_name,
+            'birthday' => $request->parent_birthday,
+            'gender' => $request->parent_gender,
+            'password' => Hash::make($request->parent_password),
+            'phone' => $request->parent_phone,
+            'adress' => $request->parent_adress ?? null,
+            'role_id' => $request->parent_role_id ?? null,
+        ]);
+        // Création ou récupération du modèle parent
+        $parentModel = ParentModel::firstOrCreate([
             'user_model_id' => $parentUser->id,
         ]);
 
-        // Création du compte utilisateur pour l'élève
-        $studentUser = UserModel::create([
+        // Création ou récupération du compte utilisateur pour l'élève
+        $studentUser = UserModel::firstOrCreate([
+            'email' => $request->student_email
+        ], [
             'first_name' => $request->student_first_name,
             'last_name' => $request->student_last_name,
             'birthday' => $request->student_birthday,
             'gender' => $request->student_gender,
-            'email' => $request->student_email,
             'password' => Hash::make($request->student_password),
             'phone' => $request->student_phone,
             'adress' => $request->student_adress ?? null,
@@ -58,10 +57,9 @@ class StudentInscriptionController extends Controller
             'parent_model_id' => $parentModel->id,
             'user_model_id' => $studentUser->id,
             'academic_records' => $request->input('academic-records', ''),
-            'class_model_id' => $request->class_model_id,
         ]);
 
-        // Création de la session d'inscription (ajout class_model_id ici)
+        // Création de la session d'inscription
         $studentSession = StudentSession::create([
             'student_id' => $student->id,
             'class_model_id' => $request->class_model_id,
