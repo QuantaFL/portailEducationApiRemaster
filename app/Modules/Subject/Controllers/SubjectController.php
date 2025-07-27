@@ -56,4 +56,5 @@ class SubjectController extends Controller
         return response()->json(SubjectResource::collection($subjects));
     }
 
+
 }

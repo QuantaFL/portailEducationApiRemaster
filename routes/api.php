@@ -29,7 +29,7 @@ Route::prefix('v1')->group(function () {
     Route::apiResource('terms', TermController::class);
     Route::get('grades/class/{classId}/students/{studentId}', [GradeController::class, 'getStudentGradesInClassForTerm']);
     Route::apiResource('parents', ParentController::class);
-    Route::apiResource('class-models', ClassModelController::class);
+    Route::apiResource('classes', ClassModelController::class);
     Route::get('classes/{classId}/students', [ClassModelController::class, 'getStudentsByClass']);
     Route::apiResource('report-cards', ReportCardController::class);
     Route::post('report-cards/generate', [ReportCardController::class, 'generateReportCards']);
@@ -43,6 +43,8 @@ Route::prefix('v1')->group(function () {
     Route::post('students/bulk', [StudentController::class, 'bulk']);
     Route::get('assignments/teacher/{id}', [AssignementController::class, 'getAssignmentsForTeacher']);
     Route::get('classes/{classId}/grades-matrix', [GradeController::class, 'getGradesMatrix']);
+    Route::post('teachers/dashboard/performance-summary/bulk', [TeacherController::class, 'getMultiClassPerformanceSummary']);
+    Route::post('subjects/bulk', [SubjectController::class, 'getSubjectsByIds']);
 
     // Auth routes
     Route::post('auth/register', [AuthController::class, 'register']);
