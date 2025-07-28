@@ -21,9 +21,10 @@ class ClassModelController extends Controller
         return  response()->json(new  ClassModelResource(ClassModel::create($request->validated()))) ;
     }
 
-    public function show(ClassModel $classModel)
+    public function show($classId)
     {
-        return response()->json(new ClassModelResource($classModel)) ;
+        $classModel = ClassModel::findOrFail($classId);
+        return response()->json(new ClassModelResource($classModel));
     }
 
     public function update(ClassModelRequest $request, ClassModel $classModel)

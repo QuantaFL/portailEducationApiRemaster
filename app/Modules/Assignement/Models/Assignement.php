@@ -21,6 +21,8 @@ class Assignement extends Model
         'academic_year_id',
     ];
 
+    protected $with = ['teacher', 'subject', 'academicYear'];
+
     public function teacher()
     {
         return $this->belongsTo(Teacher::class);
