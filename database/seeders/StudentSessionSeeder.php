@@ -15,15 +15,13 @@ class StudentSessionSeeder extends Seeder
     public function run(): void
     {
         $students = Student::all();
-        $academicYears = AcademicYear::all();
+        $academicYears = AcademicYear::find(1);
         foreach ($students as $student) {
-            foreach ($academicYears as $academicYear) {
                 StudentSession::create([
                     'student_id' => $student->id,
-                    'academic_year_id' => $academicYear->id,
+                    'academic_year_id' => $academicYears->id,
                     'class_model_id' => rand(1, 10),
                 ]);
-            }
         }
     }
 }
