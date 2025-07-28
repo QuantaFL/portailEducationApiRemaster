@@ -63,15 +63,21 @@ class StudentInscriptionController extends Controller
             'matricule' => $matricule,
             'parent_model_id' => $parentModel->id,
             'user_model_id' => $studentUser->id,
-            'academic_records' => $request->input('academic-records', ''),
+            'academic_records' => '', // not used for file storage
         ]);
         $studentSession = StudentSession::create([
             'student_id' => $student->id,
             'class_model_id' => $request->class_model_id,
             'academic_year_id' => $request->academic_year_id,
+            'justificatif_path' => '', // initialize justificatif_path to empty string
         ]);
-        if ($request->hasFile('academic-records')) {
-            $path = $request->file('academic-records')->store('justificatifs', 'public');
+        // Accept only academic_records as file field name
+        $file = $request->file('academic_records');
+        if ($file) {
+            $path = $file->store('justificatifs', 'public');
+            $studentSession->justificatif_path = $path;
+            $studentSession->save();
+            // Also save path in Student model for academic_records_url
             $student->academic_records = $path;
             $student->save();
         }
