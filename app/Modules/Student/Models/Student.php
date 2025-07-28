@@ -47,7 +47,7 @@ class Student extends Model
 
     public function getAcademicRecordsUrlAttribute()
     {
-        return $this->academic_records ? Storage::disk('public')->url($this->academic_records) : null;
+        return $this->academic_records ? asset('storage/' . ltrim(str_replace('public/', '', $this->academic_records), '/')) : null;
     }
 
     public static function generateMatricule(): string
