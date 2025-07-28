@@ -19,9 +19,12 @@ class Assignement extends Model
         'class_model_id',
         'subject_id',
         'academic_year_id',
+        'day_of_week',
+        'start_time',
+        'end_time',
     ];
 
-    protected $with = ['teacher', 'subject', 'academicYear'];
+    protected $with = ['teacher', 'subject', 'academicYear', 'classModel'];
 
     public function teacher()
     {
