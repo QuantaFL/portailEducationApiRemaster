@@ -28,6 +28,7 @@ class StudentInscriptionRequest extends FormRequest
             // Session
             'class_model_id' => ['required', 'exists:class_models,id'],
             'academic_year_id' => ['required', 'exists:academic_years,id'],
+            'academic-records' => ['nullable', 'file', 'mimes:pdf,jpg,png', 'max:2048'],
         ];
     }
 
