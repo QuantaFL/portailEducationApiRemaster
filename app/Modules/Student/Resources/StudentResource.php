@@ -23,6 +23,13 @@ class StudentResource extends JsonResource
             "latest_student_session" => $this->whenLoaded('latestStudentSession'),
             'parentModel' => $this->whenLoaded('parentModel'),
             'userModel' => $this->whenLoaded('userModel'),
+            'count'=> Student::all()->count(),
+            'maleCount' => Student::query()->whereHas('userModel', function ($query) {
+                $query->where('gender', 'M');
+            })->count(),
+            'femaleCount' => Student::query()->whereHas('userModel', function ($query) {
+                $query->where('gender', 'F');
+            })->count(),
             'academic_records_url' => $this->academic_records_url,
         ];
     }

@@ -20,6 +20,7 @@ class TeacherResource extends JsonResource
             'user_model_id' => $this->user_model_id,
             'subjects' => $this->whenLoaded('subjects'),
             'assigned_classes' => $this->whenLoaded('assignedClasses'),
+            'count' => Teacher::all()->count(),
             'userModel' => new UserModelResource($this->userModel),
         ];
     }
