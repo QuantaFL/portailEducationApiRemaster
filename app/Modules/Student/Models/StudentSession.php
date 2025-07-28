@@ -17,6 +17,7 @@ class StudentSession extends Model
         'student_id',
         'academic_year_id',
         'class_model_id',
+        'justificatif_path',
     ];
 
 
@@ -33,5 +34,10 @@ class StudentSession extends Model
     public function classModel()
     {
         return $this->belongsTo(ClassModel::class);
+    }
+
+    public function getJustificatifUrlAttribute()
+    {
+        return $this->justificatif_path ? \Storage::disk('public')->url($this->justificatif_path) : null;
     }
 }
