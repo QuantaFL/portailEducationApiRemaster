@@ -15,6 +15,7 @@ use App\Modules\User\Controllers\AuthController;
 
 
 Route::prefix('v1')->group(function () {
+    Route::get('grades/class/{classId}/teacher/{teacherId}/subject/{subjectId}/assignement/{assignementId?}/student/{studentId?}', [\App\Modules\Grade\Controllers\GradeClassController::class, 'getClassGrades']);
     Route::get('academic-year/current', [AcademicYearController::class, 'getCurrentAcademicYear']);
     Route::get('terms/current', [TermController::class, 'getCurrentTerm']);
     Route::get('academic-years/{academicYear}/terms', [AcademicYearController::class, 'getTermsByAcademicYear']);
@@ -25,7 +26,7 @@ Route::prefix('v1')->group(function () {
     Route::apiResource('subjects', SubjectController::class);
     Route::apiResource('academic-years', AcademicYearController::class);
     Route::apiResource('terms', TermController::class);
-    Route::get('grades/class/{classId}/students/{studentId}', [GradeController::class, 'getStudentGradesInClassForTerm']);
+    Route::get('grades/class/{classId}/students/{studentId?}/teacher/{teacherId?}/subject/{subjectId?}/assignement/{assignementId?}', [GradeController::class, 'getStudentGradesInClassForTerm']);
     Route::apiResource('parents', ParentController::class);
     Route::apiResource('classes', ClassModelController::class);
     Route::get('classes/{classId}/students', [ClassModelController::class, 'getStudentsByClass']);
