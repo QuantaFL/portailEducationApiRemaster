@@ -27,7 +27,7 @@ class GradeController extends Controller
         }
 
         $grades = Grade::with(['studentSession.student.userModel', 'assignement.subject'])
-            ->where('term_id', $request->term_id)
+            ->where('term_id', $term->id)
             ->whereHas('assignement', function ($query) use ($request) {
                 $query->where('class_model_id', $request->class_model_id)
                     ->where('subject_id', $request->subject_id);
@@ -64,37 +64,50 @@ class GradeController extends Controller
         try {
             foreach ($grades as $i => $gradeData) {
                 try {
-                    Log::info("Updating grade for student session", [
+                    $where = [
                         'student_session_id' => $gradeData['student_session_id'],
-                        'assignement_id' => $gradeData['assignement_id'],
                         'term_id' => Term::getCurrentTerm()->id,
+                        'assignement_id' => $gradeData['assignement_id'],
                         'type' => $gradeData['type'],
-                        'mark' => $gradeData['mark']
+                    ];
+                    $update = ['mark' => $gradeData['mark']];
+                    Log::info("Grade updateOrCreate called", [
+                        'where' => $where,
+                        'update' => $update
                     ]);
-                    Grade::updateOrCreate(
-                        [
-                            'student_session_id' => $gradeData['student_session_id'],
-                            'term_id' => Term::getCurrentTerm()->id,
-                            'assignement_id' => $gradeData['assignement_id'],
-                            'type' => $gradeData['type'],
-                        ],
-                        ['mark' => $gradeData['mark']]
-                    );
+                    $existing = Grade::where($where)->first();
+                    if ($existing) {
+                        Log::info("Existing grade found, will update", [
+                            'id' => $existing->id,
+                            'old_mark' => $existing->mark,
+                            'new_mark' => $gradeData['mark']
+                        ]);
+                    } else {
+                        Log::info("No existing grade found, will create new", $where);
+                    }
+                    Grade::updateOrCreate($where, $update);
                 } catch (\Exception $e) {
+                    Log::error("Error updating/creating grade", [
+                        'error' => $e->getMessage(),
+                        'data' => $gradeData
+                    ]);
                     $errors[$i] = $e->getMessage();
                 }
             }
             if ($errors) {
                 \DB::rollBack();
+                Log::warning("Grade update transaction rolled back", ['errors' => $errors]);
                 return response()->json([
                     'message' => 'Some grades could not be updated.',
                     'errors' => $errors
                 ], 422);
             }
             \DB::commit();
+            Log::info("Grade update transaction committed successfully");
             return response()->json(['message' => 'Grades updated successfully']);
         } catch (\Exception $e) {
             \DB::rollBack();
+            Log::error("Grade update transaction failed", ['error' => $e->getMessage()]);
             return response()->json([
                 'message' => 'Failed to update grades.',
                 'error' => $e->getMessage()
@@ -157,7 +170,8 @@ class GradeController extends Controller
      */
 public function getStudentGradesInClassForTerm($classId, $studentId=null, $teacherId = null, $subjectId = null, $assignementId = null)
     {
-        $result = \App\Modules\Grade\Services\GradeFetchService::fetchClassGrades($classId, $teacherId, $subjectId, $assignementId, $studentId);
+        $termId = Term::getCurrentTerm()->id;
+        $result = \App\Modules\Grade\Services\GradeFetchService::fetchClassGrades($classId, $teacherId, $subjectId, $assignementId, $studentId, $termId);
         if (isset($result['error'])) {
             return response()->json(['message' => $result['error']], 404);
         }
@@ -190,11 +204,10 @@ public function getStudentGradesInClassForTerm($classId, $studentId=null, $teach
     public function getGradesMatrix(Request $request, int $classId): JsonResponse
     {
         $request->validate([
-            'term_id' => 'required|integer|exists:terms,id',
             'subject_id' => 'required|integer|exists:subjects,id',
         ]);
 
-        $termId = $request->input('term_id');
+        $termId = Term::getCurrentTerm()->id;
         $subjectId = $request->input('subject_id');
 
         $class = \App\Modules\ClassModel\Models\ClassModel::with(['currentAcademicYearStudentSessions.student'])->findOrFail($classId);
