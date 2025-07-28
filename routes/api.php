@@ -12,6 +12,8 @@ use App\Modules\Subject\Controllers\SubjectController;
 use App\Modules\Teacher\Controllers\TeacherController;
 use App\Modules\Term\Controllers\TermController;
 use App\Modules\User\Controllers\AuthController;
+use Illuminate\Support\Facades\Route;
+use App\Modules\Teacher\Controllers\TeacherContractController;
 
 
 Route::prefix('v1')->group(function () {
