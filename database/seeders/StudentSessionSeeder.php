@@ -33,18 +33,18 @@ class StudentSessionSeeder extends Seeder
                     return strpos($file, "student_{$gender}_{$type}") !== false;
                 });
                 $matches = array_values($matches);
-            // Fallback: if no match for young/old, get any for gender
-            if (count($matches) === 0) {
-                $matches = array_filter($profileFiles, function ($file) use ($gender) {
-                    return strpos($file, "student_{$gender}") !== false;
-                });
-                $matches = array_values($matches);
-            }
-            // Final fallback: assign any available image
-            if (count($matches) === 0 && count($profileFiles) > 0) {
-                $matches = $profileFiles;
-            }
-            if (count($matches) > 0) {
+                // Fallback: if no match for young/old, get any for gender
+                if (count($matches) === 0) {
+                    $matches = array_filter($profileFiles, function ($file) use ($gender) {
+                        return strpos($file, "student_{$gender}") !== false;
+                    });
+                    $matches = array_values($matches);
+                }
+                // Final fallback: assign any available image
+                if (count($matches) === 0 && count($profileFiles) > 0) {
+                    $matches = $profileFiles;
+                }
+                if (count($matches) > 0) {
                     $index = $user->id % count($matches);
                     $file = $matches[$index];
                     $user->profile_picture_url = asset('storage/' . ltrim(str_replace('public/', '', $file), '/'));
