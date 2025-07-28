@@ -5,6 +5,9 @@
 /.fleet
 /.idea
 .env
+bootstrap/cache/config.php
+/bootstrap/cache/config.php
+
 /.env
 *.env
 /.nova
