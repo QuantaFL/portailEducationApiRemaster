@@ -60,6 +60,9 @@ class AssignementSeeder extends Seeder
                         'class_model_id' => $class->id,
                         'subject_id' => $subject->id,
                         'academic_year_id' => $academicYear->id,
+                        'day_of_week' => ['Monday','Tuesday','Wednesday','Thursday','Friday'][rand(0,4)],
+                        'start_time' => sprintf('%02d:00:00', rand(8, 15)),
+                        'end_time' => sprintf('%02d:50:00', rand(9, 16)),
                     ]);
                 }
             }

@@ -13,6 +13,9 @@ return new class extends Migration {
             $table->foreignId('class_model_id')->constrained('class_models');
             $table->foreignId('subject_id')->constrained('subjects');
             $table->foreignId('academic_year_id')->constrained('academic_years');
+            $table->string('day_of_week')->nullable();
+            $table->time('start_time')->nullable();
+            $table->time('end_time')->nullable();
             $table->timestamps();
         });
     }

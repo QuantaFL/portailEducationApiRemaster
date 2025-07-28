@@ -24,7 +24,10 @@ class AssignementResource extends JsonResource
             'teacher_id' => $this->teacher_id,
             'class_model_id' => $this->class_model_id,
             'subject_id' => $this->subject_id,
-            'term_id' => $this->term_id,
+            'term_id' => $this->term_id ?? null,
+            'day_of_week' => $this->day_of_week,
+            'start_time' => $this->start_time,
+            'end_time' => $this->end_time,
 
             'teacher' => new TeacherResource($this->whenLoaded('teacher')),
             'classModel' => new ClassModelResource($this->whenLoaded('classModel')),
