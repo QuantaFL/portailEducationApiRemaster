@@ -72,8 +72,11 @@ class UserModelSeeder extends Seeder
         $studentLastNames = ['Diallo', 'Ba', 'Faye', 'Gueye', 'Ndiaye', 'Diop', 'Sow', 'Thiam', 'Fall', 'Cisse', 'Diagne', 'Mbaye', 'Sarr', 'Ndour', 'Diedhiou', 'Camara', 'Dramé', 'Keita', 'Touré', 'Sy', 'Traoré', 'Diakhate', 'Sow', 'Gassama', 'Kouyaté', 'Balde', 'Sylla', 'Toure', 'Senghor', 'Fofana', 'Kane'];
 
         for ($i = 0; $i < 160; $i++) {
+            $femaleNames = ['Aissatou', 'Khady', 'Aminata', 'Fatou', 'Mariama', 'Ndeye', 'Sokhna', 'Coumba', 'Maimouna', 'Binta', 'Fatoumata'];
+            $firstName = $studentFirstNames[$i % count($studentFirstNames)];
+            $gender = in_array($firstName, $femaleNames) ? 'F' : 'M';
             UserModel::create([
-                'first_name' => $studentFirstNames[$i % count($studentFirstNames)],
+                'first_name' => $firstName,
                 'last_name' => $studentLastNames[$i % count($studentLastNames)],
                 'email' => 'student' . ($i + 1) . '@example.com',
                 'password' => Hash::make('password'),
@@ -81,7 +84,7 @@ class UserModelSeeder extends Seeder
                 'birthday' => '200' . ($i % 9) . '-0' . (($i % 11) + 1) . '-1' . (($i % 9) + 1),
                 'adress' => 'Dakar, Senegal',
                 'phone' => '77' . str_pad(rand(0, 9999999), 7, '0', STR_PAD_LEFT),
-                'gender' => (rand(0, 1) == 0) ? 'M' : 'F',
+                'gender' => $gender,
             ]);
         }
     }

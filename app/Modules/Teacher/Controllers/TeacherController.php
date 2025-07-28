@@ -204,6 +204,7 @@ class TeacherController extends Controller
                         'studentId' => $student->id,
                         'firstName' => $student->userModel->first_name,
                         'lastName' => $student->userModel->last_name,
+                        'profilePictureUrl' => $student->userModel->profile_picture_url,
                         'classId' => $pair['classId'],
                         'subjectId' => $pair['subjectId'],
                         'averageGrade' => round($averageGrade, 2),

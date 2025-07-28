@@ -17,6 +17,8 @@ return new class extends Migration {
             $table->string('password');
             $table->string('adress');
             $table->string('phone');
+            $table->string('profile_picture_url')->nullable();
+            $table->string('nationality')->nullable();
             $table->timestamps();
         });
     }
