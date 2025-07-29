@@ -12,12 +12,15 @@ use App\Modules\Subject\Controllers\SubjectController;
 use App\Modules\Teacher\Controllers\TeacherController;
 use App\Modules\Term\Controllers\TermController;
 use App\Modules\User\Controllers\AuthController;
+use \App\Modules\Grade\Controllers\GradeClassController;
+use App\Modules\Grade\Controllers\GradeStudentNotesController;
+
 use Illuminate\Support\Facades\Route;
-use App\Modules\Teacher\Controllers\TeacherContractController;
+
 
 
 Route::prefix('v1')->group(function () {
-    Route::get('grades/class/{classId}/teacher/{teacherId}/subject/{subjectId}/assignement/{assignementId?}/student/{studentId?}', [\App\Modules\Grade\Controllers\GradeClassController::class, 'getClassGrades']);
+    Route::get('grades/class/{classId}/teacher/{teacherId}/subject/{subjectId}/assignement/{assignementId?}/student/{studentId?}', [GradeClassController::class, 'getClassGrades']);
     Route::get('academic-year/current', [AcademicYearController::class, 'getCurrentAcademicYear']);
     Route::get('terms/current', [TermController::class, 'getCurrentTerm']);
     Route::get('academic-years/{academicYear}/terms', [AcademicYearController::class, 'getTermsByAcademicYear']);
@@ -44,12 +47,12 @@ Route::prefix('v1')->group(function () {
     Route::post('students/bulk', [StudentController::class, 'bulk']);
     Route::get('assignments/teacher/{id}', [AssignementController::class, 'getAssignmentsForTeacher']);
     Route::get('classes/{classId}/grades-matrix', [GradeController::class, 'getGradesMatrix']);
-    Route::get('classes/{classId}/subjects/{subjectId}/assignments/{assignmentId}/teachers/{teacherId}/student-notes', [\App\Modules\Grade\Controllers\GradeStudentNotesController::class, 'getStudentNotes']);
+    Route::get('classes/{classId}/subjects/{subjectId}/assignments/{assignmentId}/teachers/{teacherId}/student-notes', [GradeStudentNotesController::class, 'getStudentNotes']);
     Route::post('teachers/dashboard/performance-summary/bulk', [TeacherController::class, 'getMultiClassPerformanceSummary']);
     Route::post('subjects/bulk', [SubjectController::class, 'getSubjectsByIds']);
 
 
-    Route::post('/send-teacher-contract', [TeacherContractController::class, 'sendContract']);
+    // Route::post('/send-teacher-contract', [TeacherContractController::class, 'sendContract']);
 
     // Auth routes
     Route::post('auth/register', [AuthController::class, 'register']);

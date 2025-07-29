@@ -15,19 +15,21 @@ class StudentSeeder extends Seeder
     public function run(): void
     {
         $classModels = ClassModel::all();
-        $studentUserStartId = 63; // Assuming student user_model_ids start from 63
-        $parentModelStartId = 1; // Assuming parent_model_ids start from 1
+        $studentUsers = \App\Modules\User\Models\UserModel::where('role_id', 3)->get();
+        $parentModels = \App\Modules\Parent\Models\ParentModel::all();
 
+        $studentIndex = 0;
         foreach ($classModels as $classModel) {
             for ($i = 0; $i < 5; $i++) {
+                $studentUser = $studentUsers[$studentIndex % $studentUsers->count()];
+                $parentModel = $parentModels[$studentIndex % $parentModels->count()];
                 Student::create([
-                    'matricule' => 'STU' . str_pad($studentUserStartId, 3, '0', STR_PAD_LEFT),
+                    'matricule' => 'STU' . str_pad($studentUser->id, 3, '0', STR_PAD_LEFT),
                     'academic_records' => 'Good',
-                    'parent_model_id' => $parentModelStartId,
-                    'user_model_id' => $studentUserStartId,
+                    'parent_model_id' => $parentModel->id,
+                    'user_model_id' => $studentUser->id,
                 ]);
-                $studentUserStartId++;
-                $parentModelStartId++;
+                $studentIndex++;
             }
         }
     }

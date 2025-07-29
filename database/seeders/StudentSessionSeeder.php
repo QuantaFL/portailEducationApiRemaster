@@ -27,7 +27,9 @@ class StudentSessionSeeder extends Seeder
                     $age = null;
                 }
                 $isYoung = $age !== null && $age < 15;
-                $gender = strtolower($user->gender) === 'f' ? 'girl' : 'boy';
+                $genderValue = strtolower(trim($user->gender));
+                $gender = ($genderValue === 'f' || $genderValue === 'female' || $genderValue === 'F') ? 'girl' : 'boy';
+
                 $type = $isYoung ? 'young' : 'old';
                 $matches = array_filter($profileFiles, function ($file) use ($gender, $type) {
                     return strpos($file, "student_{$gender}_{$type}") !== false;

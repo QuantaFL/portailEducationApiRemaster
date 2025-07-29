@@ -13,6 +13,23 @@ class UserModelSeeder extends Seeder
      */
     public function run(): void
     {
+        $otherNationalities = [
+            'Mauritanien',
+            'Malien',
+            'Guinéen',
+            'Congolais',
+            'Ivoirien',
+            'Burkinabé',
+            'Togolais',
+            'Béninois',
+            'Nigérien',
+            'Gambien'
+        ];
+
+        $randomNationality = function () use ($otherNationalities) {
+            return rand(1, 100) <= 80 ? 'Sénégalais' : $otherNationalities[array_rand($otherNationalities)];
+        };
+
         UserModel::create([
             'first_name' => 'Admin',
             'last_name' => 'User',
@@ -23,6 +40,7 @@ class UserModelSeeder extends Seeder
             'adress' => 'Dakar, Senegal',
             'phone' => '771234567',
             'gender' => 'M',
+            'nationality' => $randomNationality(),
         ]);
 
         $teacherData = [
@@ -37,6 +55,7 @@ class UserModelSeeder extends Seeder
             ['first_name' => 'Cheikh', 'last_name' => 'Cisse', 'email' => 'teacher9@example.com', 'gender' => 'M'],
             ['first_name' => 'Mariama', 'last_name' => 'Camara', 'email' => 'teacher10@example.com', 'gender' => 'F'],
         ];
+
         for ($i = 0; $i < 10; $i++) {
             UserModel::create([
                 'first_name' => $teacherData[$i]['first_name'],
@@ -48,6 +67,7 @@ class UserModelSeeder extends Seeder
                 'adress' => 'Dakar, Senegal',
                 'phone' => '77' . str_pad((1000000 + $i), 7, '0', STR_PAD_LEFT),
                 'gender' => $teacherData[$i]['gender'],
+                'nationality' => $randomNationality(),
             ]);
         }
 
@@ -60,11 +80,12 @@ class UserModelSeeder extends Seeder
                 'last_name' => $parentLastNames[$i % count($parentLastNames)],
                 'email' => 'parent' . ($i + 1) . '@example.com',
                 'password' => Hash::make('password'),
-                'role_id' => 3, // Assuming role_id 4 is for parent
+                'role_id' => 4,
                 'birthday' => '197' . ($i % 9) . '-0' . (($i % 11) + 1) . '-1' . (($i % 9) + 1),
                 'adress' => 'Dakar, Senegal',
                 'phone' => '77' . str_pad(rand(0, 9999999), 7, '0', STR_PAD_LEFT),
                 'gender' => (rand(0, 1) == 0) ? 'M' : 'F',
+                'nationality' => $randomNationality(),
             ]);
         }
 
@@ -80,11 +101,12 @@ class UserModelSeeder extends Seeder
                 'last_name' => $studentLastNames[$i % count($studentLastNames)],
                 'email' => 'student' . ($i + 1) . '@example.com',
                 'password' => Hash::make('password'),
-                'role_id' => 4,
+                'role_id' => 3,
                 'birthday' => '200' . ($i % 9) . '-0' . (($i % 11) + 1) . '-1' . (($i % 9) + 1),
                 'adress' => 'Dakar, Senegal',
                 'phone' => '77' . str_pad(rand(0, 9999999), 7, '0', STR_PAD_LEFT),
                 'gender' => $gender,
+                'nationality' => $randomNationality(),
             ]);
         }
     }
