@@ -12,26 +12,7 @@ use Illuminate\Support\Facades\Log;
 
 class GradeStudentNotesController extends Controller
 {
-    /**
-     * Fetch notes (grades) for students in a class for a given subject.
-     *
-     * Example usage:
-     * GET /api/v1/classes/{classId}/subjects/{subjectId}/student-notes
-     *
-     * Response:
-     * [
-     *   {
-     *     "student": { ... },
-     *     "student_session_id": 1,
-     *     "grades": [
-     *       { "type": "quiz", "mark": 15.5 },
-     *       { "type": "exam", "mark": 12.0 }
-     *     ]
-     *   },
-     *   ...
-     * ]
-     */
-    /**
+     /**
      * Fetch notes (grades) for students in a class for a given assignment and teacher.
      *
      * GET /api/v1/classes/{classId}/subjects/{subjectId}/assignments/{assignmentId}/teachers/{teacherId}/student-notes
