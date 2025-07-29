@@ -31,37 +31,45 @@ class GradeStudentNotesController extends Controller
      *   ...
      * ]
      */
-    public function getStudentNotes(Request $request, int $classId, int $subjectId): JsonResponse
+    /**
+     * Fetch notes (grades) for students in a class for a given assignment and teacher.
+     *
+     * GET /api/v1/classes/{classId}/subjects/{subjectId}/assignments/{assignmentId}/teachers/{teacherId}/student-notes
+     */
+    public function getStudentNotes(Request $request, int $classId, int $subjectId, int $assignmentId, int $teacherId): JsonResponse
     {
-        // Get all student sessions for the class
         $class = \App\Modules\ClassModel\Models\ClassModel::with(['currentAcademicYearStudentSessions.student'])->findOrFail($classId);
         $students = $class->currentAcademicYearStudentSessions;
-
-        // Get all assignments for the class and subject (term/academic year managed by backend)
-        $assignments = Assignement::where('class_model_id', $classId)
-            ->where('subject_id', $subjectId)
-            ->get();
-        $assignmentIds = $assignments->pluck('id')->all();
         $studentSessionIds = $students->pluck('id')->all();
 
-        // Eager load all grades for these students and assignments
+        // Get the assignment and check teacher if needed
+        $assignment = Assignement::where('id', $assignmentId)
+            ->where('class_model_id', $classId)
+            ->where('subject_id', $subjectId)
+            ->where('teacher_id', $teacherId)
+            ->firstOrFail();
+
+        $termId = \App\Modules\Term\Models\Term::getCurrentTerm()->id;
         $grades = Grade::whereIn('student_session_id', $studentSessionIds)
-            ->whereIn('assignement_id', $assignmentIds)
+            ->where('assignement_id', $assignmentId)
+            ->where('term_id', $termId)
             ->get();
 
-        // Group grades by student session and type
         $gradesByStudent = [];
         foreach ($grades as $grade) {
-            $gradesByStudent[$grade->student_session_id][$grade->type] = $grade->mark;
+            $gradesByStudent[$grade->student_session_id][$grade->type] = $grade;
         }
 
         $result = [];
         foreach ($students as $studentSession) {
             $studentGrades = [];
             foreach (["quiz", "exam"] as $type) {
+                $grade = $gradesByStudent[$studentSession->id][$type] ?? null;
                 $studentGrades[] = [
                     "type" => $type,
-                    "mark" => $gradesByStudent[$studentSession->id][$type] ?? null
+                    "mark" => $grade ? $grade->mark : null,
+                    "assignement_id" => $assignmentId,
+                    "subject_id" => $assignment->subject_id,
                 ];
             }
             $result[] = [

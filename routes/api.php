@@ -44,7 +44,7 @@ Route::prefix('v1')->group(function () {
     Route::post('students/bulk', [StudentController::class, 'bulk']);
     Route::get('assignments/teacher/{id}', [AssignementController::class, 'getAssignmentsForTeacher']);
     Route::get('classes/{classId}/grades-matrix', [GradeController::class, 'getGradesMatrix']);
-    Route::get('classes/{classId}/subjects/{subjectId}/student-notes', [\App\Modules\Grade\Controllers\GradeStudentNotesController::class, 'getStudentNotes']);
+    Route::get('classes/{classId}/subjects/{subjectId}/assignments/{assignmentId}/teachers/{teacherId}/student-notes', [\App\Modules\Grade\Controllers\GradeStudentNotesController::class, 'getStudentNotes']);
     Route::post('teachers/dashboard/performance-summary/bulk', [TeacherController::class, 'getMultiClassPerformanceSummary']);
     Route::post('subjects/bulk', [SubjectController::class, 'getSubjectsByIds']);
 
