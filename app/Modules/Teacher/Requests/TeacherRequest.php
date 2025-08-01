@@ -18,6 +18,7 @@ class TeacherRequest extends FormRequest
             'user.password' => ['required', 'string'],
             'user.adress' => ['required', 'string'],
             'user.phone' => ['required', 'string'],
+            'user.gender'=>['required']
         ];
     }
 

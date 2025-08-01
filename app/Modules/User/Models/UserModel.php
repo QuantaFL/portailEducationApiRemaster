@@ -53,6 +53,7 @@ class UserModel extends Authenticatable implements JWTSubject
             'phone' => $this->phone,
             'role' => $this->role ? $this->role->name : null,
             'isFirstLogin' => $this->isFirstLogin,
+            'gender'=>$this->gender ? $this->gender:null
         ];
     }
 
