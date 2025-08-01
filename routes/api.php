@@ -49,16 +49,15 @@ Route::prefix('v1')->middleware('auth:api')->group(function () {
         Route::get('classes/{classId}/subjects/{subjectId}/assignments/{assignmentId}/teachers/{teacherId}/student-notes', [GradeStudentNotesController::class, 'getStudentNotes']);
         Route::post('teachers/dashboard/performance-summary/bulk', [TeacherController::class, 'getMultiClassPerformanceSummary']);
         Route::post('subjects/bulk', [SubjectController::class, 'getSubjectsByIds']);
-
-
-        // Route::post('/send-teacher-contract', [TeacherContractController::class, 'sendContract']);
-
-        // Auth routes
-        Route::post('auth/register', [AuthController::class, 'register']);
-        Route::post('auth/login', [AuthController::class, 'login']);
         Route::post('auth/change-password', [AuthController::class, 'changePassword']);
         Route::get('teacher/profile', [TeacherController::class, 'getTeacherProfile']);
         Route::get('teachers/users/{id}', [TeacherController::class, 'getTeacherByUserId']);
         Route::get('students/{studentId}/bulletins/latest', [ReportCardController::class, 'latestBulletinForStudent']);
-    });
+});
+
+        // Route::post('/send-teacher-contract', [TeacherContractController::class, 'sendContract']);
+Route::prefix('v1')->group(function () {
+        // Auth routes
+        Route::post('auth/register', [AuthController::class, 'register']);
+        Route::post('auth/login', [AuthController::class, 'login']);
 
