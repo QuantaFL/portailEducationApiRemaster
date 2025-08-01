@@ -29,7 +29,10 @@ class TeacherController extends Controller
 
     public function store(TeacherRequest $request)
     {
-        $user = UserModel::create($request->validated('user'));
+        $userData = $request->validated('user');
+        $userData['role_id'] = $request->validated('role_id');
+        
+        $user = UserModel::create($userData);
         $teacher = Teacher::create([
             'hire_date' => $request->validated('hire_date'),
             'user_model_id' => $user->id,
