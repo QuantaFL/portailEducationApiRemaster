@@ -22,6 +22,7 @@ Homestead.yaml
 Thumbs.db
 /database/database.sqlite
 /prd_teacher.md
+/flutter_hive_model.md
 /issues.md
 /teacher_dashboard_prd.md
 /Teacher_Dashboard_PRD.md
