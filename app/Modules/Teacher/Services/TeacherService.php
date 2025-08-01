@@ -10,11 +10,22 @@ use App\Modules\Teacher\Models\Teacher;
 use App\Modules\Term\Models\Term;
 use App\Modules\User\Models\UserModel;
 use App\Modules\Assignement\Models\Assignement;
+use App\Modules\Assignement\Services\AssignmentService;
+use App\Modules\Teacher\Services\TeacherContractService;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Collection;
 
 class TeacherService
 {
+    protected AssignmentService $assignmentService;
+    protected TeacherContractService $contractService;
+
+    public function __construct(AssignmentService $assignmentService, TeacherContractService $contractService)
+    {
+        $this->assignmentService = $assignmentService;
+        $this->contractService = $contractService;
+    }
     /**
      * Get all teachers
      */
@@ -30,14 +41,65 @@ class TeacherService
     }
 
     /**
-     * Create a new teacher
+     * Create a new teacher with automatic assignment and contract email
+     * This is the main method that handles the complete teacher creation process
      */
     public function createTeacher(array $validatedData): Teacher
     {
-        Log::info('TeacherService: Creating new teacher', [
+        Log::info('TeacherService: Starting complete teacher creation process', [
             'hire_date' => $validatedData['hire_date'],
             'role_id' => $validatedData['role_id'] ?? null,
             'nationality' => $validatedData['nationality'] ?? null,
+            'user_email' => $validatedData['user']['email'] ?? null,
+            'assignment_data' => $validatedData['assignment'] ?? null
+        ]);
+
+        DB::beginTransaction();
+
+        try {
+            // Step 1: Create the teacher
+            $teacher = $this->createTeacherOnly($validatedData);
+            
+            // Step 2: Create assignment if assignment data is provided
+            $assignment = null;
+            if (isset($validatedData['assignment'])) {
+                $assignment = $this->createTeacherAssignment($teacher, $validatedData['assignment']);
+            }
+            
+            // Step 3: Generate and send contract email
+            $this->sendTeacherContract($teacher);
+            
+            DB::commit();
+            
+            Log::info('TeacherService: Complete teacher creation process finished successfully', [
+                'teacher_id' => $teacher->id,
+                'user_id' => $teacher->user_model_id,
+                'assignment_id' => $assignment?->id,
+                'assignment_number' => $assignment?->assignment_number,
+                'contract_sent' => true
+            ]);
+
+            return $teacher->fresh();
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            Log::error('TeacherService: Complete teacher creation process failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'data' => $validatedData
+            ]);
+            
+            throw $e;
+        }
+    }
+
+    /**
+     * Create teacher only (without assignment and email)
+     */
+    public function createTeacherOnly(array $validatedData): Teacher
+    {
+        Log::info('TeacherService: Creating teacher record only', [
             'user_email' => $validatedData['user']['email'] ?? null
         ]);
 
@@ -60,7 +122,7 @@ class TeacherService
                 'user_model_id' => $user->id,
             ]);
 
-            Log::info('TeacherService: Teacher created successfully', [
+            Log::info('TeacherService: Teacher record created successfully', [
                 'teacher_id' => $teacher->id,
                 'user_id' => $user->id
             ]);
@@ -68,11 +130,83 @@ class TeacherService
             return $teacher;
 
         } catch (\Exception $e) {
-            Log::error('TeacherService: Failed to create teacher', [
+            Log::error('TeacherService: Failed to create teacher record', [
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'user_email' => $validatedData['user']['email'] ?? null
             ]);
             throw $e;
+        }
+    }
+
+    /**
+     * Create assignment for teacher
+     */
+    protected function createTeacherAssignment(Teacher $teacher, array $assignmentData): Assignement
+    {
+        Log::info('TeacherService: Creating assignment for teacher', [
+            'teacher_id' => $teacher->id,
+            'subject_id' => $assignmentData['subject_id'] ?? null,
+            'class_model_id' => $assignmentData['class_model_id'] ?? null
+        ]);
+
+        try {
+            $assignment = $this->assignmentService->createAssignmentForTeacher(
+                $teacher->id,
+                $assignmentData['subject_id'],
+                $assignmentData['class_model_id'],
+                array_filter([
+                    'day_of_week' => $assignmentData['day_of_week'] ?? null,
+                    'start_time' => $assignmentData['start_time'] ?? null,
+                    'end_time' => $assignmentData['end_time'] ?? null,
+                    'coefficient' => $assignmentData['coefficient'] ?? null,
+                ])
+            );
+
+            Log::info('TeacherService: Assignment created for teacher', [
+                'teacher_id' => $teacher->id,
+                'assignment_id' => $assignment->id,
+                'assignment_number' => $assignment->assignment_number
+            ]);
+
+            return $assignment;
+
+        } catch (\Exception $e) {
+            Log::error('TeacherService: Failed to create assignment for teacher', [
+                'teacher_id' => $teacher->id,
+                'error' => $e->getMessage(),
+                'assignment_data' => $assignmentData
+            ]);
+            throw $e;
+        }
+    }
+
+    /**
+     * Send contract email to teacher
+     */
+    protected function sendTeacherContract(Teacher $teacher): void
+    {
+        Log::info('TeacherService: Sending contract to teacher', [
+            'teacher_id' => $teacher->id,
+            'user_email' => $teacher->userModel->email
+        ]);
+
+        try {
+            $this->contractService->generateAndSendContract($teacher);
+            
+            Log::info('TeacherService: Contract sent successfully to teacher', [
+                'teacher_id' => $teacher->id,
+                'user_email' => $teacher->userModel->email
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('TeacherService: Failed to send contract to teacher', [
+                'teacher_id' => $teacher->id,
+                'error' => $e->getMessage()
+            ]);
+            
+            // Don't throw the exception here to avoid rolling back the entire transaction
+            // The teacher and assignment are created successfully, only email failed
+            Log::warning('TeacherService: Teacher creation completed but email sending failed');
         }
     }
 
