@@ -63,6 +63,12 @@ class AssignmentService
 
     public function createAssignment(array $data): Assignement
     {
+        Log::info('AssignmentService: Creating new assignment', [
+            'teacher_id' => $data['teacher_id'] ?? null,
+            'class_model_id' => $data['class_model_id'] ?? null,
+            'subject_id' => $data['subject_id'] ?? null
+        ]);
+
         $this->validateAssignmentData($data);
         
         DB::beginTransaction();
@@ -76,7 +82,24 @@ class AssignmentService
                 }
             }
 
+            // Generate unique assignment number
+            $data['assignment_number'] = $this->generateAssignmentNumber();
+            Log::info('AssignmentService: Generated assignment number', ['assignment_number' => $data['assignment_number']]);
+
+            // Set default values
+            if (!isset($data['isActive'])) {
+                $data['isActive'] = true;
+            }
+
             $assignment = Assignement::create($data);
+            
+            Log::info('AssignmentService: Assignment created successfully', [
+                'assignment_id' => $assignment->id,
+                'assignment_number' => $assignment->assignment_number,
+                'teacher_id' => $assignment->teacher_id,
+                'subject_id' => $assignment->subject_id,
+                'class_model_id' => $assignment->class_model_id
+            ]);
             
             DB::commit();
             
@@ -84,7 +107,10 @@ class AssignmentService
             
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Failed to create assignment: ' . $e->getMessage());
+            Log::error('AssignmentService: Failed to create assignment', [
+                'error' => $e->getMessage(),
+                'data' => $data
+            ]);
             throw AssignmentException::creationFailed();
         }
     }
@@ -239,5 +265,104 @@ class AssignmentService
                 throw AssignmentException::conflictingSchedule();
             }
         }
+    }
+
+    /**
+     * Generate a unique assignment number
+     */
+    private function generateAssignmentNumber(): string
+    {
+        $maxAttempts = 10;
+        $attempt = 0;
+        
+        do {
+            $attempt++;
+            
+            // Format: ASS-YYYY-MMDD-XXXX (ASS = Assignment, YYYY = year, MMDD = month+day, XXXX = random)
+            $year = date('Y');
+            $monthDay = date('md');
+            $randomNumber = str_pad(mt_rand(1, 9999), 4, '0', STR_PAD_LEFT);
+            
+            $assignmentNumber = "ASS-{$year}-{$monthDay}-{$randomNumber}";
+            
+            // Check if this number already exists
+            $exists = Assignement::where('assignment_number', $assignmentNumber)->exists();
+            
+            if (!$exists) {
+                Log::info('AssignmentService: Generated unique assignment number', [
+                    'assignment_number' => $assignmentNumber,
+                    'attempts' => $attempt
+                ]);
+                return $assignmentNumber;
+            }
+            
+            Log::debug('AssignmentService: Generated assignment number already exists, retrying', [
+                'assignment_number' => $assignmentNumber,
+                'attempt' => $attempt
+            ]);
+            
+        } while ($attempt < $maxAttempts);
+        
+        // If we couldn't generate a unique number after max attempts, use timestamp-based approach
+        $timestamp = time();
+        $assignmentNumber = "ASS-{$year}-{$monthDay}-" . substr($timestamp, -4);
+        
+        Log::warning('AssignmentService: Using timestamp-based assignment number after max attempts', [
+            'assignment_number' => $assignmentNumber,
+            'max_attempts_reached' => $maxAttempts
+        ]);
+        
+        return $assignmentNumber;
+    }
+
+    /**
+     * Create assignment for teacher (used by TeacherService)
+     */
+    public function createAssignmentForTeacher(int $teacherId, int $subjectId, int $classModelId, ?array $additionalData = []): Assignement
+    {
+        Log::info('AssignmentService: Creating assignment for teacher', [
+            'teacher_id' => $teacherId,
+            'subject_id' => $subjectId,
+            'class_model_id' => $classModelId
+        ]);
+
+        $data = array_merge([
+            'teacher_id' => $teacherId,
+            'subject_id' => $subjectId,
+            'class_model_id' => $classModelId,
+            'isActive' => true,
+        ], $additionalData);
+
+        return $this->createAssignment($data);
+    }
+
+    /**
+     * Activate assignment
+     */
+    public function activateAssignment(Assignement $assignment): Assignement
+    {
+        Log::info('AssignmentService: Activating assignment', [
+            'assignment_id' => $assignment->id,
+            'assignment_number' => $assignment->assignment_number
+        ]);
+
+        $assignment->update(['isActive' => true]);
+        
+        return $assignment->fresh();
+    }
+
+    /**
+     * Deactivate assignment
+     */
+    public function deactivateAssignment(Assignement $assignment): Assignement
+    {
+        Log::info('AssignmentService: Deactivating assignment', [
+            'assignment_id' => $assignment->id,
+            'assignment_number' => $assignment->assignment_number
+        ]);
+
+        $assignment->update(['isActive' => false]);
+        
+        return $assignment->fresh();
     }
 }
