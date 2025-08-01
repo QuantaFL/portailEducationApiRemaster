@@ -15,6 +15,7 @@ use App\Modules\User\Controllers\AuthController;
 use \App\Modules\Grade\Controllers\GradeClassController;
 use App\Modules\Grade\Controllers\GradeStudentNotesController;
 
+use App\Modules\User\Controllers\UserModelController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -30,6 +31,7 @@ Route::prefix('v1')->middleware('auth:api')->group(function () {
         Route::apiResource('subjects', SubjectController::class);
         Route::apiResource('academic-years', AcademicYearController::class);
         Route::apiResource('terms', TermController::class);
+        Route::apiResource('users', UserModelController::class);
         Route::get('grades/class/{classId}/students/{studentId?}/teacher/{teacherId?}/subject/{subjectId?}/assignement/{assignementId?}', [GradeController::class, 'getStudentGradesInClassForTerm']);
         Route::apiResource('parents', ParentController::class);
         Route::apiResource('classes', ClassModelController::class);
@@ -49,16 +51,16 @@ Route::prefix('v1')->middleware('auth:api')->group(function () {
         Route::get('classes/{classId}/subjects/{subjectId}/assignments/{assignmentId}/teachers/{teacherId}/student-notes', [GradeStudentNotesController::class, 'getStudentNotes']);
         Route::post('teachers/dashboard/performance-summary/bulk', [TeacherController::class, 'getMultiClassPerformanceSummary']);
         Route::post('subjects/bulk', [SubjectController::class, 'getSubjectsByIds']);
-
-
-        // Route::post('/send-teacher-contract', [TeacherContractController::class, 'sendContract']);
-
-        // Auth routes
-        Route::post('auth/register', [AuthController::class, 'register']);
-        Route::post('auth/login', [AuthController::class, 'login']);
         Route::post('auth/change-password', [AuthController::class, 'changePassword']);
         Route::get('teacher/profile', [TeacherController::class, 'getTeacherProfile']);
         Route::get('teachers/users/{id}', [TeacherController::class, 'getTeacherByUserId']);
         Route::get('students/{studentId}/bulletins/latest', [ReportCardController::class, 'latestBulletinForStudent']);
-    });
+});
 
+        // Route::post('/send-teacher-contract', [TeacherContractController::class, 'sendContract']);
+Route::prefix('v1')->group(function () {
+        // Auth routes
+        Route::post('auth/register', [AuthController::class, 'register']);
+        Route::post('auth/login', [AuthController::class, 'login'])->name('login');
+//        Route::post('login', [AuthController::class, 'login'])->name('login');
+});
