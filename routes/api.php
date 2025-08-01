@@ -15,6 +15,7 @@ use App\Modules\User\Controllers\AuthController;
 use \App\Modules\Grade\Controllers\GradeClassController;
 use App\Modules\Grade\Controllers\GradeStudentNotesController;
 
+use App\Modules\User\Controllers\UserModelController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -30,6 +31,7 @@ Route::prefix('v1')->middleware('auth:api')->group(function () {
         Route::apiResource('subjects', SubjectController::class);
         Route::apiResource('academic-years', AcademicYearController::class);
         Route::apiResource('terms', TermController::class);
+        Route::apiResource('users', UserModelController::class);
         Route::get('grades/class/{classId}/students/{studentId?}/teacher/{teacherId?}/subject/{subjectId?}/assignement/{assignementId?}', [GradeController::class, 'getStudentGradesInClassForTerm']);
         Route::apiResource('parents', ParentController::class);
         Route::apiResource('classes', ClassModelController::class);
