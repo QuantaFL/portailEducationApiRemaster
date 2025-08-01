@@ -51,6 +51,7 @@ class GradeStudentNotesController extends Controller
                     "mark" => $grade ? $grade->mark : null,
                     "assignement_id" => $assignmentId,
                     "subject_id" => $assignment->subject_id,
+                    "status" => $grade ? $grade->status : 'pending',
                 ];
             }
             $result[] = [
