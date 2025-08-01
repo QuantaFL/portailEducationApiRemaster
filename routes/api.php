@@ -61,5 +61,6 @@ Route::prefix('v1')->middleware('auth:api')->group(function () {
 Route::prefix('v1')->group(function () {
         // Auth routes
         Route::post('auth/register', [AuthController::class, 'register']);
-        Route::post('auth/login', [AuthController::class, 'login']);
+        Route::post('auth/login', [AuthController::class, 'login'])->name('login');
+//        Route::post('login', [AuthController::class, 'login'])->name('login');
 });
