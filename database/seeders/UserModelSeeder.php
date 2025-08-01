@@ -30,6 +30,13 @@ class UserModelSeeder extends Seeder
             return rand(1, 100) <= 80 ? 'Sénégalais' : $otherNationalities[array_rand($otherNationalities)];
         };
 
+        $generateUniquePhoneNumber = function () {
+            do {
+                $phoneNumber = '77' . str_pad(rand(0, 9999999), 7, '0', STR_PAD_LEFT);
+            } while (UserModel::where('phone', $phoneNumber)->exists());
+            return $phoneNumber;
+        };
+
         UserModel::create([
             'first_name' => 'Admin',
             'last_name' => 'User',
@@ -38,7 +45,7 @@ class UserModelSeeder extends Seeder
             'role_id' => 1,
             'birthday' => '2000-01-01',
             'adress' => 'Dakar, Senegal',
-            'phone' => '771234567',
+            'phone' => $generateUniquePhoneNumber(),
             'gender' => 'M',
             'nationality' => $randomNationality(),
         ]);
@@ -65,7 +72,7 @@ class UserModelSeeder extends Seeder
                 'role_id' => 2,
                 'birthday' => '198' . ($i % 10) . '-0' . (($i % 9) + 1) . '-1' . (($i % 9) + 1),
                 'adress' => 'Dakar, Senegal',
-                'phone' => '77' . str_pad((1000000 + $i), 7, '0', STR_PAD_LEFT),
+                'phone' => $generateUniquePhoneNumber(),
                 'gender' => $teacherData[$i]['gender'],
                 'nationality' => $randomNationality(),
             ]);
@@ -83,7 +90,7 @@ class UserModelSeeder extends Seeder
                 'role_id' => 4,
                 'birthday' => '197' . ($i % 9) . '-0' . (($i % 11) + 1) . '-1' . (($i % 9) + 1),
                 'adress' => 'Dakar, Senegal',
-                'phone' => '77' . str_pad(rand(0, 9999999), 7, '0', STR_PAD_LEFT),
+                'phone' => $generateUniquePhoneNumber(),
                 'gender' => (rand(0, 1) == 0) ? 'M' : 'F',
                 'nationality' => $randomNationality(),
             ]);
@@ -104,7 +111,7 @@ class UserModelSeeder extends Seeder
                 'role_id' => 3,
                 'birthday' => '200' . ($i % 9) . '-0' . (($i % 11) + 1) . '-1' . (($i % 9) + 1),
                 'adress' => 'Dakar, Senegal',
-                'phone' => '77' . str_pad(rand(0, 9999999), 7, '0', STR_PAD_LEFT),
+                'phone' => $generateUniquePhoneNumber(),
                 'gender' => $gender,
                 'nationality' => $randomNationality(),
             ]);
