@@ -17,6 +17,10 @@ use Illuminate\Notifications\Notifiable;
  */
 class User extends Authenticatable
 {
+    protected static function newFactory()
+    {
+        return \Database\Factories\UserModelFactory::new();
+    }
     use HasFactory, Notifiable;
 
     /**
