@@ -23,6 +23,8 @@ class Assignement extends Model
         'start_time',
         'end_time',
         'coefficient',
+        'isActive',
+        'assignment_number',
     ];
 
     protected $with = ['teacher', 'subject', 'academicYear', 'classModel'];
@@ -31,6 +33,7 @@ class Assignement extends Model
         'coefficient' => 'float',
         'start_time' => 'datetime:H:i',
         'end_time' => 'datetime:H:i',
+        'isActive' => 'boolean',
     ];
 
     public function teacher()
