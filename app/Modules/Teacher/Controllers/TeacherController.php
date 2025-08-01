@@ -31,7 +31,7 @@ class TeacherController extends Controller
     {
         $userData = $request->validated('user');
         $userData['role_id'] = $request->validated('role_id');
-        
+        $userData['nationality'] =$request->validated('nationality');
         $user = UserModel::create($userData);
         $teacher = Teacher::create([
             'hire_date' => $request->validated('hire_date'),

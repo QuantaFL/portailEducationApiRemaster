@@ -11,6 +11,7 @@ class TeacherRequest extends FormRequest
         return [
             'hire_date' => ['required'],
             'role_id' => ['required', 'integer', 'exists:role_models,id'],
+            'nationality' => ['nullable', 'string'],
             'user' => ['required', 'array'],
             'user.first_name' => ['required', 'string'],
             'user.last_name' => ['required', 'string'],
