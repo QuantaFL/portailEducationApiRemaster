@@ -66,7 +66,7 @@ Suivez ces étapes pour configurer le projet localement :
 4.  **Configurer l'environnement** :
     Copiez le fichier `.env.example` et renommez-le en `.env`.
     ```bash
-    cp .env.example .env
+    cp .env .env
     ```
     Générez une clé d'application :
     ```bash
