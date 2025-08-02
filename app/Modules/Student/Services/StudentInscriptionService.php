@@ -19,7 +19,7 @@ class StudentInscriptionService
     public function processInscription(array $data, ?UploadedFile $academicRecordsFile = null): array
     {
         DB::beginTransaction();
-        
+
         try {
             // Create or get parent user
             $parentResult = $this->handleParentCreation($data);
@@ -67,16 +67,16 @@ class StudentInscriptionService
                 'data' => $data,
                 'exception' => $e
             ]);
-            
+
             if ($e instanceof StudentInscriptionException) {
                 throw $e;
             }
-            
+
             throw StudentInscriptionException::inscriptionProcessFailed();
         }
     }
 
-    private function handleParentCreation(array $data): array
+    public function handleParentCreation(array $data): array
     {
         $parentUser = UserModel::where('email', $data['parent_email'])->first();
         $parentPassword = $this->generatePassword();
@@ -94,7 +94,7 @@ class StudentInscriptionService
                 'adress' => $data['parent_adress'] ?? null,
                 'role_id' => $data['parent_role_id'] ?? null,
             ], 'parent');
-            
+
             $parentJustCreated = true;
         }
 
@@ -108,7 +108,7 @@ class StudentInscriptionService
         ];
     }
 
-    private function handleStudentCreation(array $data): array
+    public function handleStudentCreation(array $data): array
     {
         $studentUser = UserModel::where('email', $data['student_email'])->first();
         $studentPassword = $this->generatePassword();
@@ -126,7 +126,7 @@ class StudentInscriptionService
                 'adress' => $data['student_adress'] ?? null,
                 'role_id' => $data['student_role_id'] ?? null,
             ], 'student');
-            
+
             $studentJustCreated = true;
         }
 
@@ -169,7 +169,7 @@ class StudentInscriptionService
     {
         try {
             $matricule = Student::generateMatricule();
-            
+
             return Student::create([
                 'matricule' => $matricule,
                 'parent_model_id' => $parentModelId,
@@ -210,10 +210,10 @@ class StudentInscriptionService
     {
         try {
             $path = $file->store('justificatifs', 'public');
-            
+
             $studentSession->justificatif_path = $path;
             $studentSession->save();
-            
+
             $student->academic_records = $path;
             $student->save();
         } catch (\Exception $e) {
@@ -227,11 +227,11 @@ class StudentInscriptionService
     }
 
     private function sendWelcomeEmails(
-        UserModel $parentUser, 
-        string $parentPassword, 
+        UserModel $parentUser,
+        string $parentPassword,
         bool $parentJustCreated,
-        UserModel $studentUser, 
-        string $studentPassword, 
+        UserModel $studentUser,
+        string $studentPassword,
         bool $studentJustCreated
     ): void {
         try {
