@@ -7,6 +7,7 @@ use App\Modules\Student\Models\Student;
 use App\Modules\Student\Requests\StudentRequest;
 use App\Modules\Student\Resources\StudentResource;
 use App\Modules\User\Models\UserModel;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class StudentController extends Controller
@@ -55,6 +56,12 @@ class StudentController extends Controller
     {
         $ids = $request->input('ids', []);
         $students = Student::whereIn('id', $ids)->get();
+        return response()->json(StudentResource::collection($students));
+    }
+
+    public function getStudentsByUserId(string $id): JsonResponse
+    {
+        $students = Student::where('user_model_id', $id)->get();
         return response()->json(StudentResource::collection($students));
     }
 }
