@@ -9,7 +9,7 @@ use App\Modules\AcademicYear\Models\AcademicYear;
 use App\Modules\Student\Models\StudentSession;
 use App\Modules\Assignement\Models\Assignement;
 use Mockery;
-use PHPUnit\Framework\TestCase;
+use Tests\TestCase;
 
 class GradeFetchServiceTest extends TestCase
 {
@@ -36,4 +36,3 @@ class GradeFetchServiceTest extends TestCase
         $this->assertEquals(['error' => 'No current term found.'], $result);
     }
 }
-
