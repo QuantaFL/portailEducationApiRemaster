@@ -7,7 +7,7 @@ use App\Modules\Subject\Services\SubjectService;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Mockery;
-use PHPUnit\Framework\TestCase;
+use Tests\TestCase;
 
 class SubjectServiceTest extends TestCase
 {
@@ -36,4 +36,3 @@ class SubjectServiceTest extends TestCase
         $this->assertEquals('Math', $result[0]->name);
     }
 }
-
