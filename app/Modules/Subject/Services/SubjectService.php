@@ -2,6 +2,7 @@
 
 namespace App\Modules\Subject\Services;
 
+use App\Modules\Subject\exceptions\SubjectException;
 use App\Modules\Subject\Models\Subject;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -15,11 +16,11 @@ class SubjectService
     public function getAllSubjects(): Collection
     {
         Log::info('SubjectService: Fetching all subjects');
-        
+
         $subjects = Subject::all();
-        
+
         Log::info('SubjectService: Retrieved ' . $subjects->count() . ' subjects');
-        
+
         return $subjects;
     }
 
@@ -30,20 +31,27 @@ class SubjectService
     {
         Log::info('SubjectService: Creating new subject', [
             'name' => $validatedData['name'],
-            'level' => $validatedData['level'],
+            'level' => $validatedData['level']?? null,
             'coefficient' => $validatedData['coefficient'] ?? null
         ]);
 
+        $existsName = Subject::where('name', $validatedData['name'])->first();
+        if($existsName!=null){
+              throw SubjectException::SubjectNameConflict();
+        }
+
         try {
-            // Check if subject already exists for this level
-            $exists = $this->subjectExistsForLevel($validatedData['name'], $validatedData['level']);
-            
-            if ($exists) {
-                Log::warning('SubjectService: Subject already exists', [
-                    'name' => $validatedData['name'],
-                    'level' => $validatedData['level']
-                ]);
-                throw new \Exception("La matière '{$validatedData['name']}' existe déjà pour le niveau {$validatedData['level']}.");
+            // Check if subject already exists for this level (only if level is provided)
+            if (isset($validatedData['level']) && $validatedData['level'] !== null) {
+                $exists = $this->subjectExistsForLevel($validatedData['name'], $validatedData['level']);
+
+                if ($exists) {
+                    Log::warning('SubjectService: Subject already exists', [
+                        'name' => $validatedData['name'],
+                        'level' => $validatedData['level']
+                    ]);
+                    throw new \Exception("La matière '{$validatedData['name']}' existe déjà pour le niveau {$validatedData['level']}.");
+                }
             }
 
             $subject = Subject::create($validatedData);
@@ -51,7 +59,7 @@ class SubjectService
             Log::info('SubjectService: Subject created successfully', [
                 'subject_id' => $subject->id,
                 'name' => $subject->name,
-                'level' => $subject->level
+                'level' => $subject->level ?? null
             ]);
 
             return $subject;
@@ -80,13 +88,13 @@ class SubjectService
 
         try {
             // Check if the updated subject would conflict with existing one
-            if (isset($validatedData['name']) && isset($validatedData['level'])) {
+            if (isset($validatedData['name']) && isset($validatedData['level']) && $validatedData['level'] !== null) {
                 $exists = $this->subjectExistsForLevel(
-                    $validatedData['name'], 
-                    $validatedData['level'], 
+                    $validatedData['name'],
+                    $validatedData['level'],
                     $subject->id
                 );
-                
+
                 if ($exists) {
                     Log::warning('SubjectService: Updated subject would conflict', [
                         'name' => $validatedData['name'],
@@ -128,9 +136,9 @@ class SubjectService
 
         try {
             $subject->delete();
-            
+
             Log::info('SubjectService: Subject deleted successfully', ['subject_id' => $subject->id]);
-            
+
             return true;
 
         } catch (\Exception $e) {
