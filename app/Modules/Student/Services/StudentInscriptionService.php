@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Mail;
 
 class StudentInscriptionService
 {
-    public function processInscription(array $data, ?UploadedFile $academicRecordsFile = null): array
+    public function processInscription(array $data, ?UploadedFile $academicRecordsFile = null, ?UploadedFile $photoFile = null): array
     {
         DB::beginTransaction();
 
@@ -43,6 +43,10 @@ class StudentInscriptionService
             // Handle file upload if provided
             if ($academicRecordsFile) {
                 $this->handleFileUpload($academicRecordsFile, $student, $studentSession);
+            }
+            // Handle student photo upload if provided
+            if ($photoFile) {
+                $this->handlePhotoUpload($photoFile, $student);
             }
 
             // Send welcome emails
@@ -220,6 +224,21 @@ class StudentInscriptionService
             Log::error('Failed to handle file upload', [
                 'student_id' => $student->id,
                 'student_session_id' => $studentSession->id,
+                'exception' => $e
+            ]);
+            throw StudentInscriptionException::fileUploadFailed();
+        }
+    }
+
+    private function handlePhotoUpload(UploadedFile $file, Student $student): void
+    {
+        try {
+            $path = $file->store('photos', 'public');
+            $student->photo = $path;
+            $student->save();
+        } catch (\Exception $e) {
+            Log::error('Failed to handle student photo upload', [
+                'student_id' => $student->id,
                 'exception' => $e
             ]);
             throw StudentInscriptionException::fileUploadFailed();
