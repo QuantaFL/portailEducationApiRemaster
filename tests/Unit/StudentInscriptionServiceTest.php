@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Mockery;
-use PHPUnit\Framework\TestCase;
+use Tests\TestCase;
 
 class StudentInscriptionServiceTest extends TestCase
 {
@@ -67,4 +67,3 @@ class StudentInscriptionServiceTest extends TestCase
         $this->assertArrayHasKey('parent_password', $result);
     }
 }
-
