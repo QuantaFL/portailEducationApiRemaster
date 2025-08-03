@@ -12,7 +12,10 @@ class AssignementRequest extends FormRequest
             'teacher_id' => ['required', 'exists:teachers'],
             'class_model_id' => ['required', 'exists:class_models'],
             'subject_id' => ['required', 'exists:subjects'],
-            'term_id'=>['required','exists:terms']
+            'academic_year_id' => ['required', 'exists:academic_years'],
+            'day_of_week' => ['nullable', 'array', 'in:Monday,Tuesday,Wednesday,Thursday,Friday,Saturday'],
+            'start_time' => ['nullable', 'date_format:H:i'],
+            'end_time' => ['nullable', 'date_format:H:i', 'after:start_time'],
         ];
     }
 

@@ -21,7 +21,7 @@ class Assignement extends Model
         'academic_year_id',
         'day_of_week',
         'start_time',
-        'end_time',
+        'end_time'
     ];
 
     protected $with = ['teacher', 'subject', 'academicYear', 'classModel'];

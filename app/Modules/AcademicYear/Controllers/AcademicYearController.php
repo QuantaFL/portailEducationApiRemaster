@@ -19,7 +19,6 @@ class AcademicYearController extends Controller
     {
         return response()->json(AcademicYearResource::collection(AcademicYear::all()));
     }
-    //TODO:rollback if terms are not save in database
     public function store(AcademicYearRequest $request)
     {
         $start = (int) $request->start_date;
