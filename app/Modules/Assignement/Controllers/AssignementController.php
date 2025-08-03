@@ -6,9 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Modules\Assignement\Exceptions\AssignmentException;
 use App\Modules\Assignement\Models\Assignement;
 use App\Modules\Assignement\Requests\AssignementRequest;
+use App\Modules\Assignement\Requests\ToggleStatusByTeacherRequest;
 use App\Modules\Assignement\Ressources\AssignementResource;
 use App\Modules\Assignement\Services\AssignmentService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class AssignementController extends Controller
 {
@@ -83,7 +85,7 @@ class AssignementController extends Controller
         try {
             $termId = $request->input('term_id');
             $classId = $request->input('class_id');
-            
+
             if (!$termId || !$classId) {
                 return response()->json([
                     'message' => 'Term ID and Class ID are required'
@@ -96,6 +98,35 @@ class AssignementController extends Controller
             return response()->json([
                 'message' => $e->getMessage()
             ], $e->getCode());
+        }
+    }
+
+    public function toggleStatusByTeacher(ToggleStatusByTeacherRequest $request)
+    {
+        try {
+            $validated = $request->validated();
+            $teacherId = $validated['teacher_id'];
+
+            $assignment = $this->assignmentService->toggleAssignmentStatusByTeacherId($teacherId);
+            return response()->json(new AssignementResource($assignment));
+
+        } catch (AssignmentException $e) {
+            Log::error('AssignementController: Failed to toggle assignment status by teacher', [
+                'error' => $e->getMessage(),
+                'teacher_id' => request()->input('teacher_id')
+            ]);
+            return response()->json(['message' => $e->getMessage()], 404);
+        } catch (\Exception $e) {
+            Log::error('AssignementController: Failed to toggle assignment status by teacher', [
+                'error' => $e->getMessage(),
+                'teacher_id' => request()->input('teacher_id')
+            ]);
+
+            if (str_contains($e->getMessage(), "Aucun assignement trouvé")) {
+                return response()->json(['message' => $e->getMessage()], 404);
+            }
+
+            return response()->json(['message' => 'Failed to toggle assignment status'], 500);
         }
     }
 }
