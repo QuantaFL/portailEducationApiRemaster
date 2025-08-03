@@ -214,4 +214,45 @@ class SubjectService
 
         return $exists;
     }
+
+    /**
+     * Toggle subject status by name
+     */
+    public function toggleStatusByName(string $subjectName): Subject
+    {
+        Log::info('SubjectService: Toggling subject status', [
+            'subject_name' => $subjectName
+        ]);
+
+        try {
+            $subject = Subject::where('name', $subjectName)->first();
+            
+            if (!$subject) {
+                Log::error('SubjectService: Subject not found for status toggle', [
+                    'subject_name' => $subjectName
+                ]);
+                throw new \Exception("La matière '{$subjectName}' n'existe pas.");
+            }
+
+            // Toggle status: if true -> false, if false -> true, if null -> false
+            $newStatus = !$subject->status;
+            $subject->update(['status' => $newStatus]);
+
+            Log::info('SubjectService: Subject status toggled successfully', [
+                'subject_id' => $subject->id,
+                'subject_name' => $subject->name,
+                'old_status' => !$newStatus,
+                'new_status' => $newStatus
+            ]);
+
+            return $subject->fresh();
+
+        } catch (\Exception $e) {
+            Log::error('SubjectService: Failed to toggle subject status', [
+                'subject_name' => $subjectName,
+                'error' => $e->getMessage()
+            ]);
+            throw $e;
+        }
+    }
 }

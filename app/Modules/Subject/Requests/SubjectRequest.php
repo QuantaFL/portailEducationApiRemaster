@@ -12,6 +12,7 @@ class SubjectRequest extends FormRequest
             'name' => ['required'],
             'level' => ['nullable'],
             'coefficient' => ['nullable'],
+            'status' => ['nullable', 'boolean'],
         ];
     }
 

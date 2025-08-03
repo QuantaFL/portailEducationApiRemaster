@@ -5,6 +5,7 @@ namespace App\Modules\Subject\Controllers;
 use App\Http\Controllers\Controller;
 use App\Modules\Subject\Models\Subject;
 use App\Modules\Subject\Requests\SubjectRequest;
+use App\Modules\Subject\Requests\ToggleStatusRequest;
 use App\Modules\Subject\Ressources\SubjectResource;
 use App\Modules\Subject\Services\SubjectService;
 use Illuminate\Support\Facades\Log;
@@ -90,5 +91,39 @@ class SubjectController extends Controller
         }
     }
 
-
+    public function toggleStatus(ToggleStatusRequest $request)
+    {
+        try {
+            $validated = $request->validated();
+            $subjectName = $validated['name'];
+            
+            Log::info('SubjectController: Toggle status request received', [
+                'subject_name' => $subjectName,
+                'user_agent' => request()->header('User-Agent'),
+                'ip' => request()->ip()
+            ]);
+            
+            $subject = $this->subjectService->toggleStatusByName($subjectName);
+            
+            Log::info('SubjectController: Toggle status completed successfully', [
+                'subject_id' => $subject->id,
+                'subject_name' => $subject->name,
+                'new_status' => $subject->status
+            ]);
+            
+            return response()->json(new SubjectResource($subject));
+        } catch (\Exception $e) {
+            Log::error('SubjectController: Failed to toggle subject status', [
+                'error' => $e->getMessage(),
+                'subject_name' => $request->input('name'),
+                'stack_trace' => $e->getTraceAsString()
+            ]);
+            
+            if (str_contains($e->getMessage(), "n'existe pas")) {
+                return response()->json(['message' => $e->getMessage()], 404);
+            }
+            
+            return response()->json(['message' => 'Failed to toggle subject status'], 500);
+        }
+    }
 }

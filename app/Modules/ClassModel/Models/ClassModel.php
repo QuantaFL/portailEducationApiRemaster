@@ -5,9 +5,11 @@ namespace App\Modules\ClassModel\Models;
 use App\Modules\AcademicYear\Models\AcademicYear;
 use App\Modules\AcademicYear\Models\StatusAcademicYearEnum;
 use App\Modules\Student\Models\StudentSession;
+use App\Modules\Subject\Models\Subject;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class ClassModel extends Model
 {
@@ -29,5 +31,14 @@ class ClassModel extends Model
 
         return $this->hasMany(StudentSession::class)
             ->where('academic_year_id', $currentAcademicYear->id);
+    }
+
+    /**
+     * Relation many-to-many avec Subject
+     */
+    public function subjects(): BelongsToMany
+    {
+        return $this->belongsToMany(Subject::class, 'class_subject', 'class_model_id', 'subject_id')
+                    ->withTimestamps();
     }
 }
