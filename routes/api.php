@@ -56,6 +56,7 @@ Route::prefix('v1')->group(function () {
     Route::get('classes/{classId}/subjects/{subjectId}/assignments/{assignmentId}/teachers/{teacherId}/student-notes', [GradeStudentNotesController::class, 'getStudentNotes']);
     Route::post('teachers/dashboard/performance-summary/bulk', [TeacherController::class, 'getMultiClassPerformanceSummary']);
     Route::post('subjects/bulk', [SubjectController::class, 'getSubjectsByIds']);
+    Route::post('classes/assign-subject', [ClassModelController::class, 'assignSubject']);
 
 
     // Route::post('/send-teacher-contract', [TeacherContractController::class, 'sendContract']);
