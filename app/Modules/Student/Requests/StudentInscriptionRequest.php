@@ -9,7 +9,6 @@ class StudentInscriptionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            // Parent
             'parent_first_name' => ['required', 'string'],
             'parent_last_name' => ['required', 'string'],
             'parent_email' => ['required', 'email', 'max:255'],
@@ -25,10 +24,10 @@ class StudentInscriptionRequest extends FormRequest
             'student_adress' => ['nullable', 'string'],
             'student_birthday' => ['required', 'date'],
             'student_gender' => ['required', 'string'],
-            // Session
             'class_model_id' => ['required', 'exists:class_models,id'],
             'academic_year_id' => ['required', 'exists:academic_years,id'],
             'academic-records' => ['nullable', 'file', 'mimes:pdf,jpg,png', 'max:2048'],
+            'photo' => ['nullable', 'file', 'mimes:jpg,jpeg,png', 'max:2048'],
         ];
     }
 

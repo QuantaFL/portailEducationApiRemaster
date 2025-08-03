@@ -7,7 +7,10 @@
 .env
 bootstrap/cache/config.php
 /bootstrap/cache/config.php
-
+STUDENT_NEXT_CLASSES_API.md
+student_details_endpoint.md
+BULLETIN_DOWNLOAD_AND_NOTIFICATION.md
+/STUDENT_NEXT_CLASSES_API.md
 /.env
 *.env
 /.nova
@@ -27,3 +30,4 @@ Thumbs.db
 /teacher_dashboard_prd.md
 /Teacher_Dashboard_PRD.md
 claude.md
+/student_details_endpoint.md

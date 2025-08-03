@@ -16,6 +16,7 @@ class Student extends Model
     protected $fillable = [
         'matricule',
         'academic_records',
+        'photo',
         'parent_model_id',
         'user_model_id',
     ];
@@ -48,6 +49,11 @@ class Student extends Model
     public function getAcademicRecordsUrlAttribute()
     {
         return $this->academic_records ? asset('storage/' . ltrim(str_replace('public/', '', $this->academic_records), '/')) : null;
+    }
+
+    public function getPhotoUrlAttribute()
+    {
+        return $this->photo ? asset('storage/' . ltrim(str_replace('public/', '', $this->photo), '/')) : null;
     }
 
     public static function generateMatricule(): string
