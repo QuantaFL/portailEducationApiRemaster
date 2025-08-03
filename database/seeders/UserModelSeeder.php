@@ -14,35 +14,29 @@ class UserModelSeeder extends Seeder
     public function run(): void
     {
         $otherNationalities = [
-            'Mauritanien',
-            'Malien',
-            'Guinéen',
-            'Congolais',
-            'Ivoirien',
-            'Burkinabé',
-            'Togolais',
-            'Béninois',
-            'Nigérien',
-            'Gambien'
+            'Mauritanien', 'Malien', 'Guinéen', 'Congolais', 'Ivoirien',
+            'Burkinabé', 'Togolais', 'Béninois', 'Nigérien', 'Gambien'
         ];
 
         $randomNationality = function () use ($otherNationalities) {
             return rand(1, 100) <= 80 ? 'Sénégalais' : $otherNationalities[array_rand($otherNationalities)];
         };
 
+        // Create Admin User
         UserModel::create([
             'first_name' => 'Admin',
             'last_name' => 'User',
             'email' => 'admin@example.com',
             'password' => Hash::make('password'),
             'role_id' => 1,
-            'birthday' => '2000-01-01',
+            'birthday' => '1980-01-01',
             'adress' => 'Dakar, Senegal',
             'phone' => '771234567',
             'gender' => 'M',
             'nationality' => $randomNationality(),
         ]);
 
+        // Create Teachers (role_id = 2) - They are NOT parents
         $teacherData = [
             ['first_name' => 'Fatou', 'last_name' => 'Diop', 'email' => 'teacher@example.com', 'gender' => 'F'],
             ['first_name' => 'Moussa', 'last_name' => 'Ba', 'email' => 'teacher2@example.com', 'gender' => 'M'],
@@ -56,58 +50,89 @@ class UserModelSeeder extends Seeder
             ['first_name' => 'Mariama', 'last_name' => 'Camara', 'email' => 'teacher10@example.com', 'gender' => 'F'],
         ];
 
-        for ($i = 0; $i < 10; $i++) {
+        foreach ($teacherData as $i => $teacher) {
             UserModel::create([
-                'first_name' => $teacherData[$i]['first_name'],
-                'last_name' => $teacherData[$i]['last_name'],
-                'email' => $teacherData[$i]['email'],
+                'first_name' => $teacher['first_name'],
+                'last_name' => $teacher['last_name'],
+                'email' => $teacher['email'],
                 'password' => Hash::make('password'),
                 'role_id' => 2,
-                'birthday' => '198' . ($i % 10) . '-0' . (($i % 9) + 1) . '-1' . (($i % 9) + 1),
+                'birthday' => '198' . ($i % 9) . '-0' . (($i % 9) + 1) . '-1' . (($i % 9) + 1),
                 'adress' => 'Dakar, Senegal',
                 'phone' => '78' . str_pad((1000000 + $i), 7, '0', STR_PAD_LEFT),
-                'gender' => $teacherData[$i]['gender'],
+                'gender' => $teacher['gender'],
                 'nationality' => $randomNationality(),
             ]);
         }
 
-        $parentFirstNames = ['Aissatou', 'Moussa', 'Fatou', 'Oumar', 'Khady', 'Pape', 'Aminata', 'Modou', 'Cheikh', 'Mariama', 'Ousmane', 'Ndeye', 'Ibrahima', 'Sokhna', 'Demba', 'Coumba', 'Lamine', 'Adama', 'Maimouna', 'Aliou', 'Youssou', 'Binta', 'Samba', 'Aissatou', 'Moussa', 'Fatoumata', 'Oumar', 'Khady', 'Pape', 'Aminata', 'Modou', 'Cheikh', 'Mariama', 'Ousmane', 'Ndeye', 'Ibrahima', 'Sokhna', 'Demba', 'Coumba'];
-        $parentLastNames = ['Diallo', 'Ba', 'Faye', 'Gueye', 'Ndiaye', 'Diop', 'Sow', 'Thiam', 'Fall', 'Cisse', 'Diagne', 'Mbaye', 'Sarr', 'Ndour', 'Diedhiou', 'Camara', 'Dramé', 'Keita', 'Touré', 'Sy', 'Traoré', 'Diakhate', 'Sow', 'Gassama', 'Kouyaté', 'Balde', 'Sylla', 'Toure', 'Senghor', 'Fofana', 'Kane'];
+        // Create Family Units - Each family has 1-2 parents and 1-4 children
+        $familyLastNames = [
+            'Diallo', 'Sarr', 'Mbaye', 'Ndour', 'Diedhiou', 'Dramé', 'Keita', 'Touré',
+            'Sy', 'Traoré', 'Diakhate', 'Gassama', 'Kouyaté', 'Balde', 'Sylla',
+            'Senghor', 'Fofana', 'Kane', 'Diouf', 'Wade', 'Samb', 'Lo', 'Seye',
+            'Niang', 'Coly', 'Manga', 'Diagne', 'Tine', 'Ly', 'Mbodj'
+        ];
 
-        for ($i = 0; $i < 80; $i++) {
-            UserModel::create([
-                'first_name' => $parentFirstNames[$i % count($parentFirstNames)],
-                'last_name' => $parentLastNames[$i % count($parentLastNames)],
-                'email' => 'parent' . ($i + 1) . '@example.com',
-                'password' => Hash::make('password'),
-                'role_id' => 4,
-                'birthday' => '197' . ($i % 9) . '-0' . (($i % 11) + 1) . '-1' . (($i % 9) + 1),
-                'adress' => 'Dakar, Senegal',
-                'phone' => '76' . str_pad((2000000 + $i), 7, '0', STR_PAD_LEFT),
-                'gender' => (rand(0, 1) == 0) ? 'M' : 'F',
-                'nationality' => $randomNationality(),
-            ]);
+        $parentFirstNames = [
+            'male' => ['Mamadou', 'Ousmane', 'Ibrahima', 'Demba', 'Lamine', 'Aliou', 'Youssou', 'Samba', 'Abdou', 'Babacar'],
+            'female' => ['Aissatou', 'Fatou', 'Khady', 'Aminata', 'Mariama', 'Ndeye', 'Sokhna', 'Coumba', 'Maimouna', 'Binta']
+        ];
+
+        $studentFirstNames = [
+            'male' => ['Omar', 'Pape', 'Modou', 'Cheikh', 'Oumar', 'Moussa', 'Alassane', 'Momar', 'Serigne', 'Abdoulaye'],
+            'female' => ['Fatoumata', 'Adama', 'Awa', 'Mame', 'Astou', 'Yacine', 'Rokhaya', 'Mbissine', 'Fatima', 'Amina']
+        ];
+
+        $familyIndex = 0;
+
+        // Create 30 families with proper relationships
+        foreach ($familyLastNames as $familyName) {
+            if ($familyIndex >= 30) break;
+
+            $numParents = rand(1, 2); // 1 or 2 parents per family
+            $numChildren = rand(1, 4); // 1-4 children per family
+
+            // Create parents for this family
+            for ($p = 0; $p < $numParents; $p++) {
+                $gender = ($p === 0) ? (rand(0, 1) ? 'M' : 'F') : ($p === 1 ? 'F' : 'M'); // Ensure diversity
+                $firstName = $parentFirstNames[$gender === 'M' ? 'male' : 'female'][array_rand($parentFirstNames[$gender === 'M' ? 'male' : 'female'])];
+
+                UserModel::create([
+                    'first_name' => $firstName,
+                    'last_name' => $familyName,
+                    'email' => 'parent_' . strtolower($familyName) . '_' . ($p + 1) . '@example.com',
+                    'password' => Hash::make('password'),
+                    'role_id' => 4, // Parent role
+                    'birthday' => '197' . rand(0, 9) . '-' . str_pad(rand(1, 12), 2, '0', STR_PAD_LEFT) . '-' . str_pad(rand(1, 28), 2, '0', STR_PAD_LEFT),
+                    'adress' => 'Dakar, Senegal',
+                    'phone' => '76' . str_pad(rand(1000000, 9999999), 7, '0', STR_PAD_LEFT),
+                    'gender' => $gender,
+                    'nationality' => $randomNationality(),
+                ]);
+            }
+
+            // Create children for this family (same last name as parents)
+            for ($c = 0; $c < $numChildren; $c++) {
+                $gender = rand(0, 1) ? 'M' : 'F';
+                $firstName = $studentFirstNames[$gender === 'M' ? 'male' : 'female'][array_rand($studentFirstNames[$gender === 'M' ? 'male' : 'female'])];
+
+                UserModel::create([
+                    'first_name' => $firstName,
+                    'last_name' => $familyName, // Same family name as parents
+                    'email' => 'student_' . strtolower($familyName) . '_' . ($c + 1) . '@example.com',
+                    'password' => Hash::make('password'),
+                    'role_id' => 3, // Student role
+                    'birthday' => '200' . rand(5, 9) . '-' . str_pad(rand(1, 12), 2, '0', STR_PAD_LEFT) . '-' . str_pad(rand(1, 28), 2, '0', STR_PAD_LEFT),
+                    'adress' => 'Dakar, Senegal',
+                    'phone' => '77' . str_pad(rand(1000000, 9999999), 7, '0', STR_PAD_LEFT),
+                    'gender' => $gender,
+                    'nationality' => $randomNationality(),
+                ]);
+            }
+
+            $familyIndex++;
         }
 
-        $studentFirstNames = ['Mamadou', 'Aissatou', 'Omar', 'Khady', 'Pape', 'Aminata', 'Modou', 'Fatou', 'Cheikh', 'Mariama', 'Ousmane', 'Ndeye', 'Ibrahima', 'Sokhna', 'Demba', 'Coumba', 'Lamine', 'Adama', 'Maimouna', 'Aliou', 'Youssou', 'Binta', 'Samba', 'Aissatou', 'Moussa', 'Fatoumata', 'Oumar', 'Khady', 'Pape', 'Aminata', 'Modou', 'Cheikh', 'Mariama', 'Ousmane', 'Ndeye', 'Ibrahima', 'Sokhna', 'Demba', 'Coumba', 'Lamine', 'Adama'];
-        $studentLastNames = ['Diallo', 'Ba', 'Faye', 'Gueye', 'Ndiaye', 'Diop', 'Sow', 'Thiam', 'Fall', 'Cisse', 'Diagne', 'Mbaye', 'Sarr', 'Ndour', 'Diedhiou', 'Camara', 'Dramé', 'Keita', 'Touré', 'Sy', 'Traoré', 'Diakhate', 'Sow', 'Gassama', 'Kouyaté', 'Balde', 'Sylla', 'Toure', 'Senghor', 'Fofana', 'Kane'];
-
-        for ($i = 0; $i < 160; $i++) {
-            $femaleNames = ['Aissatou', 'Khady', 'Aminata', 'Fatou', 'Mariama', 'Ndeye', 'Sokhna', 'Coumba', 'Maimouna', 'Binta', 'Fatoumata'];
-            $firstName = $studentFirstNames[$i % count($studentFirstNames)];
-            $gender = in_array($firstName, $femaleNames) ? 'F' : 'M';
-            UserModel::create([
-                'first_name' => $firstName,
-                'last_name' => $studentLastNames[$i % count($studentLastNames)],
-                'email' => 'student' . ($i + 1) . '@example.com',
-                'password' => Hash::make('password'),
-                'role_id' => 3,
-                'birthday' => '200' . ($i % 9) . '-0' . (($i % 11) + 1) . '-1' . (($i % 9) + 1),
-                'adress' => 'Dakar, Senegal',
-                'phone' => '75' . str_pad((3000000 + $i), 7, '0', STR_PAD_LEFT),
-                'gender' => $gender,
-                'nationality' => $randomNationality(),
-            ]);
-        }
+        $this->command->info('Created proper family relationships with ' . $familyIndex . ' families');
     }
 }

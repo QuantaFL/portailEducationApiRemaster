@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use App\Modules\Parent\Models\ParentModel;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Modules\User\Models\UserModel;
 use Illuminate\Database\Seeder;
 
 class ParentModelSeeder extends Seeder
@@ -13,10 +13,21 @@ class ParentModelSeeder extends Seeder
      */
     public function run(): void
     {
-        for ($i = 0; $i < 60; $i++) { // Create 60 parent models
+        // Get all users with parent role (role_id = 4) - these are the actual parents
+        $parentUsers = UserModel::where('role_id', 4)->get();
+
+        if ($parentUsers->isEmpty()) {
+            $this->command->error('No parent users found. Make sure UserModelSeeder runs first.');
+            return;
+        }
+
+        // Create ParentModel records for each parent user
+        foreach ($parentUsers as $parentUser) {
             ParentModel::create([
-                'user_model_id' => $i + 3, // Parent user_model_ids start from 3
+                'user_model_id' => $parentUser->id,
             ]);
         }
+
+        $this->command->info('Created ' . $parentUsers->count() . ' parent models linked to actual parent users');
     }
 }

@@ -34,6 +34,7 @@ class Assignement extends Model
         'start_time' => 'datetime:H:i',
         'end_time' => 'datetime:H:i',
         'isActive' => 'boolean',
+        'day_of_week' => 'array',
     ];
 
     public function teacher()

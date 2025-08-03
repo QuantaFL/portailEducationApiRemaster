@@ -22,11 +22,11 @@ class AssignmentService
     public function getAssignmentById(int $id): Assignement
     {
         $assignment = Assignement::find($id);
-        
+
         if (!$assignment) {
             throw AssignmentException::assignmentNotFound();
         }
-        
+
         return $assignment;
     }
 
@@ -70,9 +70,9 @@ class AssignmentService
         ]);
 
         $this->validateAssignmentData($data);
-        
+
         DB::beginTransaction();
-        
+
         try {
             // Set current academic year if not provided
             if (!isset($data['academic_year_id'])) {
@@ -92,7 +92,7 @@ class AssignmentService
             }
 
             $assignment = Assignement::create($data);
-            
+
             Log::info('AssignmentService: Assignment created successfully', [
                 'assignment_id' => $assignment->id,
                 'assignment_number' => $assignment->assignment_number,
@@ -100,11 +100,11 @@ class AssignmentService
                 'subject_id' => $assignment->subject_id,
                 'class_model_id' => $assignment->class_model_id
             ]);
-            
+
             DB::commit();
-            
+
             return $assignment;
-            
+
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('AssignmentService: Failed to create assignment', [
@@ -118,16 +118,16 @@ class AssignmentService
     public function updateAssignment(Assignement $assignment, array $data): Assignement
     {
         $this->validateAssignmentData($data, $assignment->id);
-        
+
         DB::beginTransaction();
-        
+
         try {
             $assignment->update($data);
-            
+
             DB::commit();
-            
+
             return $assignment;
-            
+
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Failed to update assignment: ' . $e->getMessage());
@@ -188,7 +188,7 @@ class AssignmentService
 
         // Check for duplicate assignments
         $this->checkForDuplicateAssignment($data, $excludeId);
-        
+
         // Check for schedule conflicts
         $this->checkForScheduleConflicts($data, $excludeId);
     }
@@ -222,47 +222,51 @@ class AssignmentService
             return;
         }
 
-        // Check teacher conflicts
-        if (isset($data['teacher_id'])) {
-            $teacherConflict = Assignement::where('teacher_id', $data['teacher_id'])
-                ->where('day_of_week', $data['day_of_week'])
-                ->where(function ($query) use ($data) {
-                    $query->whereBetween('start_time', [$data['start_time'], $data['end_time']])
-                          ->orWhereBetween('end_time', [$data['start_time'], $data['end_time']])
-                          ->orWhere(function ($q) use ($data) {
-                              $q->where('start_time', '<=', $data['start_time'])
-                                ->where('end_time', '>=', $data['end_time']);
-                          });
-                });
+        $daysOfWeek = is_array($data['day_of_week']) ? $data['day_of_week'] : [$data['day_of_week']];
 
-            if ($excludeId) {
-                $teacherConflict->where('id', '!=', $excludeId);
+        foreach ($daysOfWeek as $day) {
+            // Check teacher conflicts
+            if (isset($data['teacher_id'])) {
+                $teacherConflict = Assignement::where('teacher_id', $data['teacher_id'])
+                    ->whereJsonContains('day_of_week', $day)
+                    ->where(function ($query) use ($data) {
+                        $query->whereBetween('start_time', [$data['start_time'], $data['end_time']])
+                              ->orWhereBetween('end_time', [$data['start_time'], $data['end_time']])
+                              ->orWhere(function ($q) use ($data) {
+                                  $q->where('start_time', '<=', $data['start_time'])
+                                    ->where('end_time', '>=', $data['end_time']);
+                              });
+                    });
+
+                if ($excludeId) {
+                    $teacherConflict->where('id', '!=', $excludeId);
+                }
+
+                if ($teacherConflict->exists()) {
+                    throw AssignmentException::conflictingSchedule();
+                }
             }
 
-            if ($teacherConflict->exists()) {
-                throw AssignmentException::conflictingSchedule();
-            }
-        }
+            // Check class conflicts
+            if (isset($data['class_model_id'])) {
+                $classConflict = Assignement::where('class_model_id', $data['class_model_id'])
+                    ->whereJsonContains('day_of_week', $day)
+                    ->where(function ($query) use ($data) {
+                        $query->whereBetween('start_time', [$data['start_time'], $data['end_time']])
+                              ->orWhereBetween('end_time', [$data['start_time'], $data['end_time']])
+                              ->orWhere(function ($q) use ($data) {
+                                  $q->where('start_time', '<=', $data['start_time'])
+                                    ->where('end_time', '>=', $data['end_time']);
+                              });
+                    });
 
-        // Check class conflicts
-        if (isset($data['class_model_id'])) {
-            $classConflict = Assignement::where('class_model_id', $data['class_model_id'])
-                ->where('day_of_week', $data['day_of_week'])
-                ->where(function ($query) use ($data) {
-                    $query->whereBetween('start_time', [$data['start_time'], $data['end_time']])
-                          ->orWhereBetween('end_time', [$data['start_time'], $data['end_time']])
-                          ->orWhere(function ($q) use ($data) {
-                              $q->where('start_time', '<=', $data['start_time'])
-                                ->where('end_time', '>=', $data['end_time']);
-                          });
-                });
+                if ($excludeId) {
+                    $classConflict->where('id', '!=', $excludeId);
+                }
 
-            if ($excludeId) {
-                $classConflict->where('id', '!=', $excludeId);
-            }
-
-            if ($classConflict->exists()) {
-                throw AssignmentException::conflictingSchedule();
+                if ($classConflict->exists()) {
+                    throw AssignmentException::conflictingSchedule();
+                }
             }
         }
     }
@@ -274,20 +278,20 @@ class AssignmentService
     {
         $maxAttempts = 10;
         $attempt = 0;
-        
+
         do {
             $attempt++;
-            
+
             // Format: ASS-YYYY-MMDD-XXXX (ASS = Assignment, YYYY = year, MMDD = month+day, XXXX = random)
             $year = date('Y');
             $monthDay = date('md');
             $randomNumber = str_pad(mt_rand(1, 9999), 4, '0', STR_PAD_LEFT);
-            
+
             $assignmentNumber = "ASS-{$year}-{$monthDay}-{$randomNumber}";
-            
+
             // Check if this number already exists
             $exists = Assignement::where('assignment_number', $assignmentNumber)->exists();
-            
+
             if (!$exists) {
                 Log::info('AssignmentService: Generated unique assignment number', [
                     'assignment_number' => $assignmentNumber,
@@ -295,23 +299,23 @@ class AssignmentService
                 ]);
                 return $assignmentNumber;
             }
-            
+
             Log::debug('AssignmentService: Generated assignment number already exists, retrying', [
                 'assignment_number' => $assignmentNumber,
                 'attempt' => $attempt
             ]);
-            
+
         } while ($attempt < $maxAttempts);
-        
+
         // If we couldn't generate a unique number after max attempts, use timestamp-based approach
         $timestamp = time();
         $assignmentNumber = "ASS-{$year}-{$monthDay}-" . substr($timestamp, -4);
-        
+
         Log::warning('AssignmentService: Using timestamp-based assignment number after max attempts', [
             'assignment_number' => $assignmentNumber,
             'max_attempts_reached' => $maxAttempts
         ]);
-        
+
         return $assignmentNumber;
     }
 
@@ -347,7 +351,7 @@ class AssignmentService
         ]);
 
         $assignment->update(['isActive' => true]);
-        
+
         return $assignment->fresh();
     }
 
@@ -362,7 +366,8 @@ class AssignmentService
         ]);
 
         $assignment->update(['isActive' => false]);
-        
+
         return $assignment->fresh();
     }
 }
+
