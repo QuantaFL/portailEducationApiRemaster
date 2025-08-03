@@ -21,10 +21,20 @@ class Assignement extends Model
         'academic_year_id',
         'day_of_week',
         'start_time',
-        'end_time'
+        'end_time',
+        'coefficient',
+        'isActive',
+        'assignment_number',
     ];
 
     protected $with = ['teacher', 'subject', 'academicYear', 'classModel'];
+
+    protected $casts = [
+        'coefficient' => 'float',
+        'start_time' => 'datetime:H:i',
+        'end_time' => 'datetime:H:i',
+        'isActive' => 'boolean',
+    ];
 
     public function teacher()
     {

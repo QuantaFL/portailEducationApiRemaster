@@ -65,7 +65,7 @@ class UserModelSeeder extends Seeder
                 'role_id' => 2,
                 'birthday' => '198' . ($i % 10) . '-0' . (($i % 9) + 1) . '-1' . (($i % 9) + 1),
                 'adress' => 'Dakar, Senegal',
-                'phone' => '77' . str_pad((1000000 + $i), 7, '0', STR_PAD_LEFT),
+                'phone' => '78' . str_pad((1000000 + $i), 7, '0', STR_PAD_LEFT),
                 'gender' => $teacherData[$i]['gender'],
                 'nationality' => $randomNationality(),
             ]);
@@ -83,7 +83,7 @@ class UserModelSeeder extends Seeder
                 'role_id' => 4,
                 'birthday' => '197' . ($i % 9) . '-0' . (($i % 11) + 1) . '-1' . (($i % 9) + 1),
                 'adress' => 'Dakar, Senegal',
-                'phone' => '77' . str_pad(rand(0, 9999999), 7, '0', STR_PAD_LEFT),
+                'phone' => '76' . str_pad(rand(0, 9999999), 7, '0', STR_PAD_LEFT),
                 'gender' => (rand(0, 1) == 0) ? 'M' : 'F',
                 'nationality' => $randomNationality(),
             ]);
@@ -104,7 +104,7 @@ class UserModelSeeder extends Seeder
                 'role_id' => 3,
                 'birthday' => '200' . ($i % 9) . '-0' . (($i % 11) + 1) . '-1' . (($i % 9) + 1),
                 'adress' => 'Dakar, Senegal',
-                'phone' => '77' . str_pad(rand(0, 9999999), 7, '0', STR_PAD_LEFT),
+                'phone' => '75' . str_pad(rand(0, 9999999), 7, '0', STR_PAD_LEFT),
                 'gender' => $gender,
                 'nationality' => $randomNationality(),
             ]);

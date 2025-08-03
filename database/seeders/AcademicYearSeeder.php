@@ -15,14 +15,14 @@ class AcademicYearSeeder extends Seeder
     {
         // Assurez-vous qu'une seule année est 'en_cours'
         AcademicYear::create([
-            'label' => '2024-2025',
+            'label' => '2025-2026',
             'start_date' => '2025-07-01',
             'end_date' => '2026-05-30',
             'status' => 'en_cours',
         ]);
 
         AcademicYear::create([
-            'label' => '2023-2024',
+            'label' => '2024-2025',
             'start_date' => '2024-07-01',
             'end_date' => '2025-05-30',
             'status' => 'termine',

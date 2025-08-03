@@ -29,6 +29,7 @@ class UserModel extends Authenticatable implements JWTSubject
         'role_id', // Ajouté pour permettre l'enregistrement du rôle
         'isFirstLogin',
         'gender',
+        'nationality'
     ];
 
     protected $casts = [
@@ -53,6 +54,7 @@ class UserModel extends Authenticatable implements JWTSubject
             'phone' => $this->phone,
             'role' => $this->role ? $this->role->name : null,
             'isFirstLogin' => $this->isFirstLogin,
+            'gender'=>$this->gender ? $this->gender:null
         ];
     }
 

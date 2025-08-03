@@ -20,6 +20,7 @@ class UserModelFactory extends Factory
             'password' => bcrypt($this->faker->password()),
             'adress' => $this->faker->word(),
             'phone' => $this->faker->phoneNumber(),
+            'gender' => $this->faker->randomElement(['M', 'F']),
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
         ];

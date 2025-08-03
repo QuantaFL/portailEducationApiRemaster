@@ -16,6 +16,7 @@ class SubjectResource extends JsonResource
             'name' => $this->name,
             'level' => $this->level,
             'coefficient' => $this->coefficient,
+            'status' => $this->status,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

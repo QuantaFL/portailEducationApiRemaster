@@ -16,6 +16,7 @@ class ClassModelResource extends JsonResource
             'name' => $this->name,
             'level' => $this->level,
             'current_academic_year_student_sessions' => $this->whenLoaded('currentAcademicYearStudentSessions'),
+            'subjects' => $this->whenLoaded('subjects'),
             'count'=> ClassModel::all()->count(),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

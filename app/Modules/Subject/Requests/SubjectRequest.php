@@ -10,8 +10,9 @@ class SubjectRequest extends FormRequest
     {
         return [
             'name' => ['required'],
-            'level' => ['required'],
-            'coefficient' => ['required'],
+            'level' => ['nullable'],
+            'coefficient' => ['nullable'],
+            'status' => ['nullable', 'boolean'],
         ];
     }
 

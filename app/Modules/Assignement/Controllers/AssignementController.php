@@ -3,33 +3,40 @@
 namespace App\Modules\Assignement\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Modules\AcademicYear\Models\AcademicYear;
-use App\Modules\AcademicYear\Models\StatusAcademicYearEnum;
+use App\Modules\Assignement\Exceptions\AssignmentException;
 use App\Modules\Assignement\Models\Assignement;
 use App\Modules\Assignement\Requests\AssignementRequest;
+use App\Modules\Assignement\Requests\ToggleStatusByTeacherRequest;
 use App\Modules\Assignement\Ressources\AssignementResource;
+use App\Modules\Assignement\Services\AssignmentService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class AssignementController extends Controller
 {
+    private AssignmentService $assignmentService;
+
+    public function __construct(AssignmentService $assignmentService)
+    {
+        $this->assignmentService = $assignmentService;
+    }
+
     public function index()
     {
-        return response()->json(AssignementResource::collection(Assignement::all()));
+        $assignments = $this->assignmentService->getAllAssignments();
+        return response()->json(AssignementResource::collection($assignments));
     }
 
     public function store(AssignementRequest $request)
     {
-        /*
-         *  'teacher_id' => ['required', 'exists:teachers'],
-            'class_model_id' => ['required', 'exists:class_models'],
-            'subject_id' => ['required', 'exists:subjects'],
-         * */
-        //$currentYear = DB::table("academic_years")
-           // ->where("status",StatusAcademicYearEnum::EN_COURS);
-        return response()->json(new AssignementResource(Assignement::create($request->validated())));
-
-
+        try {
+            $assignment = $this->assignmentService->createAssignment($request->validated());
+            return response()->json(new AssignementResource($assignment), 201);
+        } catch (AssignmentException $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], $e->getCode());
+        }
     }
 
     public function show(Assignement $assignement)
@@ -39,24 +46,87 @@ class AssignementController extends Controller
 
     public function update(AssignementRequest $request, Assignement $assignement)
     {
-        $assignement->update($request->validated());
-
-        return response()->json(new AssignementResource($assignement));
+        try {
+            $updatedAssignment = $this->assignmentService->updateAssignment($assignement, $request->validated());
+            return response()->json(new AssignementResource($updatedAssignment));
+        } catch (AssignmentException $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], $e->getCode());
+        }
     }
 
     public function destroy(Assignement $assignement)
     {
-        $assignement->delete();
-
-        return response()->json();
+        try {
+            $this->assignmentService->deleteAssignment($assignement);
+            return response()->json();
+        } catch (AssignmentException $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], $e->getCode());
+        }
     }
 
     public function getAssignmentsForTeacher($id)
     {
-        $currentAcademicYear = AcademicYear::getCurrentAcademicYear();
-        $assignments = Assignement::where('teacher_id', $id)
-            ->where('academic_year_id', $currentAcademicYear?->id)
-            ->get();
-        return response()->json(AssignementResource::collection($assignments));
+        try {
+            $assignments = $this->assignmentService->getAssignmentsForTeacher($id);
+            return response()->json(AssignementResource::collection($assignments));
+        } catch (AssignmentException $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], $e->getCode());
+        }
+    }
+
+    public function getByTermAndClass(Request $request)
+    {
+        try {
+            $termId = $request->input('term_id');
+            $classId = $request->input('class_id');
+
+            if (!$termId || !$classId) {
+                return response()->json([
+                    'message' => 'Term ID and Class ID are required'
+                ], 400);
+            }
+
+            $assignments = $this->assignmentService->getAssignmentsByTermAndClass($termId, $classId);
+            return response()->json(AssignementResource::collection($assignments));
+        } catch (AssignmentException $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], $e->getCode());
+        }
+    }
+
+    public function toggleStatusByTeacher(ToggleStatusByTeacherRequest $request)
+    {
+        try {
+            $validated = $request->validated();
+            $teacherId = $validated['teacher_id'];
+
+            $assignment = $this->assignmentService->toggleAssignmentStatusByTeacherId($teacherId);
+            return response()->json(new AssignementResource($assignment));
+
+        } catch (AssignmentException $e) {
+            Log::error('AssignementController: Failed to toggle assignment status by teacher', [
+                'error' => $e->getMessage(),
+                'teacher_id' => request()->input('teacher_id')
+            ]);
+            return response()->json(['message' => $e->getMessage()], 404);
+        } catch (\Exception $e) {
+            Log::error('AssignementController: Failed to toggle assignment status by teacher', [
+                'error' => $e->getMessage(),
+                'teacher_id' => request()->input('teacher_id')
+            ]);
+
+            if (str_contains($e->getMessage(), "Aucun assignement trouvé")) {
+                return response()->json(['message' => $e->getMessage()], 404);
+            }
+
+            return response()->json(['message' => 'Failed to toggle assignment status'], 500);
+        }
     }
 }
