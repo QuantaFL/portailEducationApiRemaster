@@ -29,7 +29,7 @@ class AcademicYearController extends Controller
     {
         try {
             $result = $this->academicYearService->createAcademicYear($request->validated());
-            
+
             return response()->json([
                 'academic_year' => new AcademicYearResource($result['academic_year']),
                 'terms' => $result['terms']
