@@ -69,12 +69,14 @@ class StudentController extends Controller
 
     public function getStudentDetails(string $id): JsonResponse
     {
+        Log::debug('Fetching student details for user_model_id', ['id' => $id]);
         $student = Student::with([
             'userModel',
             'parentModel.userModel',
             'latestStudentSession.classModel',
             'latestStudentSession.academicYear',
-        ])->first();
+        ])->where('user_model_id', $id)->first();
+        Log::debug('Fetching student details for user_model_id', ['id' => $id]);
 
         if (!$student) {
             return response()->json([
