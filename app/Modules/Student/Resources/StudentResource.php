@@ -2,7 +2,6 @@
 
 namespace App\Modules\Student\Resources;
 
-use App\Modules\ClassModel\Ressources\ClassModelResource;
 use App\Modules\Student\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -20,7 +19,7 @@ class StudentResource extends JsonResource
             'parent_model_id' => $this->parent_model_id,
             'user_model_id' => $this->user_model_id,
 
-            "latest_student_session" => $this->whenLoaded('latestStudentSession'),
+            'latest_student_session' => new StudentSessionResource($this->whenLoaded('latestStudentSession')),
             'parentModel' => $this->whenLoaded('parentModel'),
             'userModel' => $this->whenLoaded('userModel'),
             'count'=> Student::all()->count(),
