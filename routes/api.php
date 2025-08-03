@@ -35,6 +35,7 @@ Route::prefix('v1')->group(function () {
     Route::apiResource('parents', ParentController::class);
     Route::apiResource('classes', ClassModelController::class);
     Route::get('users/{id}/students', [StudentController::class, 'getStudentsByUserId']);
+    Route::get('students/{id}/details', [StudentController::class, 'getStudentDetails']);
     Route::get('classes/{classId}/students', [ClassModelController::class, 'getStudentsByClass']);
     Route::apiResource('report-cards', ReportCardController::class);
     Route::post('report-cards/generate', [ReportCardController::class, 'generateReportCards']);
@@ -62,4 +63,17 @@ Route::prefix('v1')->group(function () {
     Route::middleware('auth:api')->post('auth/change-password', [AuthController::class, 'changePassword']);
     Route::get('teacher/profile', [TeacherController::class, 'getTeacherProfile']);
     Route::get('teachers/users/{id}', [TeacherController::class, 'getTeacherByUserId']);
+    Route::get('/students/{id}/next-classes', [
+        StudentController::class,
+        'getNextClasses',
+    ]);
+    Route::get('/report-cards/{id}/download', [
+        App\Modules\ReportCard\Controllers\ReportCardController::class,
+        'download',
+    ]);
+    Route::get('students/{studentId}/bulletins/latest', [
+        App\Modules\ReportCard\Controllers\ReportCardController::class,
+        'latestBulletinForStudent',
+    ]);
+    Route::get('students/{studentId}/report-cards', [ReportCardController::class, 'getReportCardsByStudent']);
 });
