@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Modules\Parent\Models\ParentModel;
 use App\Modules\Parent\Requests\ParentRequest;
 use App\Modules\Parent\Ressources\ParentResource;
+use App\Modules\Student\Resources\StudentResource;
 use App\Modules\User\Models\UserModel;
 
 class ParentController extends Controller
@@ -42,5 +43,20 @@ class ParentController extends Controller
         $parent->delete();
 
         return response()->json();
+    }
+
+    public function children(ParentModel $parent)
+    {
+        $children = $parent->children;
+        return response()->json(StudentResource::collection($children));
+    }
+
+    public function getParentByUserId($id)
+    {
+        $parent = ParentModel::where('user_model_id', $id)->first();
+        if (!$parent) {
+            return response()->json(['message' => 'Parent not found'], 404);
+        }
+        return response()->json(new ParentResource($parent));
     }
 }

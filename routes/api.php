@@ -33,6 +33,9 @@ Route::prefix('v1')->group(function () {
     Route::apiResource('terms', TermController::class);
     Route::get('grades/class/{classId}/students/{studentId?}/teacher/{teacherId?}/subject/{subjectId?}/assignement/{assignementId?}', [GradeController::class, 'getStudentGradesInClassForTerm']);
     Route::apiResource('parents', ParentController::class);
+    Route::get('parents/{parent}/children', [ParentController::class, 'children']);
+    Route::apiResource('parents', ParentController::class);
+    Route::get('users/{id}/parents', [ParentController::class, 'getParentByUserId']);
     Route::apiResource('classes', ClassModelController::class);
     Route::get('users/{id}/students', [StudentController::class, 'getStudentsByUserId']);
     Route::get('students/{id}/details', [StudentController::class, 'getStudentDetails']);
