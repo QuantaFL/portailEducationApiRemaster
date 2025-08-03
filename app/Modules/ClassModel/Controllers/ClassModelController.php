@@ -16,7 +16,7 @@ class ClassModelController extends Controller
 {
     public function index()
     {
-        $classes = ClassModel::with('subjects')->get();
+        $classes = ClassModel::with(['subjects', 'currentAcademicYearStudentSessions'])->get();
         return response()->json(ClassModelResource::collection($classes));
     }
 
@@ -27,7 +27,7 @@ class ClassModelController extends Controller
 
     public function show($classId)
     {
-        $classModel = ClassModel::findOrFail($classId);
+        $classModel = ClassModel::with(['subjects', 'currentAcademicYearStudentSessions'])->findOrFail($classId);
         return response()->json(new ClassModelResource($classModel));
     }
 
