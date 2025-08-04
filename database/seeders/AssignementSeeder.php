@@ -98,7 +98,7 @@ class AssignementSeeder extends Seeder
             return Subject::whereIn('level', $subjectLevels)->get();
         }
 
-        return collect();
+        return Subject::query()->whereIn('level', [])->get(); // Return empty Eloquent collection
     }
 
     /**
@@ -171,39 +171,71 @@ class AssignementSeeder extends Seeder
      */
     private function hasScheduleConflict(int $teacherId, int $classId, string $day, array $timeSlot): bool
     {
-        // Check teacher schedule conflict
+        // Check teacher schedule conflict in memory
         $teacherKey = "{$teacherId}_{$day}_{$timeSlot['start']}_{$timeSlot['end']}";
         if (isset($this->teacherSchedule[$teacherKey])) {
             return true;
         }
 
-        // Check class schedule conflict
+        // Check class schedule conflict in memory
         $classKey = "{$classId}_{$day}_{$timeSlot['start']}_{$timeSlot['end']}";
         if (isset($this->classSchedule[$classKey])) {
             return true;
         }
 
-        // Check for overlapping times in database
-        $conflicts = Assignement::where(function ($query) use ($teacherId, $classId) {
-                $query->where('teacher_id', $teacherId)
-                      ->orWhere('class_model_id', $classId);
-            })
+        // Check for teacher conflicts in database
+        $teacherConflicts = Assignement::where('teacher_id', $teacherId)
             ->whereJsonContains('day_of_week', $day)
             ->where(function ($query) use ($timeSlot) {
                 $query->where(function ($q) use ($timeSlot) {
+                    // New assignment starts during an existing one
                     $q->where('start_time', '<=', $timeSlot['start'])
                       ->where('end_time', '>', $timeSlot['start']);
                 })->orWhere(function ($q) use ($timeSlot) {
+                    // New assignment ends during an existing one
                     $q->where('start_time', '<', $timeSlot['end'])
                       ->where('end_time', '>=', $timeSlot['end']);
                 })->orWhere(function ($q) use ($timeSlot) {
+                    // New assignment completely contains an existing one
                     $q->where('start_time', '>=', $timeSlot['start'])
                       ->where('end_time', '<=', $timeSlot['end']);
+                })->orWhere(function ($q) use ($timeSlot) {
+                    // Existing assignment completely contains the new one
+                    $q->where('start_time', '<=', $timeSlot['start'])
+                      ->where('end_time', '>=', $timeSlot['end']);
                 });
             })
             ->exists();
 
-        return $conflicts;
+        if ($teacherConflicts) {
+            return true;
+        }
+
+        // Check for class (student) conflicts in database
+        $classConflicts = Assignement::where('class_model_id', $classId)
+            ->whereJsonContains('day_of_week', $day)
+            ->where(function ($query) use ($timeSlot) {
+                $query->where(function ($q) use ($timeSlot) {
+                    // New assignment starts during an existing one
+                    $q->where('start_time', '<=', $timeSlot['start'])
+                      ->where('end_time', '>', $timeSlot['start']);
+                })->orWhere(function ($q) use ($timeSlot) {
+                    // New assignment ends during an existing one
+                    $q->where('start_time', '<', $timeSlot['end'])
+                      ->where('end_time', '>=', $timeSlot['end']);
+                })->orWhere(function ($q) use ($timeSlot) {
+                    // New assignment completely contains an existing one
+                    $q->where('start_time', '>=', $timeSlot['start'])
+                      ->where('end_time', '<=', $timeSlot['end']);
+                })->orWhere(function ($q) use ($timeSlot) {
+                    // Existing assignment completely contains the new one
+                    $q->where('start_time', '<=', $timeSlot['start'])
+                      ->where('end_time', '>=', $timeSlot['end']);
+                });
+            })
+            ->exists();
+
+        return $classConflicts;
     }
 
     /**

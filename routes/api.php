@@ -39,6 +39,7 @@ Route::prefix('v1')->group(function () {
     Route::apiResource('classes', ClassModelController::class);
     Route::get('users/{id}/students', [StudentController::class, 'getStudentsByUserId']);
     Route::get('students/{id}/details', [StudentController::class, 'getStudentDetails']);
+    Route::get('students/{id}/users', [StudentController::class, 'getStudentsByUserId']);
     Route::get('classes/{classId}/students', [ClassModelController::class, 'getStudentsByClass']);
     Route::apiResource('report-cards', ReportCardController::class);
     Route::post('report-cards/generate', [ReportCardController::class, 'generateReportCards']);

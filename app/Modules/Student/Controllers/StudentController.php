@@ -5,6 +5,7 @@ namespace App\Modules\Student\Controllers;
 use App\Http\Controllers\Controller;
 use App\Modules\Assignement\Models\Assignement;
 use App\Modules\Student\Models\Student;
+use App\Modules\Student\Models\StudentSession;
 use App\Modules\Student\Requests\StudentRequest;
 use App\Modules\Student\Resources\StudentResource;
 use App\Modules\User\Models\UserModel;
@@ -63,24 +64,30 @@ class StudentController extends Controller
 
     public function getStudentsByUserId(string $id): JsonResponse
     {
-        $students = Student::where('user_model_id', $id)->get();
-        return response()->json(StudentResource::collection($students));
+        $students = Student::with([
+            'parentModel.userModel',
+            'userModel',
+            'latestStudentSession.classModel',
+            'latestStudentSession.academicYear',
+        ])->where('user_model_id', $id)->first();
+        return response()->json(new StudentResource($students));
     }
 
     public function getStudentDetails(string $id): JsonResponse
     {
-        Log::debug('Fetching student details for user_model_id', ['id' => $id]);
+        Log::debug('Fetching student details for student ID', ['student_id' => $id]);
+
+        // Get the student with all relationships using the student ID
         $student = Student::with([
-            'userModel',
             'parentModel.userModel',
+            'userModel',
             'latestStudentSession.classModel',
             'latestStudentSession.academicYear',
-        ])->where('user_model_id', $id)->first();
-        Log::debug('Fetching student details for user_model_id', ['id' => $id]);
+        ])->find($id);
 
         if (!$student) {
             return response()->json([
-                'message' => 'Student not found for the given user_model_id.'
+                'message' => 'Student not found.'
             ], 404);
         }
 
