@@ -10,6 +10,7 @@ use App\Modules\ReportCard\Requests\GenerateReportCardsRequest;
 use App\Modules\ReportCard\Services\ReportCardGeneratorService;
 use App\Modules\Student\Models\Student;
 use App\Modules\Student\Models\StudentSession;
+use App\Modules\Term\Models\Term;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -49,7 +50,7 @@ class ReportCardController extends Controller
         try {
             $generatedReportCards = $reportCardGeneratorService->generateReportCardsForClassAndTerm(
                 $request->class_model_id,
-                $request->term_id
+                $request->term_id ?? Term::getCurrentTerm()->id
             );
 
             $reportCardIds = collect($generatedReportCards)->pluck('report_card_model.id')->toArray();

@@ -10,7 +10,7 @@ class GenerateReportCardsRequest extends FormRequest
     {
         return [
             'class_model_id' => ['required', 'exists:class_models,id'],
-            'term_id' => ['required', 'exists:terms,id'],
+//            'term_id' => ['required', 'exists:terms,id'],
         ];
     }
 

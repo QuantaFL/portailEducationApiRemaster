@@ -72,7 +72,7 @@ Route::prefix('v1')->group(function () {
         'getNextClasses',
     ]);
     Route::get('/report-cards/{id}/download', [
-        App\Modules\ReportCard\Controllers\ReportCardController::class,
+        ReportCardController::class,
         'download',
     ]);
     Route::get('students/{studentId}/bulletins/latest', [
