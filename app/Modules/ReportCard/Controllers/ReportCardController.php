@@ -13,6 +13,8 @@ use App\Modules\Student\Models\StudentSession;
 use App\Modules\Term\Models\Term;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class ReportCardController extends Controller
 {
@@ -47,10 +49,17 @@ class ReportCardController extends Controller
 
     public function generateReportCards(GenerateReportCardsRequest $request, ReportCardGeneratorService $reportCardGeneratorService): JsonResponse
     {
+        Log::info("start generation bulletin");
+        $current_term = Term::getCurrentTerm();
+        Log::info($current_term);
         try {
             $generatedReportCards = $reportCardGeneratorService->generateReportCardsForClassAndTerm(
                 $request->class_model_id,
+<<<<<<< HEAD
+                $current_term->id
+=======
                 $request->term_id ?? Term::getCurrentTerm()->id
+>>>>>>> 088aa7c3b6f779878daa47eebc7cd99af43a7e24
             );
 
             $reportCardIds = collect($generatedReportCards)->pluck('report_card_model.id')->toArray();
@@ -144,8 +153,10 @@ class ReportCardController extends Controller
         if (!$filePath || !\Storage::disk('public')->exists($filePath)) {
             abort(404, 'File not found.');
         }
-        return \Storage::disk('public')->download($filePath);
+
+        return Storage::disk('public')->download($filePath);
     }
+
 
     /**
      * Get all report cards for a given student (by student.id or user_model_id).
