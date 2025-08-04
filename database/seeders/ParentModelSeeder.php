@@ -13,7 +13,6 @@ class ParentModelSeeder extends Seeder
      */
     public function run(): void
     {
-        // Get all users with parent role (role_id = 4) - these are the actual parents
         $parentUsers = UserModel::where('role_id', 4)->get();
 
         if ($parentUsers->isEmpty()) {
@@ -21,7 +20,6 @@ class ParentModelSeeder extends Seeder
             return;
         }
 
-        // Create ParentModel records for each parent user
         foreach ($parentUsers as $parentUser) {
             ParentModel::create([
                 'user_model_id' => $parentUser->id,

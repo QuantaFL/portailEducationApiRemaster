@@ -65,7 +65,7 @@ class UserModelSeeder extends Seeder
             ]);
         }
 
-        // Create Family Units - Each family has 1-2 parents and 1-4 children
+        // Create Family Units with unique identifiers
         $familyLastNames = [
             'Diallo', 'Sarr', 'Mbaye', 'Ndour', 'Diedhiou', 'Dramé', 'Keita', 'Touré',
             'Sy', 'Traoré', 'Diakhate', 'Gassama', 'Kouyaté', 'Balde', 'Sylla',
@@ -83,56 +83,73 @@ class UserModelSeeder extends Seeder
             'female' => ['Fatoumata', 'Adama', 'Awa', 'Mame', 'Astou', 'Yacine', 'Rokhaya', 'Mbissine', 'Fatima', 'Amina']
         ];
 
+        // Store family relationships for proper linking
+        $familyRelationships = [];
         $familyIndex = 0;
 
-        // Create 30 families with proper relationships
+        // Create 30 families with proper tracking
         foreach ($familyLastNames as $familyName) {
             if ($familyIndex >= 30) break;
 
-            $numParents = rand(1, 2); // 1 or 2 parents per family
-            $numChildren = rand(1, 4); // 1-4 children per family
+            $numParents = rand(1, 2);
+            $numChildren = rand(1, 4);
+
+            // Create unique family identifier using last name + index
+            $familyId = $familyName . '_' . $familyIndex;
+            $familyRelationships[$familyId] = [
+                'parents' => [],
+                'children' => []
+            ];
 
             // Create parents for this family
             for ($p = 0; $p < $numParents; $p++) {
-                $gender = ($p === 0) ? (rand(0, 1) ? 'M' : 'F') : ($p === 1 ? 'F' : 'M'); // Ensure diversity
+                $gender = ($p === 0) ? (rand(0, 1) ? 'M' : 'F') : ($p === 1 ? 'F' : 'M');
                 $firstName = $parentFirstNames[$gender === 'M' ? 'male' : 'female'][array_rand($parentFirstNames[$gender === 'M' ? 'male' : 'female'])];
 
-                UserModel::create([
+                $parent = UserModel::create([
                     'first_name' => $firstName,
                     'last_name' => $familyName,
-                    'email' => 'parent_' . strtolower($familyName) . '_' . ($p + 1) . '@example.com',
+                    'email' => 'parent_' . strtolower($familyId) . '_' . ($p + 1) . '@example.com',
                     'password' => Hash::make('password'),
-                    'role_id' => 4, // Parent role
+                    'role_id' => 4,
                     'birthday' => '197' . rand(0, 9) . '-' . str_pad(rand(1, 12), 2, '0', STR_PAD_LEFT) . '-' . str_pad(rand(1, 28), 2, '0', STR_PAD_LEFT),
                     'adress' => 'Dakar, Senegal',
                     'phone' => '76' . str_pad(rand(1000000, 9999999), 7, '0', STR_PAD_LEFT),
                     'gender' => $gender,
                     'nationality' => $randomNationality(),
                 ]);
+
+                $familyRelationships[$familyId]['parents'][] = $parent->id;
             }
 
-            // Create children for this family (same last name as parents)
+            // Create children for this family
             for ($c = 0; $c < $numChildren; $c++) {
                 $gender = rand(0, 1) ? 'M' : 'F';
                 $firstName = $studentFirstNames[$gender === 'M' ? 'male' : 'female'][array_rand($studentFirstNames[$gender === 'M' ? 'male' : 'female'])];
 
-                UserModel::create([
+                $student = UserModel::create([
                     'first_name' => $firstName,
-                    'last_name' => $familyName, // Same family name as parents
-                    'email' => 'student_' . strtolower($familyName) . '_' . ($c + 1) . '@example.com',
+                    'last_name' => $familyName,
+                    'email' => 'student_' . strtolower($familyId) . '_' . ($c + 1) . '@example.com',
                     'password' => Hash::make('password'),
-                    'role_id' => 3, // Student role
+                    'role_id' => 3,
                     'birthday' => '200' . rand(5, 9) . '-' . str_pad(rand(1, 12), 2, '0', STR_PAD_LEFT) . '-' . str_pad(rand(1, 28), 2, '0', STR_PAD_LEFT),
                     'adress' => 'Dakar, Senegal',
                     'phone' => '77' . str_pad(rand(1000000, 9999999), 7, '0', STR_PAD_LEFT),
                     'gender' => $gender,
                     'nationality' => $randomNationality(),
                 ]);
+
+                $familyRelationships[$familyId]['children'][] = $student->id;
             }
 
             $familyIndex++;
         }
 
+        // Store family relationships in cache or session for other seeders to use
+        cache(['family_relationships' => $familyRelationships], now()->addHours(1));
+
         $this->command->info('Created proper family relationships with ' . $familyIndex . ' families');
+        $this->command->info('Family relationships cached for other seeders');
     }
 }

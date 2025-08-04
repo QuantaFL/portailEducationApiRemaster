@@ -16,37 +16,66 @@ class StudentSeeder extends Seeder
     public function run(): void
     {
         $classModels = ClassModel::all();
-        $studentUsers = UserModel::where('role_id', 3)->get(); // Students
 
-        if ($classModels->isEmpty() || $studentUsers->isEmpty()) {
-            $this->command->error('No classes or student users found. Make sure previous seeders run first.');
+        if ($classModels->isEmpty()) {
+            $this->command->error('No classes found. Make sure ClassModelSeeder runs first.');
             return;
         }
 
-        $studentsPerClass = ceil($studentUsers->count() / $classModels->count());
+        // Retrieve family relationships from cache
+        $familyRelationships = cache('family_relationships');
+
+        if (!$familyRelationships) {
+            $this->command->error('No family relationships found. Make sure UserModelSeeder runs first.');
+            return;
+        }
+
+        $allStudentIds = [];
+        foreach ($familyRelationships as $familyId => $family) {
+            $allStudentIds = array_merge($allStudentIds, $family['children']);
+        }
+
+        if (empty($allStudentIds)) {
+            $this->command->error('No student IDs found in family relationships.');
+            return;
+        }
+
+        $studentsPerClass = ceil(count($allStudentIds) / $classModels->count());
         $studentIndex = 0;
 
         foreach ($classModels as $classModel) {
             $studentsInThisClass = 0;
 
-            while ($studentsInThisClass < $studentsPerClass && $studentIndex < $studentUsers->count()) {
-                $studentUser = $studentUsers[$studentIndex];
+            while ($studentsInThisClass < $studentsPerClass && $studentIndex < count($allStudentIds)) {
+                $studentUserId = $allStudentIds[$studentIndex];
+                $studentUser = UserModel::find($studentUserId);
 
-                // Find parent with same last name (family relationship)
-                $parentUser = UserModel::where('role_id', 4)
-                    ->where('last_name', $studentUser->last_name)
-                    ->first();
+                if (!$studentUser) {
+                    $this->command->warn("Student user not found for ID: {$studentUserId}");
+                    $studentIndex++;
+                    continue;
+                }
 
-                if (!$parentUser) {
+                // Find the correct parent for this student using family relationships
+                $parentUserId = null;
+                foreach ($familyRelationships as $familyId => $family) {
+                    if (in_array($studentUserId, $family['children'])) {
+                        // Get the first parent from this family
+                        $parentUserId = $family['parents'][0] ?? null;
+                        break;
+                    }
+                }
+
+                if (!$parentUserId) {
                     $this->command->warn("No parent found for student {$studentUser->first_name} {$studentUser->last_name}");
                     $studentIndex++;
                     continue;
                 }
 
-                $parentModel = ParentModel::where('user_model_id', $parentUser->id)->first();
+                $parentModel = ParentModel::where('user_model_id', $parentUserId)->first();
 
                 if (!$parentModel) {
-                    $this->command->warn("No parent model found for parent user {$parentUser->first_name} {$parentUser->last_name}");
+                    $this->command->warn("No parent model found for parent user ID: {$parentUserId}");
                     $studentIndex++;
                     continue;
                 }
@@ -63,6 +92,6 @@ class StudentSeeder extends Seeder
             }
         }
 
-        $this->command->info('Created students with proper family relationships');
+        $this->command->info('Created students with proper family relationships using cached data');
     }
 }
