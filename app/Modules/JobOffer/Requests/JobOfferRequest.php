@@ -4,17 +4,30 @@ namespace App\Modules\JobOffer\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * Class JobOfferRequest
+ *
+ * Requête de formulaire pour les offres d'emploi.
+ */
 class JobOfferRequest extends FormRequest
 {
+    /**
+     * Détermine si l'utilisateur est autorisé à effectuer cette requête.
+     *
+     * @return bool
+     */
     public function authorize(): bool
     {
         return true;
     }
 
+    /**
+     * Récupère les règles de validation qui s'appliquent à la requête.
+     *
+     * @return array
+     */
     public function rules(): array
     {
-       // $jobOfferId = $this->route('jobOffer')?->id;
-
         return [
             'title' => 'required|string|max:255',
             'description' => 'required|string',
@@ -32,6 +45,11 @@ class JobOfferRequest extends FormRequest
         ];
     }
 
+    /**
+     * Récupère les messages de validation personnalisés.
+     *
+     * @return array
+     */
     public function messages(): array
     {
         return [

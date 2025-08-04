@@ -12,13 +12,30 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
+/**
+ * Class AssignmentService
+ *
+ * Service pour la logique métier des affectations.
+ */
 class AssignmentService
 {
+    /**
+     * Récupère toutes les affectations.
+     *
+     * @return Collection
+     */
     public function getAllAssignments(): Collection
     {
         return Assignement::all();
     }
 
+    /**
+     * Récupère une affectation par son ID.
+     *
+     * @param int $id
+     * @return Assignement
+     * @throws AssignmentException
+     */
     public function getAssignmentById(int $id): Assignement
     {
         $assignment = Assignement::find($id);
@@ -30,6 +47,13 @@ class AssignmentService
         return $assignment;
     }
 
+    /**
+     * Récupère les affectations d'un enseignant.
+     *
+     * @param int $teacherId
+     * @return Collection
+     * @throws AssignmentException
+     */
     public function getAssignmentsForTeacher(int $teacherId): Collection
     {
         $teacher = Teacher::find($teacherId);
@@ -47,6 +71,14 @@ class AssignmentService
             ->get();
     }
 
+    /**
+     * Récupère les affectations par semestre et par classe.
+     *
+     * @param int $termId
+     * @param int $classId
+     * @return Collection
+     * @throws AssignmentException
+     */
     public function getAssignmentsByTermAndClass(int $termId, int $classId): Collection
     {
         $class = ClassModel::find($classId);
@@ -61,9 +93,16 @@ class AssignmentService
             ->get();
     }
 
+    /**
+     * Crée une nouvelle affectation.
+     *
+     * @param array $data
+     * @return Assignement
+     * @throws AssignmentException
+     */
     public function createAssignment(array $data): Assignement
     {
-        Log::info('AssignmentService: Creating new assignment', [
+        Log::info('AssignmentService: Création d\'une nouvelle affectation', [
             'teacher_id' => $data['teacher_id'] ?? null,
             'class_model_id' => $data['class_model_id'] ?? null,
             'subject_id' => $data['subject_id'] ?? null
@@ -84,7 +123,7 @@ class AssignmentService
 
             // Generate unique assignment number
             $data['assignment_number'] = $this->generateAssignmentNumber();
-            Log::info('AssignmentService: Generated assignment number', ['assignment_number' => $data['assignment_number']]);
+            Log::info('AssignmentService: Numéro d\'affectation généré', ['assignment_number' => $data['assignment_number']]);
 
             // Set default values
             if (!isset($data['isActive'])) {
@@ -93,7 +132,7 @@ class AssignmentService
 
             $assignment = Assignement::create($data);
 
-            Log::info('AssignmentService: Assignment created successfully', [
+            Log::info('AssignmentService: Affectation créée avec succès', [
                 'assignment_id' => $assignment->id,
                 'assignment_number' => $assignment->assignment_number,
                 'teacher_id' => $assignment->teacher_id,
@@ -107,7 +146,7 @@ class AssignmentService
 
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('AssignmentService: Failed to create assignment', [
+            Log::error('AssignmentService: Échec de la création de l\'affectation', [
                 'error' => $e->getMessage(),
                 'data' => $data
             ]);
@@ -115,6 +154,14 @@ class AssignmentService
         }
     }
 
+    /**
+     * Met à jour une affectation.
+     *
+     * @param Assignement $assignment
+     * @param array $data
+     * @return Assignement
+     * @throws AssignmentException
+     */
     public function updateAssignment(Assignement $assignment, array $data): Assignement
     {
         $this->validateAssignmentData($data, $assignment->id);
@@ -130,21 +177,36 @@ class AssignmentService
 
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Failed to update assignment: ' . $e->getMessage());
+            Log::error('Échec de la mise à jour de l\'affectation: ' . $e->getMessage());
             throw AssignmentException::updateFailed();
         }
     }
 
+    /**
+     * Supprime une affectation.
+     *
+     * @param Assignement $assignment
+     * @return bool
+     * @throws AssignmentException
+     */
     public function deleteAssignment(Assignement $assignment): bool
     {
         try {
             return $assignment->delete();
         } catch (\Exception $e) {
-            Log::error('Failed to delete assignment: ' . $e->getMessage());
+            Log::error('Échec de la suppression de l\'affectation: ' . $e->getMessage());
             throw AssignmentException::deletionFailed();
         }
     }
 
+    /**
+     * Valide les données de l\'affectation.
+     *
+     * @param array $data
+     * @param int|null $excludeId
+     * @return void
+     * @throws AssignmentException
+     */
     private function validateAssignmentData(array $data, ?int $excludeId = null): void
     {
         // Validate teacher exists
@@ -193,6 +255,14 @@ class AssignmentService
         $this->checkForScheduleConflicts($data, $excludeId);
     }
 
+    /**
+     * Vérifie les affectations en double.
+     *
+     * @param array $data
+     * @param int|null $excludeId
+     * @return void
+     * @throws AssignmentException
+     */
     private function checkForDuplicateAssignment(array $data, ?int $excludeId = null): void
     {
         if (!isset($data['teacher_id'], $data['class_model_id'], $data['subject_id'])) {
@@ -216,6 +286,14 @@ class AssignmentService
         }
     }
 
+    /**
+     * Vérifie les conflits d\'horaire.
+     *
+     * @param array $data
+     * @param int|null $excludeId
+     * @return void
+     * @throws AssignmentException
+     */
     private function checkForScheduleConflicts(array $data, ?int $excludeId = null): void
     {
         if (!isset($data['day_of_week'], $data['start_time'], $data['end_time'])) {
@@ -272,7 +350,9 @@ class AssignmentService
     }
 
     /**
-     * Generate a unique assignment number
+     * Génère un numéro d\'affectation unique.
+     *
+     * @return string
      */
     private function generateAssignmentNumber(): string
     {
@@ -293,14 +373,14 @@ class AssignmentService
             $exists = Assignement::where('assignment_number', $assignmentNumber)->exists();
 
             if (!$exists) {
-                Log::info('AssignmentService: Generated unique assignment number', [
+                Log::info('AssignmentService: Numéro d\'affectation unique généré', [
                     'assignment_number' => $assignmentNumber,
                     'attempts' => $attempt
                 ]);
                 return $assignmentNumber;
             }
 
-            Log::debug('AssignmentService: Generated assignment number already exists, retrying', [
+            Log::debug('AssignmentService: Le numéro d\'affectation généré existe déjà, nouvelle tentative', [
                 'assignment_number' => $assignmentNumber,
                 'attempt' => $attempt
             ]);
@@ -311,7 +391,7 @@ class AssignmentService
         $timestamp = time();
         $assignmentNumber = "ASS-{$year}-{$monthDay}-" . substr($timestamp, -4);
 
-        Log::warning('AssignmentService: Using timestamp-based assignment number after max attempts', [
+        Log::warning('AssignmentService: Utilisation d\'un numéro d\'affectation basé sur l\'horodatage après le nombre maximum de tentatives', [
             'assignment_number' => $assignmentNumber,
             'max_attempts_reached' => $maxAttempts
         ]);
@@ -320,11 +400,18 @@ class AssignmentService
     }
 
     /**
-     * Create assignment for teacher (used by TeacherService)
+     * Crée une affectation pour un enseignant (utilisé par TeacherService).
+     *
+     * @param int $teacherId
+     * @param int $subjectId
+     * @param int $classModelId
+     * @param array|null $additionalData
+     * @return Assignement
+     * @throws AssignmentException
      */
     public function createAssignmentForTeacher(int $teacherId, int $subjectId, int $classModelId, ?array $additionalData = []): Assignement
     {
-        Log::info('AssignmentService: Creating assignment for teacher', [
+        Log::info('AssignmentService: Création d\'une affectation pour un enseignant', [
             'teacher_id' => $teacherId,
             'subject_id' => $subjectId,
             'class_model_id' => $classModelId
@@ -341,11 +428,14 @@ class AssignmentService
     }
 
     /**
-     * Activate assignment
+     * Active une affectation.
+     *
+     * @param Assignement $assignment
+     * @return Assignement
      */
     public function activateAssignment(Assignement $assignment): Assignement
     {
-        Log::info('AssignmentService: Activating assignment', [
+        Log::info('AssignmentService: Activation de l\'affectation', [
             'assignment_id' => $assignment->id,
             'assignment_number' => $assignment->assignment_number
         ]);
@@ -356,11 +446,14 @@ class AssignmentService
     }
 
     /**
-     * Deactivate assignment
+     * Désactive une affectation.
+     *
+     * @param Assignement $assignment
+     * @return Assignement
      */
     public function deactivateAssignment(Assignement $assignment): Assignement
     {
-        Log::info('AssignmentService: Deactivating assignment', [
+        Log::info('AssignmentService: Désactivation de l\'affectation', [
             'assignment_id' => $assignment->id,
             'assignment_number' => $assignment->assignment_number
         ]);

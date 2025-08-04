@@ -4,8 +4,18 @@ namespace App\Modules\Grade\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * Class UpdateGradesRequest
+ *
+ * Requête de formulaire pour la mise à jour en masse des notes.
+ */
 class UpdateGradesRequest extends FormRequest
 {
+    /**
+     * Récupère les règles de validation qui s'appliquent à la requête.
+     *
+     * @return array
+     */
     public function rules(): array
     {
         return [
@@ -17,6 +27,11 @@ class UpdateGradesRequest extends FormRequest
         ];
     }
 
+    /**
+     * Détermine si l'utilisateur est autorisé à effectuer cette requête.
+     *
+     * @return bool
+     */
     public function authorize(): bool
     {
         return true;

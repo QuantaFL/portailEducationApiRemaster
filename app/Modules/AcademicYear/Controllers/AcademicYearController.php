@@ -9,23 +9,48 @@ use App\Modules\AcademicYear\Requests\AcademicYearRequest;
 use App\Modules\AcademicYear\Ressources\AcademicYearResource;
 use App\Modules\AcademicYear\Services\AcademicYearService;
 use App\Modules\Term\Ressources\TermResource;
+use Illuminate\Http\JsonResponse;
 
+/**
+ * Class AcademicYearController
+ *
+ * Gère les requêtes liées aux années académiques.
+ */
 class AcademicYearController extends Controller
 {
+    /**
+     * @var AcademicYearService
+     */
     private AcademicYearService $academicYearService;
 
+    /**
+     * AcademicYearController constructor.
+     *
+     * @param AcademicYearService $academicYearService
+     */
     public function __construct(AcademicYearService $academicYearService)
     {
         $this->academicYearService = $academicYearService;
     }
 
-    public function index()
+    /**
+     * Affiche une liste des années académiques.
+     *
+     * @return JsonResponse
+     */
+    public function index(): JsonResponse
     {
         $academicYears = $this->academicYearService->getAllAcademicYears();
         return response()->json(AcademicYearResource::collection($academicYears));
     }
 
-    public function store(AcademicYearRequest $request)
+    /**
+     * Enregistre une nouvelle année académique.
+     *
+     * @param AcademicYearRequest $request
+     * @return JsonResponse
+     */
+    public function store(AcademicYearRequest $request): JsonResponse
     {
         try {
             $result = $this->academicYearService->createAcademicYear($request->validated());
@@ -41,12 +66,25 @@ class AcademicYearController extends Controller
         }
     }
 
-    public function show(AcademicYear $academicYear)
+    /**
+     * Affiche une année académique spécifique.
+     *
+     * @param AcademicYear $academicYear
+     * @return JsonResponse
+     */
+    public function show(AcademicYear $academicYear): JsonResponse
     {
         return response()->json(new AcademicYearResource($academicYear));
     }
 
-    public function update(AcademicYearRequest $request, AcademicYear $academicYear)
+    /**
+     * Met à jour une année académique spécifique.
+     *
+     * @param AcademicYearRequest $request
+     * @param AcademicYear $academicYear
+     * @return JsonResponse
+     */
+    public function update(AcademicYearRequest $request, AcademicYear $academicYear): JsonResponse
     {
         try {
             $updatedAcademicYear = $this->academicYearService->updateAcademicYear($academicYear, $request->validated());
@@ -58,7 +96,13 @@ class AcademicYearController extends Controller
         }
     }
 
-    public function destroy(AcademicYear $academicYear)
+    /**
+     * Supprime une année académique spécifique.
+     *
+     * @param AcademicYear $academicYear
+     * @return JsonResponse
+     */
+    public function destroy(AcademicYear $academicYear): JsonResponse
     {
         try {
             $this->academicYearService->deleteAcademicYear($academicYear);
@@ -70,7 +114,12 @@ class AcademicYearController extends Controller
         }
     }
 
-    public function getCurrentAcademicYear()
+    /**
+     * Récupère l'année académique en cours.
+     *
+     * @return JsonResponse
+     */
+    public function getCurrentAcademicYear(): JsonResponse
     {
         try {
             $currentYear = $this->academicYearService->getCurrentAcademicYear();
@@ -82,7 +131,12 @@ class AcademicYearController extends Controller
         }
     }
 
-    public function getActiveAcademicYears()
+    /**
+     * Récupère les années académiques actives.
+     *
+     * @return JsonResponse
+     */
+    public function getActiveAcademicYears(): JsonResponse
     {
         try {
             $activeYears = $this->academicYearService->getActiveAcademicYears();
@@ -94,7 +148,13 @@ class AcademicYearController extends Controller
         }
     }
 
-    public function getAcademicYearById($id)
+    /**
+     * Récupère une année académique par son ID.
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function getAcademicYearById(int $id): JsonResponse
     {
         try {
             $academicYear = $this->academicYearService->getAcademicYearById($id);
@@ -106,7 +166,13 @@ class AcademicYearController extends Controller
         }
     }
 
-    public function getTermsByAcademicYear($academicYearId)
+    /**
+     * Récupère les semestres d'une année académique donnée.
+     *
+     * @param int $academicYearId
+     * @return JsonResponse
+     */
+    public function getTermsByAcademicYear(int $academicYearId): JsonResponse
     {
         try {
             $terms = $this->academicYearService->getTermsByAcademicYear($academicYearId);

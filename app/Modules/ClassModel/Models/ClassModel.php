@@ -3,7 +3,6 @@
 namespace App\Modules\ClassModel\Models;
 
 use App\Modules\AcademicYear\Models\AcademicYear;
-use App\Modules\AcademicYear\Models\StatusAcademicYearEnum;
 use App\Modules\Student\Models\StudentSession;
 use App\Modules\Subject\Models\Subject;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -11,6 +10,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
+/**
+ * Class ClassModel
+ *
+ * @property int $id
+ * @property string $name
+ * @property string $level
+ */
 class ClassModel extends Model
 {
     use HasFactory;
@@ -21,12 +27,17 @@ class ClassModel extends Model
         'level',
     ];
 
+    /**
+     * Récupère les sessions des étudiants pour l'année académique en cours.
+     *
+     * @return HasMany
+     */
     public function currentAcademicYearStudentSessions(): HasMany
     {
         $currentAcademicYear = AcademicYear::getCurrentAcademicYear();
 
         if (!$currentAcademicYear) {
-            return $this->hasMany(StudentSession::class)->whereRaw('1 = 0'); // Return empty relation if no current academic year
+            return $this->hasMany(StudentSession::class)->whereRaw('1 = 0'); // Retourne une relation vide si aucune année académique en cours
         }
 
         return $this->hasMany(StudentSession::class)
@@ -34,7 +45,9 @@ class ClassModel extends Model
     }
 
     /**
-     * Relation many-to-many avec Subject
+     * Relation plusieurs-à-plusieurs avec Subject.
+     *
+     * @return BelongsToMany
      */
     public function subjects(): BelongsToMany
     {

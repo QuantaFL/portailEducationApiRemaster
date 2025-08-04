@@ -8,7 +8,23 @@ use App\Modules\Subject\Models\Subject;
 use App\Modules\Teacher\Models\Teacher;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * Class Assignement
+ *
+ * @property int $id
+ * @property int $teacher_id
+ * @property int $class_model_id
+ * @property int $subject_id
+ * @property int $academic_year_id
+ * @property array $day_of_week
+ * @property string $start_time
+ * @property string $end_time
+ * @property float $coefficient
+ * @property bool $isActive
+ * @property string $assignment_number
+ */
 class Assignement extends Model
 {
     use HasFactory;
@@ -37,22 +53,42 @@ class Assignement extends Model
         'day_of_week' => 'array',
     ];
 
-    public function teacher()
+    /**
+     * Récupère l'enseignant associé.
+     *
+     * @return BelongsTo
+     */
+    public function teacher(): BelongsTo
     {
         return $this->belongsTo(Teacher::class);
     }
 
-    public function classModel()
+    /**
+     * Récupère la classe associée.
+     *
+     * @return BelongsTo
+     */
+    public function classModel(): BelongsTo
     {
         return $this->belongsTo(ClassModel::class);
     }
 
-    public function subject()
+    /**
+     * Récupère la matière associée.
+     *
+     * @return BelongsTo
+     */
+    public function subject(): BelongsTo
     {
         return $this->belongsTo(Subject::class);
     }
 
-    public function academicYear()
+    /**
+     * Récupère l'année académique associée.
+     *
+     * @return BelongsTo
+     */
+    public function academicYear(): BelongsTo
     {
         return $this->belongsTo(AcademicYear::class);
     }

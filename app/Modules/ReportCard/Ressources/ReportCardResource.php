@@ -18,7 +18,7 @@ class ReportCardResource extends JsonResource
             'average_grade' => $this->average_grade,
             'honors' => $this->honors,
             'path' => $this->path,
-            'pdf_url' => $this->path ? asset('storage/' . str_replace('public/', '', $this->path)) : null,
+            'pdf_url' => $this->pdf_url,
             'rank' => $this->rank,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

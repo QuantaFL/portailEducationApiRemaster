@@ -9,9 +9,15 @@ use App\Modules\Assignement\Requests\AssignementRequest;
 use App\Modules\Assignement\Requests\ToggleStatusByTeacherRequest;
 use App\Modules\Assignement\Ressources\AssignementResource;
 use App\Modules\Assignement\Services\AssignmentService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
+/**
+ * Class AssignementController
+ *
+ * Gère les requêtes liées aux affectations.
+ */
 class AssignementController extends Controller
 {
     private AssignmentService $assignmentService;
@@ -21,13 +27,24 @@ class AssignementController extends Controller
         $this->assignmentService = $assignmentService;
     }
 
-    public function index()
+    /**
+     * Affiche une liste des affectations.
+     *
+     * @return JsonResponse
+     */
+    public function index(): JsonResponse
     {
         $assignments = $this->assignmentService->getAllAssignments();
         return response()->json(AssignementResource::collection($assignments));
     }
 
-    public function store(AssignementRequest $request)
+    /**
+     * Enregistre une nouvelle affectation.
+     *
+     * @param AssignementRequest $request
+     * @return JsonResponse
+     */
+    public function store(AssignementRequest $request): JsonResponse
     {
         try {
             $assignment = $this->assignmentService->createAssignment($request->validated());
@@ -39,12 +56,25 @@ class AssignementController extends Controller
         }
     }
 
-    public function show(Assignement $assignement)
+    /**
+     * Affiche une affectation spécifique.
+     *
+     * @param Assignement $assignement
+     * @return JsonResponse
+     */
+    public function show(Assignement $assignement): JsonResponse
     {
         return response()->json(new AssignementResource($assignement));
     }
 
-    public function update(AssignementRequest $request, Assignement $assignement)
+    /**
+     * Met à jour une affectation spécifique.
+     *
+     * @param AssignementRequest $request
+     * @param Assignement $assignement
+     * @return JsonResponse
+     */
+    public function update(AssignementRequest $request, Assignement $assignement): JsonResponse
     {
         try {
             $updatedAssignment = $this->assignmentService->updateAssignment($assignement, $request->validated());
@@ -56,7 +86,13 @@ class AssignementController extends Controller
         }
     }
 
-    public function destroy(Assignement $assignement)
+    /**
+     * Supprime une affectation spécifique.
+     *
+     * @param Assignement $assignement
+     * @return JsonResponse
+     */
+    public function destroy(Assignement $assignement): JsonResponse
     {
         try {
             $this->assignmentService->deleteAssignment($assignement);
@@ -68,7 +104,13 @@ class AssignementController extends Controller
         }
     }
 
-    public function getAssignmentsForTeacher($id)
+    /**
+     * Récupère les affectations d'un enseignant.
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function getAssignmentsForTeacher(int $id): JsonResponse
     {
         try {
             $assignments = $this->assignmentService->getAssignmentsForTeacher($id);
@@ -80,7 +122,13 @@ class AssignementController extends Controller
         }
     }
 
-    public function getByTermAndClass(Request $request)
+    /**
+     * Récupère les affectations par semestre et par classe.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function getByTermAndClass(Request $request): JsonResponse
     {
         try {
             $termId = $request->input('term_id');
@@ -88,7 +136,7 @@ class AssignementController extends Controller
 
             if (!$termId || !$classId) {
                 return response()->json([
-                    'message' => 'Term ID and Class ID are required'
+                    'message' => 'L\'ID du semestre et l\'ID de la classe sont requis'
                 ], 400);
             }
 
@@ -101,7 +149,13 @@ class AssignementController extends Controller
         }
     }
 
-    public function toggleStatusByTeacher(ToggleStatusByTeacherRequest $request)
+    /**
+     * Bascule le statut d'une affectation par l'enseignant.
+     *
+     * @param ToggleStatusByTeacherRequest $request
+     * @return JsonResponse
+     */
+    public function toggleStatusByTeacher(ToggleStatusByTeacherRequest $request): JsonResponse
     {
         try {
             $validated = $request->validated();
@@ -111,13 +165,13 @@ class AssignementController extends Controller
             return response()->json(new AssignementResource($assignment));
 
         } catch (AssignmentException $e) {
-            Log::error('AssignementController: Failed to toggle assignment status by teacher', [
+            Log::error('AssignementController: Échec du basculement du statut de l\'affectation par l\'enseignant', [
                 'error' => $e->getMessage(),
                 'teacher_id' => request()->input('teacher_id')
             ]);
             return response()->json(['message' => $e->getMessage()], 404);
         } catch (\Exception $e) {
-            Log::error('AssignementController: Failed to toggle assignment status by teacher', [
+            Log::error('AssignementController: Échec du basculement du statut de l\'affectation par l\'enseignant', [
                 'error' => $e->getMessage(),
                 'teacher_id' => request()->input('teacher_id')
             ]);
@@ -126,7 +180,7 @@ class AssignementController extends Controller
                 return response()->json(['message' => $e->getMessage()], 404);
             }
 
-            return response()->json(['message' => 'Failed to toggle assignment status'], 500);
+            return response()->json(['message' => 'Échec du basculement du statut de l\'affectation'], 500);
         }
     }
 }

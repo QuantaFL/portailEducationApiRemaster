@@ -4,8 +4,18 @@ namespace App\Modules\Assignement\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * Class AssignementRequest
+ *
+ * Requête de formulaire pour les affectations.
+ */
 class AssignementRequest extends FormRequest
 {
+    /**
+     * Récupère les règles de validation qui s'appliquent à la requête.
+     *
+     * @return array
+     */
     public function rules(): array
     {
         return [
@@ -21,6 +31,11 @@ class AssignementRequest extends FormRequest
         ];
     }
 
+    /**
+     * Détermine si l'utilisateur est autorisé à effectuer cette requête.
+     *
+     * @return bool
+     */
     public function authorize(): bool
     {
         return true;

@@ -10,6 +10,12 @@ use Illuminate\Http\Resources\Json\JsonResource;
 /** @mixin JobApplication */
 class JobApplicationResource extends JsonResource
 {
+    /**
+     * Transforme la ressource en un tableau.
+     *
+     * @param Request $request
+     * @return array
+     */
     public function toArray(Request $request): array
     {
         return [
@@ -31,22 +37,22 @@ class JobApplicationResource extends JsonResource
             'reviewed_at_formatted' => $this->reviewed_at?->format('d/m/Y H:i'),
             'created_at' => $this->created_at->toISOString(),
             'updated_at' => $this->updated_at->toISOString(),
-            
-            // File information
+
+            // Informations sur les fichiers
             'has_files' => $this->hasFiles(),
             'has_cover_letter_file' => $this->hasCoverLetterFile(),
             'cv_original_name' => $this->cv_original_name,
             'cover_letter_original_name' => $this->cover_letter_original_name,
             'formatted_file_size' => $this->formatted_file_size,
-            
-            // Status flags
+
+            // Indicateurs de statut
             'is_reviewed' => $this->isReviewed(),
             'can_be_modified' => $this->canBeModified(),
-            
-            // Download URLs
+
+            // URL de téléchargement
             'cv_download_url' => $this->hasFiles() ? "/api/v1/job-applications/{$this->id}/download/cv" : null,
             'cover_letter_download_url' => $this->hasCoverLetterFile() ? "/api/v1/job-applications/{$this->id}/download/cover_letter" : null,
-            
+
             // Relations
             'job_offer' => new JobOfferResource($this->whenLoaded('jobOffer')),
             'reviewed_by' => new UserModelResource($this->whenLoaded('reviewedBy')),

@@ -4,18 +4,26 @@ namespace App\Modules\Grade\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Modules\Grade\Models\Grade;
-use App\Modules\Student\Models\StudentSession;
 use App\Modules\Assignement\Models\Assignement;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 
+/**
+ * Class GradeStudentNotesController
+ *
+ * Gère les requêtes liées aux notes des étudiants.
+ */
 class GradeStudentNotesController extends Controller
 {
-     /**
-     * Fetch notes (grades) for students in a class for a given assignment and teacher.
+    /**
+     * Récupère les notes des étudiants pour une affectation donnée.
      *
-     * GET /api/v1/classes/{classId}/subjects/{subjectId}/assignments/{assignmentId}/teachers/{teacherId}/student-notes
+     * @param Request $request
+     * @param int $classId
+     * @param int $subjectId
+     * @param int $assignmentId
+     * @param int $teacherId
+     * @return JsonResponse
      */
     public function getStudentNotes(Request $request, int $classId, int $subjectId, int $assignmentId, int $teacherId): JsonResponse
     {

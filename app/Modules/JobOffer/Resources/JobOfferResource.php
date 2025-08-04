@@ -11,6 +11,12 @@ use Illuminate\Http\Resources\Json\JsonResource;
 /** @mixin JobOffer */
 class JobOfferResource extends JsonResource
 {
+    /**
+     * Transforme la ressource en un tableau.
+     *
+     * @param Request $request
+     * @return array
+     */
     public function toArray(Request $request): array
     {
         return [
@@ -44,7 +50,7 @@ class JobOfferResource extends JsonResource
             'pending_applications_count' => $this->pending_applications_count,
             'is_expired' => $this->isExpired(),
             'is_published' => $this->isPublished(),
-            
+
             // Relations
             'subject' => new SubjectResource($this->whenLoaded('subject')),
             'posted_by' => new UserModelResource($this->whenLoaded('postedBy')),
@@ -52,9 +58,14 @@ class JobOfferResource extends JsonResource
         ];
     }
 
+    /**
+     * Récupère le libellé du type d'emploi.
+     *
+     * @return string
+     */
     private function getEmploymentTypeLabel(): string
     {
-        return match($this->employment_type) {
+        return match ($this->employment_type) {
             'full_time' => 'Temps plein',
             'part_time' => 'Temps partiel',
             'contract' => 'Contrat',
@@ -62,9 +73,14 @@ class JobOfferResource extends JsonResource
         };
     }
 
+    /**
+     * Récupère le libellé du niveau d'expérience.
+     *
+     * @return string
+     */
     private function getExperienceLevelLabel(): string
     {
-        return match($this->experience_level) {
+        return match ($this->experience_level) {
             'entry' => 'Débutant',
             'junior' => 'Junior',
             'senior' => 'Senior',
@@ -73,9 +89,14 @@ class JobOfferResource extends JsonResource
         };
     }
 
+    /**
+     * Récupère le libellé du statut.
+     *
+     * @return string
+     */
     private function getStatusLabel(): string
     {
-        return match($this->status) {
+        return match ($this->status) {
             'active' => 'Active',
             'inactive' => 'Inactive',
             'expired' => 'Expirée',

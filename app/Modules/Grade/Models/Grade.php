@@ -10,6 +10,16 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * Class Grade
+ *
+ * @property int $id
+ * @property float $mark
+ * @property string $type
+ * @property int $assignement_id
+ * @property int $student_session_id
+ * @property int $term_id
+ */
 class Grade extends Model
 {
     use HasFactory;
@@ -24,21 +34,41 @@ class Grade extends Model
 
     protected $with = ['assignement', 'studentSession', 'term', 'subject'];
 
-    public function assignement()
+    /**
+     * Récupère l'affectation associée.
+     *
+     * @return BelongsTo
+     */
+    public function assignement(): BelongsTo
     {
         return $this->belongsTo(Assignement::class);
     }
 
-    public function studentSession()
+    /**
+     * Récupère la session de l'étudiant associée.
+     *
+     * @return BelongsTo
+     */
+    public function studentSession(): BelongsTo
     {
         return $this->belongsTo(StudentSession::class);
     }
 
-    public function term() : BelongsTo
+    /**
+     * Récupère le semestre associé.
+     *
+     * @return BelongsTo
+     */
+    public function term(): BelongsTo
     {
         return $this->belongsTo(Term::class);
     }
 
+    /**
+     * Récupère la matière associée.
+     *
+     * @return BelongsTo
+     */
     public function subject(): BelongsTo
     {
         return $this->belongsTo(Subject::class);

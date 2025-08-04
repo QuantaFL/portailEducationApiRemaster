@@ -1,136 +1,142 @@
 <?php
 
-namespace App\Modules\JobOffer\Exceptions;
+namespace App
+Modules\JobOffer\Exceptions;
 
 use Exception;
 
+/**
+ * Class JobOfferException
+ *
+ * Exception personnalisée pour les erreurs liées aux offres d'emploi et aux candidatures.
+ */
 class JobOfferException extends Exception
 {
-    // Job Offer Exceptions
+    // Exceptions pour les offres d'emploi
     public static function jobOfferNotFound(): self
     {
-        return new self('Job offer not found');
+        return new self('Offre d\'emploi non trouvée');
     }
 
     public static function subjectNotFound(): self
     {
-        return new self('Subject not found');
+        return new self('Matière non trouvée');
     }
 
     public static function userNotFound(): self
     {
-        return new self('User not found');
+        return new self('Utilisateur non trouvé');
     }
 
     public static function creationFailed(): self
     {
-        return new self('Failed to create job offer');
+        return new self('Échec de la création de l\'offre d\'emploi');
     }
 
     public static function updateFailed(): self
     {
-        return new self('Failed to update job offer');
+        return new self('Échec de la mise à jour de l\'offre d\'emploi');
     }
 
     public static function deletionFailed(): self
     {
-        return new self('Failed to delete job offer');
+        return new self('Échec de la suppression de l\'offre d\'emploi');
     }
 
     public static function cannotDeleteWithApplications(): self
     {
-        return new self('Cannot delete job offer with existing applications');
+        return new self('Impossible de supprimer une offre d\'emploi avec des candidatures existantes');
     }
 
     public static function invalidDeadline(): self
     {
-        return new self('Application deadline must be in the future');
+        return new self('La date limite de candidature doit être dans le futur');
     }
 
     public static function invalidSalaryRange(): self
     {
-        return new self('Minimum salary cannot be greater than maximum salary');
+        return new self('Le salaire minimum ne peut pas être supérieur au salaire maximum');
     }
 
     public static function invalidEmploymentType(): self
     {
-        return new self('Invalid employment type. Allowed values: full_time, part_time, contract');
+        return new self('Type d\'emploi invalide. Valeurs autorisées : temps_plein, temps_partiel, contrat');
     }
 
     public static function invalidExperienceLevel(): self
     {
-        return new self('Invalid experience level. Allowed values: entry, junior, senior, expert');
+        return new self('Niveau d\'expérience invalide. Valeurs autorisées : debutant, junior, senior, expert');
     }
 
-    // Job Application Exceptions
+    // Exceptions pour les candidatures
     public static function applicationNotFound(): self
     {
-        return new self('Job application not found');
+        return new self('Candidature non trouvée');
     }
 
     public static function applicationCreationFailed(): self
     {
-        return new self('Failed to create job application');
+        return new self('Échec de la création de la candidature');
     }
 
     public static function applicationUpdateFailed(): self
     {
-        return new self('Failed to update job application');
+        return new self('Échec de la mise à jour de la candidature');
     }
 
     public static function applicationDeletionFailed(): self
     {
-        return new self('Failed to delete job application');
+        return new self('Échec de la suppression de la candidature');
     }
 
     public static function duplicateApplication(): self
     {
-        return new self('An application from this email already exists for this job offer');
+        return new self('Une candidature de cet email existe déjà pour cette offre d\'emploi');
     }
 
     public static function jobOfferNotActive(): self
     {
-        return new self('Job offer is not active');
+        return new self('L\'offre d\'emploi n\'est pas active');
     }
 
     public static function jobOfferExpired(): self
     {
-        return new self('Job offer application deadline has passed');
+        return new self('La date limite de candidature pour cette offre d\'emploi est dépassée');
     }
 
     public static function invalidApplicationStatus(): self
     {
-        return new self('Invalid application status. Allowed values: pending, reviewed, accepted, rejected');
+        return new self('Statut de candidature invalide. Valeurs autorisées : pending, reviewed, accepted, rejected');
     }
 
-    // File Upload Exceptions
+    // Exceptions pour le téléchargement de fichiers
     public static function cvFileRequired(): self
     {
-        return new self('CV file is required');
+        return new self('Le fichier CV est requis');
     }
 
     public static function fileUploadFailed(): self
     {
-        return new self('Failed to upload file');
+        return new self('Échec du téléchargement du fichier');
     }
 
     public static function fileTooLarge(): self
     {
-        return new self('File size exceeds maximum allowed size (5MB)');
+        return new self('La taille du fichier dépasse la taille maximale autorisée (5 Mo)');
     }
 
     public static function invalidFileType(): self
     {
-        return new self('Invalid file type. Allowed types: PDF, DOC, DOCX');
+        return new self('Type de fichier invalide. Types autorisés : PDF, DOC, DOCX');
     }
 
     public static function invalidFile(): self
     {
-        return new self('Invalid or corrupted file');
+        return new self('Fichier invalide ou corrompu');
     }
 
     public static function fileNotFound(): self
     {
-        return new self('File not found');
+        return new self('Fichier non trouvé');
     }
 }

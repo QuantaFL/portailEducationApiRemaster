@@ -2,26 +2,29 @@
 
 namespace App\Http\Controllers;
 
-use App\Modules\User\Models\User;
 use App\Modules\User\Models\UserModel;
+use App\Services\ContractService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use App\Services\ContractService;
 
 class TeacherContractController extends Controller
 {
     /**
-     * Génère et envoie le contrat de travail à l'enseignant.
+     * Generate and send a work contract to a teacher.
      *
-     * @param Request $request
-     * juste le mail du professeur
-     * @return JsonResponse
+     * This method validates the teacher's email, retrieves the teacher's data,
+     * populates a contract with predefined and dynamic data, and then uses
+     * the ContractService to generate and email the contract.
+     *
+     * @param  Request  $request The incoming request containing the teacher's email.
+     * @return JsonResponse A JSON response indicating the success or failure of the operation.
      */
-    public function sendContract(Request $request)
+    public function sendContract(Request $request): JsonResponse
     {
         $request->validate([
             'teacher_email' => 'required|email',
         ]);
+
         $teacher = UserModel::where('email', $request->input('teacher_email'))->firstOrFail();
 
         $contractData = [
@@ -36,7 +39,7 @@ class TeacherContractController extends Controller
             'nom_enseignant' => $teacher->last_name ?? '',
             'prenom_enseignant' => $teacher->first_name ?? '',
             'date_lieu_naissance_enseignant' => ($teacher->birthday ? date('d/m/Y', strtotime($teacher->birth_date)) : '') . ($teacher->birth_place ? ' à ' . $teacher->birth_place : ''),
-            'nationalite_enseignant' => $teacher->nationality ??  'Sénégalaise',
+            'nationalite_enseignant' => $teacher->nationality ?? 'Sénégalaise',
             'cni_passeport_enseignant' => $teacher->cni_number ?? '8983293239832',
             'adresse_enseignant' => $teacher->address ?? '456 Avenue de la Liberté, Dakar, Sénégal',
             'telephone_enseignant' => $teacher->phone ?? '+221 77 392 32 47',
@@ -53,12 +56,10 @@ class TeacherContractController extends Controller
             'date_signature' => date('d F Y'),
         ];
 
-
-
         if (ContractService::generateAndSendContract($contractData, $request->input('teacher_email'))) {
             return response()->json(['message' => 'Contrat généré et envoyé avec succès.'], 200);
-        } else {
-            return response()->json(['message' => 'Échec de la génération ou de l\'envoi du contrat.'], 500);
         }
+
+        return response()->json(['message' => 'Échec de la génération ou de l\'envoi du contrat.'], 500);
     }
 }

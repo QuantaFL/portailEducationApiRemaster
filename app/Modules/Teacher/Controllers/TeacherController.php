@@ -25,6 +25,7 @@ class TeacherController extends Controller
     {
         try {
             $teachers = $this->teacherService->getAllTeachers();
+            Log::info($teachers);
             return response()->json(TeacherResource::collection($teachers));
         } catch (\Exception $e) {
             Log::error('TeacherController: Failed to get teachers', ['error' => $e->getMessage()]);
@@ -38,14 +39,14 @@ class TeacherController extends Controller
             $photoFile = $request->file('photo');
             $cvFile = $request->file('cv');
             $diplomasFile = $request->file('diplomas');
-            
+
             $teacher = $this->teacherService->createTeacher(
-                $request->validated(), 
-                $photoFile, 
-                $cvFile, 
+                $request->validated(),
+                $photoFile,
+                $cvFile,
                 $diplomasFile
             );
-            
+
             return response()->json([
                 'teacher' => new TeacherResource($teacher),
                 'photo_url' => $teacher->photo_url,
@@ -129,7 +130,7 @@ class TeacherController extends Controller
     {
         try {
             $teacher = $this->teacherService->getTeacherByUserId($userId);
-            
+
             if (!$teacher) {
                 return response()->json(['message' => 'Teacher not found for this user ID.'], 404);
             }

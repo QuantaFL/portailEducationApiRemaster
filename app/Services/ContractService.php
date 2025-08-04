@@ -6,37 +6,39 @@ use App\Mails\TeacherContractMail;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Exception;
 
 class ContractService
 {
     /**
-     * Génère le contrat PDF et l'envoie par email à l'enseignant.
+     * Generate a PDF contract and send it via email to the teacher.
      *
-     * @param array $contractData Les données à injecter dans le contrat.
-     * @param string $teacherEmail L'adresse email de l'enseignant.
-     * @return bool
+     * This method creates a PDF from a Blade view, saves it temporarily,
+     * sends it as an email attachment, and then deletes the temporary file.
+     *
+     * @param  array  $contractData The data to be injected into the contract view.
+     * @param  string  $teacherEmail The teacher's email address.
+     * @return bool True on success, false on failure.
      */
     public static function generateAndSendContract(array $contractData, string $teacherEmail): bool
     {
         try {
-            // Générer le PDF à partir de la vue Blade
             $pdf = Pdf::loadView('contracts.teacher_contract', ['data' => $contractData]);
 
-            // Sauvegarder le PDF temporairement pour l'attacher à l'email
             $pdfPath = storage_path('app/public/contracts/contract_' . uniqid() . '.pdf');
             $pdf->save($pdfPath);
 
-            // Envoyer l'email avec le PDF attaché
-//            Mail::to($teacherEmail)->send(new TeacherContractMail($pdfPath, $contractData['nom_enseignant'] ?? 'Enseignant'));
-            Mail::to("atidiane741@gmail.com")->send(new TeacherContractMail($pdfPath, $contractData['nom_enseignant'] ?? 'Enseignant'));
-            // Supprimer le fichier temporaire après l'envoi
-            unlink($pdfPath);
+            // Send the email with the attached PDF
+            Mail::to($teacherEmail)->send(new TeacherContractMail($pdfPath, $contractData['nom_enseignant'] ?? 'Enseignant'));
+
+            // Delete the temporary file after sending
+            if (file_exists($pdfPath)) {
+                unlink($pdfPath);
+            }
 
             return true;
-        } catch (\Exception $e) {
-            Log::error('Erreur lors de la génération ou de l\'envoi du contrat : ' . $e->getMessage());
-            // Gérer les erreurs (log, etc.)
-            // Log::error('Erreur lors de la génération ou de l'envoi du contrat : ' . $e->getMessage());
+        } catch (Exception $e) {
+            Log::error('Error generating or sending contract: ' . $e->getMessage());
             return false;
         }
     }

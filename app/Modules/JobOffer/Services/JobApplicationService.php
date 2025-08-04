@@ -5,7 +5,6 @@ namespace App\Modules\JobOffer\Services;
 use App\Modules\JobOffer\Exceptions\JobOfferException;
 use App\Modules\JobOffer\Models\JobApplication;
 use App\Modules\JobOffer\Models\JobOffer;
-use App\Modules\User\Models\UserModel;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -14,15 +13,26 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
+/**
+ * Class JobApplicationService
+ *
+ * Service pour la logique métier des candidatures.
+ */
 class JobApplicationService
 {
     private const ALLOWED_CV_EXTENSIONS = ['pdf', 'doc', 'docx'];
     private const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
     private const UPLOAD_DIRECTORY = 'job-applications';
 
+    /**
+     * Récupère toutes les candidatures.
+     *
+     * @param array $filters
+     * @return LengthAwarePaginator
+     */
     public function getAllApplications(array $filters = []): LengthAwarePaginator
     {
-        Log::info('JobApplicationService: Getting all applications', ['filters' => $filters]);
+        Log::info('JobApplicationService: Récupération de toutes les candidatures', ['filters' => $filters]);
 
         $query = JobApplication::query();
 
@@ -62,31 +72,54 @@ class JobApplicationService
         return $query->paginate($perPage);
     }
 
+    /**
+     * Récupère une candidature par son ID.
+     *
+     * @param int $id
+     * @return JobApplication
+     * @throws JobOfferException
+     */
     public function getApplicationById(int $id): JobApplication
     {
         $application = JobApplication::find($id);
-        
+
         if (!$application) {
             throw JobOfferException::applicationNotFound();
         }
-        
+
         return $application;
     }
 
+    /**
+     * Récupère une candidature par son numéro.
+     *
+     * @param string $applicationNumber
+     * @return JobApplication
+     * @throws JobOfferException
+     */
     public function getApplicationByNumber(string $applicationNumber): JobApplication
     {
         $application = JobApplication::where('application_number', $applicationNumber)->first();
-        
+
         if (!$application) {
             throw JobOfferException::applicationNotFound();
         }
-        
+
         return $application;
     }
 
+    /**
+     * Crée une nouvelle candidature.
+     *
+     * @param array $data
+     * @param UploadedFile|null $cvFile
+     * @param UploadedFile|null $coverLetterFile
+     * @return JobApplication
+     * @throws JobOfferException
+     */
     public function createApplication(array $data, ?UploadedFile $cvFile = null, ?UploadedFile $coverLetterFile = null): JobApplication
     {
-        Log::info('JobApplicationService: Creating new application', [
+        Log::info('JobApplicationService: Création d\'une nouvelle candidature', [
             'job_offer_id' => $data['job_offer_id'] ?? null,
             'applicant_email' => $data['applicant_email'] ?? null,
             'has_cv_file' => $cvFile !== null,
@@ -95,19 +128,19 @@ class JobApplicationService
 
         $this->validateApplicationData($data);
         $this->validateJobOfferForApplication($data['job_offer_id']);
-        
+
         DB::beginTransaction();
-        
+
         try {
             // Generate unique application number
             $data['application_number'] = $this->generateApplicationNumber();
-            Log::info('JobApplicationService: Generated application number', ['application_number' => $data['application_number']]);
+            Log::info('JobApplicationService: Numéro de candidature généré', ['application_number' => $data['application_number']]);
 
             // Handle CV file upload (required)
             if (!$cvFile) {
                 throw JobOfferException::cvFileRequired();
             }
-            
+
             $cvUploadResult = $this->uploadFile($cvFile, 'cv', $data['application_number']);
             $data['cv_path'] = $cvUploadResult['path'];
             $data['cv_original_name'] = $cvUploadResult['original_name'];
@@ -123,20 +156,20 @@ class JobApplicationService
             $data['applied_at'] = now();
 
             $application = JobApplication::create($data);
-            
-            Log::info('JobApplicationService: Application created successfully', [
+
+            Log::info('JobApplicationService: Candidature créée avec succès', [
                 'application_id' => $application->id,
                 'application_number' => $application->application_number,
                 'job_offer_id' => $application->job_offer_id
             ]);
-            
+
             DB::commit();
-            
+
             return $application;
-            
+
         } catch (\Exception $e) {
             DB::rollBack();
-            
+
             // Clean up uploaded files in case of error
             if (isset($cvUploadResult['path'])) {
                 Storage::delete($cvUploadResult['path']);
@@ -144,8 +177,8 @@ class JobApplicationService
             if (isset($coverLetterUploadResult['path'])) {
                 Storage::delete($coverLetterUploadResult['path']);
             }
-            
-            Log::error('JobApplicationService: Failed to create application', [
+
+            Log::error('JobApplicationService: Échec de la création de la candidature', [
                 'error' => $e->getMessage(),
                 'data' => $data
             ]);
@@ -153,9 +186,19 @@ class JobApplicationService
         }
     }
 
+    /**
+     * Met à jour le statut d'une candidature.
+     *
+     * @param JobApplication $application
+     * @param string $status
+     * @param int|null $reviewedBy
+     * @param string|null $adminNotes
+     * @return JobApplication
+     * @throws JobOfferException
+     */
     public function updateApplicationStatus(JobApplication $application, string $status, ?int $reviewedBy = null, ?string $adminNotes = null): JobApplication
     {
-        Log::info('JobApplicationService: Updating application status', [
+        Log::info('JobApplicationService: Mise à jour du statut de la candidature', [
             'application_id' => $application->id,
             'old_status' => $application->status,
             'new_status' => $status,
@@ -168,7 +211,7 @@ class JobApplicationService
         }
 
         DB::beginTransaction();
-        
+
         try {
             $updateData = [
                 'status' => $status,
@@ -181,19 +224,19 @@ class JobApplicationService
             }
 
             $application->update($updateData);
-            
-            Log::info('JobApplicationService: Application status updated successfully', [
+
+            Log::info('JobApplicationService: Statut de la candidature mis à jour avec succès', [
                 'application_id' => $application->id,
                 'new_status' => $status
             ]);
-            
+
             DB::commit();
-            
+
             return $application->fresh();
-            
+
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('JobApplicationService: Failed to update application status', [
+            Log::error('JobApplicationService: Échec de la mise à jour du statut de la candidature', [
                 'error' => $e->getMessage(),
                 'application_id' => $application->id
             ]);
@@ -201,9 +244,16 @@ class JobApplicationService
         }
     }
 
+    /**
+     * Supprime une candidature.
+     *
+     * @param JobApplication $application
+     * @return bool
+     * @throws JobOfferException
+     */
     public function deleteApplication(JobApplication $application): bool
     {
-        Log::info('JobApplicationService: Deleting application', [
+        Log::info('JobApplicationService: Suppression de la candidature', [
             'application_id' => $application->id,
             'application_number' => $application->application_number
         ]);
@@ -219,7 +269,7 @@ class JobApplicationService
 
             return $application->delete();
         } catch (\Exception $e) {
-            Log::error('JobApplicationService: Failed to delete application', [
+            Log::error('JobApplicationService: Échec de la suppression de la candidature', [
                 'error' => $e->getMessage(),
                 'application_id' => $application->id
             ]);
@@ -227,9 +277,17 @@ class JobApplicationService
         }
     }
 
+    /**
+     * Télécharge un fichier d'une candidature.
+     *
+     * @param JobApplication $application
+     * @param string $fileType
+     * @return array
+     * @throws JobOfferException
+     */
     public function downloadFile(JobApplication $application, string $fileType): array
     {
-        Log::info('JobApplicationService: Downloading file', [
+        Log::info('JobApplicationService: Téléchargement du fichier', [
             'application_id' => $application->id,
             'file_type' => $fileType
         ]);
@@ -262,16 +320,35 @@ class JobApplicationService
         ];
     }
 
+    /**
+     * Récupère les candidatures par offre d'emploi.
+     *
+     * @param int $jobOfferId
+     * @return Collection
+     */
     public function getApplicationsByJobOffer(int $jobOfferId): Collection
     {
         return JobApplication::byJobOffer($jobOfferId)->orderBy('applied_at', 'desc')->get();
     }
 
+    /**
+     * Récupère les candidatures récentes.
+     *
+     * @param int $days
+     * @return Collection
+     */
     public function getRecentApplications(int $days = 7): Collection
     {
         return JobApplication::recent($days)->orderBy('applied_at', 'desc')->get();
     }
 
+    /**
+     * Valide les données de la candidature.
+     *
+     * @param array $data
+     * @return void
+     * @throws JobOfferException
+     */
     private function validateApplicationData(array $data): void
     {
         // Check for duplicate application from same email for same job offer
@@ -279,17 +356,24 @@ class JobApplicationService
             $existingApplication = JobApplication::where('job_offer_id', $data['job_offer_id'])
                 ->where('applicant_email', $data['applicant_email'])
                 ->first();
-            
+
             if ($existingApplication) {
                 throw JobOfferException::duplicateApplication();
             }
         }
     }
 
+    /**
+     * Valide l'offre d'emploi pour la candidature.
+     *
+     * @param int $jobOfferId
+     * @return void
+     * @throws JobOfferException
+     */
     private function validateJobOfferForApplication(int $jobOfferId): void
     {
         $jobOffer = JobOffer::find($jobOfferId);
-        
+
         if (!$jobOffer) {
             throw JobOfferException::jobOfferNotFound();
         }
@@ -303,9 +387,18 @@ class JobApplicationService
         }
     }
 
+    /**
+     * Télécharge un fichier.
+     *
+     * @param UploadedFile $file
+     * @param string $type
+     * @param string $applicationNumber
+     * @return array
+     * @throws JobOfferException
+     */
     private function uploadFile(UploadedFile $file, string $type, string $applicationNumber): array
     {
-        Log::info('JobApplicationService: Uploading file', [
+        Log::info('JobApplicationService: Téléchargement du fichier', [
             'type' => $type,
             'original_name' => $file->getClientOriginalName(),
             'size' => $file->getSize(),
@@ -318,15 +411,15 @@ class JobApplicationService
         // Generate unique filename
         $extension = $file->getClientOriginalExtension();
         $filename = $applicationNumber . '_' . $type . '_' . Str::random(8) . '.' . $extension;
-        
+
         // Store file
         $path = $file->storeAs(self::UPLOAD_DIRECTORY, $filename);
-        
+
         if (!$path) {
             throw JobOfferException::fileUploadFailed();
         }
 
-        Log::info('JobApplicationService: File uploaded successfully', [
+        Log::info('JobApplicationService: Fichier téléchargé avec succès', [
             'path' => $path,
             'type' => $type,
             'application_number' => $applicationNumber
@@ -338,6 +431,13 @@ class JobApplicationService
         ];
     }
 
+    /**
+     * Valide un fichier téléchargé.
+     *
+     * @param UploadedFile $file
+     * @return void
+     * @throws JobOfferException
+     */
     private function validateUploadedFile(UploadedFile $file): void
     {
         // Check file size
@@ -357,51 +457,61 @@ class JobApplicationService
         }
     }
 
+    /**
+     * Génère un numéro de candidature unique.
+     *
+     * @return string
+     */
     private function generateApplicationNumber(): string
     {
         $maxAttempts = 10;
         $attempt = 0;
-        
+
         do {
             $attempt++;
-            
+
             // Format: APP-YYYY-MMDD-XXXX (APP = Application, YYYY = year, MMDD = month+day, XXXX = random)
             $year = date('Y');
             $monthDay = date('md');
             $randomNumber = str_pad(mt_rand(1, 9999), 4, '0', STR_PAD_LEFT);
-            
+
             $applicationNumber = "APP-{$year}-{$monthDay}-{$randomNumber}";
-            
+
             // Check if this number already exists
             $exists = JobApplication::where('application_number', $applicationNumber)->exists();
-            
+
             if (!$exists) {
-                Log::info('JobApplicationService: Generated unique application number', [
+                Log::info('JobApplicationService: Numéro de candidature unique généré', [
                     'application_number' => $applicationNumber,
                     'attempts' => $attempt
                 ]);
                 return $applicationNumber;
             }
-            
-            Log::debug('JobApplicationService: Generated application number already exists, retrying', [
+
+            Log::debug('JobApplicationService: Le numéro de candidature généré existe déjà, nouvelle tentative', [
                 'application_number' => $applicationNumber,
                 'attempt' => $attempt
             ]);
-            
+
         } while ($attempt < $maxAttempts);
-        
+
         // If we couldn't generate a unique number after max attempts, use timestamp-based approach
         $timestamp = time();
         $applicationNumber = "APP-{$year}-{$monthDay}-" . substr($timestamp, -4);
-        
-        Log::warning('JobApplicationService: Using timestamp-based application number after max attempts', [
+
+        Log::warning('JobApplicationService: Utilisation d\'un numéro de candidature basé sur l\'horodatage après le nombre maximum de tentatives', [
             'application_number' => $applicationNumber,
             'max_attempts_reached' => $maxAttempts
         ]);
-        
+
         return $applicationNumber;
     }
 
+    /**
+     * Récupère les statistiques des candidatures.
+     *
+     * @return array
+     */
     public function getApplicationStatistics(): array
     {
         return [

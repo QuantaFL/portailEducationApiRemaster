@@ -11,13 +11,30 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
+/**
+ * Class AcademicYearService
+ *
+ * Service pour la logique métier des années académiques.
+ */
 class AcademicYearService
 {
+    /**
+     * Récupère toutes les années académiques.
+     *
+     * @return Collection
+     */
     public function getAllAcademicYears(): Collection
     {
         return AcademicYear::all();
     }
 
+    /**
+     * Récupère une année académique par son ID.
+     *
+     * @param int $id
+     * @return AcademicYear
+     * @throws AcademicYearException
+     */
     public function getAcademicYearById(int $id): AcademicYear
     {
         $academicYear = AcademicYear::find($id);
@@ -29,9 +46,14 @@ class AcademicYearService
         return $academicYear;
     }
 
+    /**
+     * Récupère l'année académique en cours.
+     *
+     * @return AcademicYear
+     * @throws AcademicYearException
+     */
     public function getCurrentAcademicYear(): AcademicYear
     {
-//        $currentYear = AcademicYear::where('status', StatusAcademicYearEnum::EN_COURS->value)->first();
         $currentYear = AcademicYear::getCurrentAcademicYear();
         if (!$currentYear) {
             throw AcademicYearException::noCurrentAcademicYear();
@@ -40,6 +62,12 @@ class AcademicYearService
         return $currentYear;
     }
 
+    /**
+     * Récupère les années académiques actives.
+     *
+     * @return Collection
+     * @throws AcademicYearException
+     */
     public function getActiveAcademicYears(): Collection
     {
         $activeYears = AcademicYear::where('status', 'active')->get();
@@ -51,6 +79,13 @@ class AcademicYearService
         return $activeYears;
     }
 
+    /**
+     * Récupère les semestres d'une année académique.
+     *
+     * @param int $academicYearId
+     * @return Collection
+     * @throws AcademicYearException
+     */
     public function getTermsByAcademicYear(int $academicYearId): Collection
     {
         $academicYear = $this->getAcademicYearById($academicYearId);
@@ -58,6 +93,13 @@ class AcademicYearService
         return $academicYear->terms;
     }
 
+    /**
+     * Crée une nouvelle année académique.
+     *
+     * @param array $data
+     * @return array
+     * @throws AcademicYearException
+     */
     public function createAcademicYear(array $data): array
     {
         $this->validateAcademicYearData($data);
@@ -96,6 +138,13 @@ class AcademicYearService
         }
     }
 
+    /**
+     * Met à jour une année académique.
+     *
+     * @param AcademicYear $academicYear
+     * @param array $data
+     * @return AcademicYear
+     */
     public function updateAcademicYear(AcademicYear $academicYear, array $data): AcademicYear
     {
         $academicYear->update($data);
@@ -103,11 +152,24 @@ class AcademicYearService
         return $academicYear;
     }
 
+    /**
+     * Supprime une année académique.
+     *
+     * @param AcademicYear $academicYear
+     * @return bool
+     */
     public function deleteAcademicYear(AcademicYear $academicYear): bool
     {
         return $academicYear->delete();
     }
 
+    /**
+     * Valide les données de l'année académique.
+     *
+     * @param array $data
+     * @return void
+     * @throws AcademicYearException
+     */
     private function validateAcademicYearData(array $data): void
     {
         $start = (int) $data['start_date'];
@@ -140,6 +202,13 @@ class AcademicYearService
         }
     }
 
+    /**
+     * Crée les semestres pour une année académique.
+     *
+     * @param AcademicYear $academicYear
+     * @param array $data
+     * @return array
+     */
     private function createTermsForAcademicYear(AcademicYear $academicYear, array $data): array
     {
         $startDate = Carbon::parse($data['start_date'])->startOfDay();

@@ -9,6 +9,12 @@ use Illuminate\Http\Resources\Json\JsonResource;
 /** @mixin AcademicYear */
 class AcademicYearResource extends JsonResource
 {
+    /**
+     * Transforme la ressource en un tableau.
+     *
+     * @param Request $request
+     * @return array
+     */
     public function toArray(Request $request): array
     {
         return [

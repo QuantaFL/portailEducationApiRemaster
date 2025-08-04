@@ -7,50 +7,90 @@ use App\Modules\ClassModel\Models\ClassModel;
 use App\Modules\ClassModel\Requests\ClassModelRequest;
 use App\Modules\ClassModel\Requests\AssignSubjectRequest;
 use App\Modules\ClassModel\Ressources\ClassModelResource;
-use App\Modules\AcademicYear\Models\AcademicYear;
-use App\Modules\Student\Models\Student;
 use App\Modules\Subject\Models\Subject;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 
+/**
+ * Class ClassModelController
+ *
+ * Gère les requêtes liées aux classes.
+ */
 class ClassModelController extends Controller
 {
-    public function index()
+    /**
+     * Affiche une liste des classes.
+     *
+     * @return JsonResponse
+     */
+    public function index(): JsonResponse
     {
         $classes = ClassModel::with(['subjects', 'currentAcademicYearStudentSessions'])->get();
         return response()->json(ClassModelResource::collection($classes));
     }
 
-    public function store(ClassModelRequest $request)
+    /**
+     * Enregistre une nouvelle classe.
+     *
+     * @param ClassModelRequest $request
+     * @return JsonResponse
+     */
+    public function store(ClassModelRequest $request): JsonResponse
     {
-        return  response()->json(new  ClassModelResource(ClassModel::create($request->validated()))) ;
+        return response()->json(new ClassModelResource(ClassModel::create($request->validated())));
     }
 
-    public function show($classId)
+    /**
+     * Affiche une classe spécifique.
+     *
+     * @param int $classId
+     * @return JsonResponse
+     */
+    public function show(int $classId): JsonResponse
     {
         $classModel = ClassModel::with(['subjects', 'currentAcademicYearStudentSessions'])->findOrFail($classId);
         return response()->json(new ClassModelResource($classModel));
     }
 
-    public function update(ClassModelRequest $request, ClassModel $classModel)
+    /**
+     * Met à jour une classe spécifique.
+     *
+     * @param ClassModelRequest $request
+     * @param ClassModel $classModel
+     * @return JsonResponse
+     */
+    public function update(ClassModelRequest $request, ClassModel $classModel): JsonResponse
     {
         $classModel->update($request->validated());
 
         return response()->json(new ClassModelResource($classModel));
     }
 
-    public function destroy(ClassModel $classModel)
+    /**
+     * Supprime une classe spécifique.
+     *
+     * @param ClassModel $classModel
+     * @return JsonResponse
+     */
+    public function destroy(ClassModel $classModel): JsonResponse
     {
         $classModel->delete();
 
         return response()->json();
     }
 
-    public function getStudentsByClass($classId)
+    /**
+     * Récupère les étudiants d'une classe.
+     *
+     * @param int $classId
+     * @return JsonResponse
+     */
+    public function getStudentsByClass(int $classId): JsonResponse
     {
         $currentAcademicYear = \App\Modules\AcademicYear\Models\AcademicYear::getCurrentAcademicYear();
 
         if (!$currentAcademicYear) {
-            return response()->json(['message' => 'No current academic year found.'], 404);
+            return response()->json(['message' => 'Aucune année académique en cours trouvée.'], 404);
         }
 
         $students = \App\Modules\Student\Models\Student::whereHas('studentSessions', function ($query) use ($classId, $currentAcademicYear) {
@@ -75,16 +115,19 @@ class ClassModelController extends Controller
     }
 
     /**
-     * Affecter une matière à une classe
+     * Affecte une matière à une classe.
+     *
+     * @param AssignSubjectRequest $request
+     * @return JsonResponse
      */
-    public function assignSubject(AssignSubjectRequest $request)
+    public function assignSubject(AssignSubjectRequest $request): JsonResponse
     {
         try {
             $validated = $request->validated();
             $classId = $validated['class_id'];
             $subjectId = $validated['subject_id'];
 
-            Log::info('ClassModelController: Assign subject request received', [
+            Log::info('ClassModelController: Demande d\'affectation de matière reçue', [
                 'class_id' => $classId,
                 'subject_id' => $subjectId,
                 'user_agent' => request()->header('User-Agent'),
@@ -96,7 +139,7 @@ class ClassModelController extends Controller
 
             // Vérifier si la relation existe déjà
             if ($class->subjects()->where('subject_id', $subjectId)->exists()) {
-                Log::warning('ClassModelController: Subject already assigned to class', [
+                Log::warning('ClassModelController: Matière déjà affectée à la classe', [
                     'class_id' => $classId,
                     'subject_id' => $subjectId
                 ]);
@@ -106,7 +149,7 @@ class ClassModelController extends Controller
             // Affecter la matière à la classe
             $class->subjects()->attach($subjectId);
 
-            Log::info('ClassModelController: Subject assigned to class successfully', [
+            Log::info('ClassModelController: Matière affectée à la classe avec succès', [
                 'class_id' => $classId,
                 'subject_id' => $subjectId,
                 'class_name' => $class->name,
@@ -118,7 +161,7 @@ class ClassModelController extends Controller
             return response()->json(new ClassModelResource($class));
 
         } catch (\Exception $e) {
-            Log::error('ClassModelController: Failed to assign subject to class', [
+            Log::error('ClassModelController: Échec de l\'affectation de la matière à la classe', [
                 'error' => $e->getMessage(),
                 'class_id' => request()->input('class_id'),
                 'subject_id' => request()->input('subject_id')
@@ -133,9 +176,12 @@ class ClassModelController extends Controller
     }
 
     /**
-     * Retirer une matière d'une classe
+     * Retire une matière d'une classe.
+     *
+     * @param AssignSubjectRequest $request
+     * @return JsonResponse
      */
-    public function detachSubject(AssignSubjectRequest $request)
+    public function detachSubject(AssignSubjectRequest $request): JsonResponse
     {
         try {
             $validated = $request->validated();
@@ -153,7 +199,7 @@ class ClassModelController extends Controller
             // Retirer la matière de la classe
             $class->subjects()->detach($subjectId);
 
-            Log::info('ClassModelController: Subject detached from class successfully', [
+            Log::info('ClassModelController: Matière retirée de la classe avec succès', [
                 'class_id' => $classId,
                 'subject_id' => $subjectId,
                 'class_name' => $class->name,
@@ -165,7 +211,7 @@ class ClassModelController extends Controller
             return response()->json(new ClassModelResource($class));
 
         } catch (\Exception $e) {
-            Log::error('ClassModelController: Failed to detach subject from class', [
+            Log::error('ClassModelController: Échec du retrait de la matière de la classe', [
                 'error' => $e->getMessage(),
                 'class_id' => request()->input('class_id'),
                 'subject_id' => request()->input('subject_id')

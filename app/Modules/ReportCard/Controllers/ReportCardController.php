@@ -55,11 +55,7 @@ class ReportCardController extends Controller
         try {
             $generatedReportCards = $reportCardGeneratorService->generateReportCardsForClassAndTerm(
                 $request->class_model_id,
-<<<<<<< HEAD
-                $current_term->id
-=======
                 $request->term_id ?? Term::getCurrentTerm()->id
->>>>>>> 088aa7c3b6f779878daa47eebc7cd99af43a7e24
             );
 
             $reportCardIds = collect($generatedReportCards)->pluck('report_card_model.id')->toArray();

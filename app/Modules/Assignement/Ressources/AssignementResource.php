@@ -14,6 +14,12 @@ use Illuminate\Http\Resources\Json\JsonResource;
 /** @mixin Assignement */
 class AssignementResource extends JsonResource
 {
+    /**
+     * Transforme la ressource en un tableau.
+     *
+     * @param Request $request
+     * @return array
+     */
     public function toArray(Request $request): array
     {
         return [

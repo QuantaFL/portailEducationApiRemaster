@@ -7,17 +7,26 @@ use App\Modules\JobOffer\Models\JobOffer;
 use App\Modules\Subject\Models\Subject;
 use App\Modules\User\Models\UserModel;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
 
+/**
+ * Class JobOfferService
+ *
+ * Service pour la logique métier des offres d'emploi.
+ */
 class JobOfferService
 {
+    /**
+     * Récupère toutes les offres d'emploi.
+     *
+     * @param array $filters
+     * @return LengthAwarePaginator
+     */
     public function getAllJobOffers(array $filters = []): LengthAwarePaginator
     {
-        Log::info('JobOfferService: Getting all job offers', ['filters' => $filters]);
+        Log::info('JobOfferService: Récupération de toutes les offres d\'emploi', ['filters' => $filters]);
 
         $query = JobOffer::query();
 
@@ -64,11 +73,23 @@ class JobOfferService
         return $query->paginate($perPage);
     }
 
+    /**
+     * Récupère les offres d'emploi actives.
+     *
+     * @return Collection
+     */
     public function getActiveJobOffers(): Collection
     {
         return JobOffer::active()->notExpired()->get();
     }
 
+    /**
+     * Récupère une offre d'emploi par son ID.
+     *
+     * @param int $id
+     * @return JobOffer
+     * @throws JobOfferException
+     */
     public function getJobOfferById(int $id): JobOffer
     {
         $jobOffer = JobOffer::find($id);
@@ -80,6 +101,13 @@ class JobOfferService
         return $jobOffer;
     }
 
+    /**
+     * Récupère une offre d'emploi par son numéro.
+     *
+     * @param string $offerNumber
+     * @return JobOffer
+     * @throws JobOfferException
+     */
     public function getJobOfferByNumber(string $offerNumber): JobOffer
     {
         $jobOffer = JobOffer::where('offer_number', $offerNumber)->first();
@@ -91,9 +119,16 @@ class JobOfferService
         return $jobOffer;
     }
 
+    /**
+     * Crée une nouvelle offre d'emploi.
+     *
+     * @param array $data
+     * @return JobOffer
+     * @throws JobOfferException
+     */
     public function createJobOffer(array $data): JobOffer
     {
-        Log::info('JobOfferService: Creating new job offer', [
+        Log::info('JobOfferService: Création d\'une nouvelle offre d\'emploi', [
             'title' => $data['title'] ?? null,
             'subject_id' => $data['subject_id'] ?? null
         ]);
@@ -105,7 +140,7 @@ class JobOfferService
         try {
             // Generate unique offer number
             $data['offer_number'] = $this->generateOfferNumber();
-            Log::info('JobOfferService: Generated offer number', ['offer_number' => $data['offer_number']]);
+            Log::info('JobOfferService: Numéro d\'offre généré', ['offer_number' => $data['offer_number']]);
 
             // Set published_at if not provided and is_active is true
             if (!isset($data['published_at']) && ($data['is_active'] ?? false)) {
@@ -114,7 +149,7 @@ class JobOfferService
 
             $jobOffer = JobOffer::create($data);
 
-            Log::info('JobOfferService: Job offer created successfully', [
+            Log::info('JobOfferService: Offre d\'emploi créée avec succès', [
                 'job_offer_id' => $jobOffer->id,
                 'offer_number' => $jobOffer->offer_number,
                 'title' => $jobOffer->title
@@ -126,7 +161,7 @@ class JobOfferService
 
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('JobOfferService: Failed to create job offer', [
+            Log::error('JobOfferService: Échec de la création de l\'offre d\'emploi', [
                 'error' => $e->getMessage(),
                 'data' => $data
             ]);
@@ -134,9 +169,17 @@ class JobOfferService
         }
     }
 
+    /**
+     * Met à jour une offre d'emploi.
+     *
+     * @param JobOffer $jobOffer
+     * @param array $data
+     * @return JobOffer
+     * @throws JobOfferException
+     */
     public function updateJobOffer(JobOffer $jobOffer, array $data): JobOffer
     {
-        Log::info('JobOfferService: Updating job offer', [
+        Log::info('JobOfferService: Mise à jour de l\'offre d\'emploi', [
             'job_offer_id' => $jobOffer->id,
             'offer_number' => $jobOffer->offer_number
         ]);
@@ -153,7 +196,7 @@ class JobOfferService
 
             $jobOffer->update($data);
 
-            Log::info('JobOfferService: Job offer updated successfully', [
+            Log::info('JobOfferService: Offre d\'emploi mise à jour avec succès', [
                 'job_offer_id' => $jobOffer->id
             ]);
 
@@ -163,7 +206,7 @@ class JobOfferService
 
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('JobOfferService: Failed to update job offer', [
+            Log::error('JobOfferService: Échec de la mise à jour de l\'offre d\'emploi', [
                 'error' => $e->getMessage(),
                 'job_offer_id' => $jobOffer->id
             ]);
@@ -171,9 +214,16 @@ class JobOfferService
         }
     }
 
+    /**
+     * Supprime une offre d'emploi.
+     *
+     * @param JobOffer $jobOffer
+     * @return bool
+     * @throws JobOfferException
+     */
     public function deleteJobOffer(JobOffer $jobOffer): bool
     {
-        Log::info('JobOfferService: Deleting job offer', [
+        Log::info('JobOfferService: Suppression de l\'offre d\'emploi', [
             'job_offer_id' => $jobOffer->id,
             'offer_number' => $jobOffer->offer_number
         ]);
@@ -186,7 +236,7 @@ class JobOfferService
 
             return $jobOffer->delete();
         } catch (\Exception $e) {
-            Log::error('JobOfferService: Failed to delete job offer', [
+            Log::error('JobOfferService: Échec de la suppression de l\'offre d\'emploi', [
                 'error' => $e->getMessage(),
                 'job_offer_id' => $jobOffer->id
             ]);
@@ -194,9 +244,15 @@ class JobOfferService
         }
     }
 
+    /**
+     * Publie une offre d'emploi.
+     *
+     * @param JobOffer $jobOffer
+     * @return JobOffer
+     */
     public function publishJobOffer(JobOffer $jobOffer): JobOffer
     {
-        Log::info('JobOfferService: Publishing job offer', [
+        Log::info('JobOfferService: Publication de l\'offre d\'emploi', [
             'job_offer_id' => $jobOffer->id,
             'offer_number' => $jobOffer->offer_number
         ]);
@@ -209,9 +265,15 @@ class JobOfferService
         return $jobOffer->fresh();
     }
 
+    /**
+     * Dépublie une offre d'emploi.
+     *
+     * @param JobOffer $jobOffer
+     * @return JobOffer
+     */
     public function unpublishJobOffer(JobOffer $jobOffer): JobOffer
     {
-        Log::info('JobOfferService: Unpublishing job offer', [
+        Log::info('JobOfferService: Dépublication de l\'offre d\'emploi', [
             'job_offer_id' => $jobOffer->id,
             'offer_number' => $jobOffer->offer_number
         ]);
@@ -221,6 +283,13 @@ class JobOfferService
         return $jobOffer->fresh();
     }
 
+    /**
+     * Récupère les offres d'emploi par matière.
+     *
+     * @param int $subjectId
+     * @return Collection
+     * @throws JobOfferException
+     */
     public function getJobOffersBySubject(int $subjectId): Collection
     {
         $subject = Subject::find($subjectId);
@@ -231,6 +300,14 @@ class JobOfferService
         return JobOffer::bySubject($subjectId)->active()->notExpired()->get();
     }
 
+    /**
+     * Valide les données de l'offre d'emploi.
+     *
+     * @param array $data
+     * @param int|null $excludeId
+     * @return void
+     * @throws JobOfferException
+     */
     private function validateJobOfferData(array $data, ?int $excludeId = null): void
     {
         // Vérifie que la matière existe
@@ -279,62 +356,13 @@ class JobOfferService
                 throw JobOfferException::invalidExperienceLevel();
             }
         }
-
-        /*
-         *
-         *
-         *
-        // Validate subject exists
-        if (isset($data['subject_id'])) {
-            $subject = Subject::find($data['subject_id']);
-            if (!$subject) {
-                throw JobOfferException::subjectNotFound();
-            }
-        }
-
-        // Validate posted_by user exists
-        if (isset($data['posted_by'])) {
-            $user = UserModel::find($data['posted_by']);
-            if (!$user) {
-                throw JobOfferException::userNotFound();
-            }
-        }
-
-        // Validate application deadline is in the future
-        if (isset($data['application_deadline'])) {
-            $deadline = \Carbon\Carbon::parse($data['application_deadline']);
-            if ($deadline->isPast()) {
-                throw JobOfferException::invalidDeadline();
-            }
-        }
-
-        // Validate salary range
-        if (isset($data['salary_min'], $data['salary_max'])) {
-            if ($data['salary_min'] > $data['salary_max']) {
-                throw JobOfferException::invalidSalaryRange();
-            }
-        }
-
-        // Validate employment type
-        if (isset($data['employment_type'])) {
-            $validTypes = ['full_time', 'part_time', 'contract'];
-            if (!in_array($data['employment_type'], $validTypes)) {
-                throw JobOfferException::invalidEmploymentType();
-            }
-        }
-
-        // Validate experience level
-        if (isset($data['experience_level'])) {
-            $validLevels = ['entry', 'junior', 'senior', 'expert'];
-            if (!in_array($data['experience_level'], $validLevels)) {
-                throw JobOfferException::invalidExperienceLevel();
-            }
-        }
-         *
-         *
-         * */
     }
 
+    /**
+     * Génère un numéro d'offre unique.
+     *
+     * @return string
+     */
     private function generateOfferNumber(): string
     {
         $maxAttempts = 10;
@@ -354,14 +382,14 @@ class JobOfferService
             $exists = JobOffer::where('offer_number', $offerNumber)->exists();
 
             if (!$exists) {
-                Log::info('JobOfferService: Generated unique offer number', [
+                Log::info('JobOfferService: Numéro d\'offre unique généré', [
                     'offer_number' => $offerNumber,
                     'attempts' => $attempt
                 ]);
                 return $offerNumber;
             }
 
-            Log::debug('JobOfferService: Generated offer number already exists, retrying', [
+            Log::debug('JobOfferService: Le numéro d\'offre généré existe déjà, nouvelle tentative', [
                 'offer_number' => $offerNumber,
                 'attempt' => $attempt
             ]);
@@ -372,7 +400,7 @@ class JobOfferService
         $timestamp = time();
         $offerNumber = "JOB-{$year}-{$monthDay}-" . substr($timestamp, -4);
 
-        Log::warning('JobOfferService: Using timestamp-based offer number after max attempts', [
+        Log::warning('JobOfferService: Utilisation d\'un numéro d\'offre basé sur l\'horodatage après le nombre maximum de tentatives', [
             'offer_number' => $offerNumber,
             'max_attempts_reached' => $maxAttempts
         ]);
@@ -380,6 +408,11 @@ class JobOfferService
         return $offerNumber;
     }
 
+    /**
+     * Récupère les statistiques des offres d'emploi.
+     *
+     * @return array
+     */
     public function getJobOfferStatistics(): array
     {
         return [

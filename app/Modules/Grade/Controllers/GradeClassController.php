@@ -6,13 +6,24 @@ use App\Http\Controllers\Controller;
 use App\Modules\Grade\Services\GradeFetchService;
 use Illuminate\Http\JsonResponse;
 
+/**
+ * Class GradeClassController
+ *
+ * Gère les requêtes liées aux notes d'une classe.
+ */
 class GradeClassController extends Controller
 {
     /**
-     * Fetch grades for all students in a class, optionally filtered by teacher, subject, or assignment.
-     * Endpoint: GET /api/v1/grades/class/{classId}/teacher/{teacherId}/subject/{subjectId}/assignement/{assignementId?}
+     * Récupère les notes de tous les étudiants d'une classe, avec filtres optionnels.
+     *
+     * @param int $classId
+     * @param int|null $teacherId
+     * @param int|null $subjectId
+     * @param int|null $assignementId
+     * @param int|null $studentId
+     * @return JsonResponse
      */
-    public function getClassGrades($classId, $teacherId = null, $subjectId = null, $assignementId = null, $studentId = null): JsonResponse
+    public function getClassGrades(int $classId, int $teacherId = null, int $subjectId = null, int $assignementId = null, int $studentId = null): JsonResponse
     {
         if ($studentId !== null && $studentId !== 'null') {
             $result = GradeFetchService::fetchStudentGrades($classId, $studentId, $teacherId, $subjectId, $assignementId);
