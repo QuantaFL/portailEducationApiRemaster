@@ -35,8 +35,23 @@ class TeacherController extends Controller
     public function store(TeacherRequest $request)
     {
         try {
-            $teacher = $this->teacherService->createTeacher($request->validated());
-            return response()->json(new TeacherResource($teacher));
+            $photoFile = $request->file('photo');
+            $cvFile = $request->file('cv');
+            $diplomasFile = $request->file('diplomas');
+            
+            $teacher = $this->teacherService->createTeacher(
+                $request->validated(), 
+                $photoFile, 
+                $cvFile, 
+                $diplomasFile
+            );
+            
+            return response()->json([
+                'teacher' => new TeacherResource($teacher),
+                'photo_url' => $teacher->photo_url,
+                'cv_url' => $teacher->cv_url,
+                'diplomas_url' => $teacher->diplomas_url,
+            ]);
         } catch (\Exception $e) {
             Log::error('TeacherController: Failed to create teacher', ['error' => $e->getMessage()]);
             return response()->json(['message' => 'Failed to create teacher'], 500);
@@ -154,6 +169,48 @@ class TeacherController extends Controller
         } catch (\Exception $e) {
             Log::error('TeacherController: Failed to get performance summary', ['error' => $e->getMessage()]);
             return response()->json(['message' => $e->getMessage()], 404);
+        }
+    }
+
+    /**
+     * Toggle teacher status
+     */
+    public function toggleStatus(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'teacher_id' => 'required|integer|exists:teachers,id'
+            ]);
+
+            $teacherId = $validated['teacher_id'];
+
+            Log::info('TeacherController: Toggle status request received', [
+                'teacher_id' => $teacherId,
+                'user_agent' => $request->header('User-Agent'),
+                'ip' => $request->ip()
+            ]);
+
+            $teacher = $this->teacherService->toggleTeacherStatus($teacherId);
+
+            Log::info('TeacherController: Teacher status toggled successfully', [
+                'teacher_id' => $teacherId,
+                'new_status' => $teacher->status
+            ]);
+
+            return response()->json(new TeacherResource($teacher));
+
+        } catch (\Exception $e) {
+            Log::error('TeacherController: Failed to toggle teacher status', [
+                'error' => $e->getMessage(),
+                'teacher_id' => $request->input('teacher_id'),
+                'stack_trace' => $e->getTraceAsString()
+            ]);
+
+            if (str_contains($e->getMessage(), 'No query results')) {
+                return response()->json(['message' => 'Enseignant non trouvé'], 404);
+            }
+
+            return response()->json(['message' => 'Erreur lors du changement de status'], 500);
         }
     }
 }

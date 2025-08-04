@@ -15,6 +15,7 @@ use App\Modules\Teacher\Services\TeacherContractService;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Collection;
+use Illuminate\Http\UploadedFile;
 
 class TeacherService
 {
@@ -32,11 +33,11 @@ class TeacherService
     public function getAllTeachers(): Collection
     {
         Log::info('TeacherService: Fetching all teachers');
-        
-        $teachers = Teacher::all();
-        
+
+        $teachers = Teacher::with(['userModel', 'subjects', 'assignments'])->get();
+
         Log::info('TeacherService: Retrieved ' . $teachers->count() . ' teachers');
-        
+
         return $teachers;
     }
 
@@ -44,14 +45,17 @@ class TeacherService
      * Create a new teacher with automatic assignment and contract email
      * This is the main method that handles the complete teacher creation process
      */
-    public function createTeacher(array $validatedData): Teacher
+    public function createTeacher(array $validatedData, ?UploadedFile $photoFile = null, ?UploadedFile $cvFile = null, ?UploadedFile $diplomasFile = null): Teacher
     {
         Log::info('TeacherService: Starting complete teacher creation process', [
             'hire_date' => $validatedData['hire_date'],
             'role_id' => $validatedData['role_id'] ?? null,
             'nationality' => $validatedData['nationality'] ?? null,
             'user_email' => $validatedData['user']['email'] ?? null,
-            'assignment_data' => $validatedData['assignment'] ?? null
+            'assignment_data' => $validatedData['assignment'] ?? null,
+            'has_photo' => $photoFile !== null,
+            'has_cv' => $cvFile !== null,
+            'has_diplomas' => $diplomasFile !== null
         ]);
 
         DB::beginTransaction();
@@ -59,37 +63,53 @@ class TeacherService
         try {
             // Step 1: Create the teacher
             $teacher = $this->createTeacherOnly($validatedData);
-            
-            // Step 2: Create assignment if assignment data is provided
+
+            // Step 2: Handle file uploads
+            if ($photoFile) {
+                $this->handlePhotoUpload($photoFile, $teacher);
+            }
+            if ($cvFile) {
+                $this->handleCvUpload($cvFile, $teacher);
+            }
+            if ($diplomasFile) {
+                $this->handleDiplomasUpload($diplomasFile, $teacher);
+            }
+
+            // Step 3: Create assignment if assignment data is provided
             $assignment = null;
             if (isset($validatedData['assignment'])) {
                 $assignment = $this->createTeacherAssignment($teacher, $validatedData['assignment']);
             }
-            
-            // Step 3: Generate and send contract email
+
+            // Step 4: Generate and send contract email
             $this->sendTeacherContract($teacher);
-            
+
             DB::commit();
-            
+
             Log::info('TeacherService: Complete teacher creation process finished successfully', [
                 'teacher_id' => $teacher->id,
                 'user_id' => $teacher->user_model_id,
                 'assignment_id' => $assignment?->id,
                 'assignment_number' => $assignment?->assignment_number,
-                'contract_sent' => true
+                'contract_sent' => true,
+                'files_uploaded' => [
+                    'photo' => $photoFile !== null,
+                    'cv' => $cvFile !== null,
+                    'diplomas' => $diplomasFile !== null
+                ]
             ]);
 
             return $teacher->fresh();
 
         } catch (\Exception $e) {
             DB::rollBack();
-            
+
             Log::error('TeacherService: Complete teacher creation process failed', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
                 'data' => $validatedData
             ]);
-            
+
             throw $e;
         }
     }
@@ -107,7 +127,7 @@ class TeacherService
             // Prepare user data with role_id and nationality
             $userData = $validatedData['user'];
             $userData['role_id'] = $validatedData['role_id'];
-            
+
             if (isset($validatedData['nationality'])) {
                 $userData['nationality'] = $validatedData['nationality'];
             }
@@ -120,6 +140,7 @@ class TeacherService
             $teacher = Teacher::create([
                 'hire_date' => $validatedData['hire_date'],
                 'user_model_id' => $user->id,
+                'status'=>1
             ]);
 
             Log::info('TeacherService: Teacher record created successfully', [
@@ -192,7 +213,7 @@ class TeacherService
 
         try {
             $this->contractService->generateAndSendContract($teacher);
-            
+
             Log::info('TeacherService: Contract sent successfully to teacher', [
                 'teacher_id' => $teacher->id,
                 'user_email' => $teacher->userModel->email
@@ -203,7 +224,7 @@ class TeacherService
                 'teacher_id' => $teacher->id,
                 'error' => $e->getMessage()
             ]);
-            
+
             // Don't throw the exception here to avoid rolling back the entire transaction
             // The teacher and assignment are created successfully, only email failed
             Log::warning('TeacherService: Teacher creation completed but email sending failed');
@@ -219,7 +240,7 @@ class TeacherService
 
         try {
             $refUser = UserModel::findOrFail($teacher->user_model_id);
-            
+
             Log::info('TeacherService: Found user to update', ['user_id' => $refUser->id]);
 
             $refUser->update($validatedData['user']);
@@ -246,9 +267,9 @@ class TeacherService
 
         try {
             $teacher->delete();
-            
+
             Log::info('TeacherService: Teacher deleted successfully', ['teacher_id' => $teacher->id]);
-            
+
             return true;
 
         } catch (\Exception $e) {
@@ -268,7 +289,7 @@ class TeacherService
         Log::info('TeacherService: Getting subjects for teacher', ['teacher_id' => $teacherId]);
 
         $academicYear = AcademicYear::getCurrentAcademicYear();
-        
+
         if (!$academicYear) {
             Log::warning('TeacherService: No current academic year found');
             throw new \Exception('No current academic year found');
@@ -300,7 +321,7 @@ class TeacherService
         Log::info('TeacherService: Getting classes for teacher', ['teacher_id' => $teacherId]);
 
         $academicYear = AcademicYear::getCurrentAcademicYear();
-        
+
         if (!$academicYear) {
             Log::warning('TeacherService: No current academic year found');
             throw new \Exception('No current academic year found');
@@ -476,5 +497,165 @@ class TeacherService
             'bestPerformingStudent' => $best,
             'worstPerformingStudent' => $worst,
         ];
+    }
+
+    /**
+     * Toggle teacher status by ID
+     */
+    public function toggleTeacherStatus(int $teacherId): Teacher
+    {
+        Log::info('TeacherService: Toggling teacher status', [
+            'teacher_id' => $teacherId
+        ]);
+
+        try {
+            $teacher = Teacher::findOrFail($teacherId);
+
+            // Si status est null, on le considère comme 1 (actif)
+            $currentStatus = $teacher->status ?? true;
+            $newStatus = !$currentStatus;
+
+            Log::info('TeacherService: Current teacher status', [
+                'teacher_id' => $teacherId,
+                'current_status' => $currentStatus,
+                'new_status' => $newStatus
+            ]);
+
+            $teacher->update(['status' => $newStatus]);
+
+            Log::info('TeacherService: Teacher status toggled successfully', [
+                'teacher_id' => $teacherId,
+                'old_status' => $currentStatus,
+                'new_status' => $newStatus
+            ]);
+
+            return $teacher->fresh();
+
+        } catch (\Exception $e) {
+            Log::error('TeacherService: Failed to toggle teacher status', [
+                'teacher_id' => $teacherId,
+                'error' => $e->getMessage(),
+                'stack_trace' => $e->getTraceAsString()
+            ]);
+
+            throw $e;
+        }
+    }
+
+    /**
+     * Activate teacher status
+     */
+    public function activateTeacher(int $teacherId): Teacher
+    {
+        Log::info('TeacherService: Activating teacher', ['teacher_id' => $teacherId]);
+
+        try {
+            $teacher = Teacher::findOrFail($teacherId);
+            $teacher->update(['status' => true]);
+
+            Log::info('TeacherService: Teacher activated successfully', ['teacher_id' => $teacherId]);
+
+            return $teacher->fresh();
+
+        } catch (\Exception $e) {
+            Log::error('TeacherService: Failed to activate teacher', [
+                'teacher_id' => $teacherId,
+                'error' => $e->getMessage()
+            ]);
+            throw $e;
+        }
+    }
+
+    /**
+     * Deactivate teacher status
+     */
+    public function deactivateTeacher(int $teacherId): Teacher
+    {
+        Log::info('TeacherService: Deactivating teacher', ['teacher_id' => $teacherId]);
+
+        try {
+            $teacher = Teacher::findOrFail($teacherId);
+            $teacher->update(['status' => false]);
+
+            Log::info('TeacherService: Teacher deactivated successfully', ['teacher_id' => $teacherId]);
+
+            return $teacher->fresh();
+
+        } catch (\Exception $e) {
+            Log::error('TeacherService: Failed to deactivate teacher', [
+                'teacher_id' => $teacherId,
+                'error' => $e->getMessage()
+            ]);
+            throw $e;
+        }
+    }
+
+    /**
+     * Handle photo upload for teacher - similar to Student logic
+     */
+    private function handlePhotoUpload(UploadedFile $file, Teacher $teacher): void
+    {
+        try {
+            $path = $file->store('teacher_photos', 'public');
+            $teacher->photo = $path;
+            $teacher->save();
+
+            Log::info('TeacherService: Photo uploaded successfully', [
+                'teacher_id' => $teacher->id,
+                'photo_path' => $path
+            ]);
+        } catch (\Exception $e) {
+            Log::error('TeacherService: Failed to handle teacher photo upload', [
+                'teacher_id' => $teacher->id,
+                'exception' => $e
+            ]);
+            throw new \Exception('Failed to upload teacher photo');
+        }
+    }
+
+    /**
+     * Handle CV upload for teacher
+     */
+    private function handleCvUpload(UploadedFile $file, Teacher $teacher): void
+    {
+        try {
+            $path = $file->store('teacher_cvs', 'public');
+            $teacher->cv = $path;
+            $teacher->save();
+
+            Log::info('TeacherService: CV uploaded successfully', [
+                'teacher_id' => $teacher->id,
+                'cv_path' => $path
+            ]);
+        } catch (\Exception $e) {
+            Log::error('TeacherService: Failed to handle teacher CV upload', [
+                'teacher_id' => $teacher->id,
+                'exception' => $e
+            ]);
+            throw new \Exception('Failed to upload teacher CV');
+        }
+    }
+
+    /**
+     * Handle diplomas upload for teacher
+     */
+    private function handleDiplomasUpload(UploadedFile $file, Teacher $teacher): void
+    {
+        try {
+            $path = $file->store('teacher_diplomas', 'public');
+            $teacher->diplomas = $path;
+            $teacher->save();
+
+            Log::info('TeacherService: Diplomas uploaded successfully', [
+                'teacher_id' => $teacher->id,
+                'diplomas_path' => $path
+            ]);
+        } catch (\Exception $e) {
+            Log::error('TeacherService: Failed to handle teacher diplomas upload', [
+                'teacher_id' => $teacher->id,
+                'exception' => $e
+            ]);
+            throw new \Exception('Failed to upload teacher diplomas');
+        }
     }
 }

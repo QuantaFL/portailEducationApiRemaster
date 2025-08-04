@@ -210,7 +210,9 @@ class StudentInscriptionService
         }
     }
 
-    private function handleFileUpload(UploadedFile $file, Student $student, StudentSession $studentSession): void
+    private function
+
+    handleFileUpload(UploadedFile $file, Student $student, StudentSession $studentSession): void
     {
         try {
             $path = $file->store('justificatifs', 'public');

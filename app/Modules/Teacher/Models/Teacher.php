@@ -16,8 +16,18 @@ class Teacher extends Model
         'hire_date',
         'user_model_id',
         'teacher_matricule',
+        'status',
+        'photo',
+        'cv',
+        'diplomas',
     ];
-    protected $with = ['userModel', 'subjects'];
+    // Removed eager loading to prevent memory issues during seeding
+    // Use ->with() explicitly when needed
+    // protected $with = ['userModel', 'subjects', 'assignments'];
+
+    protected $casts = [
+        'status' => 'boolean',
+    ];
 
     public function userModel()
     {
@@ -28,10 +38,11 @@ class Teacher extends Model
         return $this->belongsToMany(Subject::class, 'teacher_subjects');
     }
 
-    public function assignments()
+   public function assignments()
     {
         return $this->hasMany(\App\Modules\Assignement\Models\Assignement::class);
     }
+
 
     public function assignedClasses()
     {
@@ -40,9 +51,7 @@ class Teacher extends Model
             'assignments', // Table pivot
             'teacher_id',  // Clé étrangère sur la table pivot (assignments) qui lie au modèle Teacher
             'class_model_id' // Clé étrangère sur la table pivot (assignments) qui lie au modèle ClassModel
-        )->whereHas('terms.academicYear', function ($query) {
-            $query->where('status', \App\Modules\AcademicYear\Models\StatusAcademicYearEnum::EN_COURS->value);
-        });
+        )->distinct();
     }
 
     /**
@@ -57,8 +66,8 @@ class Teacher extends Model
         do {
             $attempt++;
 
-            // Get total teachers count + 1
-            $totalTeachers = self::count() + 1;
+            // Get total teachers count + 1 (optimized query)
+            $totalTeachers = self::withoutGlobalScopes()->count() + 1;
 
             // Get current year
             $year = date('Y');
@@ -116,5 +125,29 @@ class Teacher extends Model
                 ]);
             }
         });
+    }
+
+    /**
+     * Get the photo URL attribute similar to Student model
+     */
+    public function getPhotoUrlAttribute()
+    {
+        return $this->photo ? asset('storage/' . ltrim(str_replace('public/', '', $this->photo), '/')) : null;
+    }
+
+    /**
+     * Get the CV URL attribute
+     */
+    public function getCvUrlAttribute()
+    {
+        return $this->cv ? asset('storage/' . ltrim(str_replace('public/', '', $this->cv), '/')) : null;
+    }
+
+    /**
+     * Get the diplomas URL attribute
+     */
+    public function getDiplomasUrlAttribute()
+    {
+        return $this->diplomas ? asset('storage/' . ltrim(str_replace('public/', '', $this->diplomas), '/')) : null;
     }
 }

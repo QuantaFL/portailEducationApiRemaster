@@ -16,8 +16,8 @@ class GenerateTeacherMatricules extends Command
     {
         $this->info('Starting to generate matricules for existing teachers...');
 
-        // Get all teachers without matricule
-        $teachersWithoutMatricule = Teacher::whereNull('teacher_matricule')->get();
+        // Get all teachers without matricule (without relations for memory optimization)
+        $teachersWithoutMatricule = Teacher::select('id', 'teacher_matricule')->whereNull('teacher_matricule')->get();
 
         if ($teachersWithoutMatricule->isEmpty()) {
             $this->info('All teachers already have matricules!');

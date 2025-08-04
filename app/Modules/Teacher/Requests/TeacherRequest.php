@@ -22,6 +22,11 @@ class TeacherRequest extends FormRequest
             'user.phone' => ['required', 'string'],
             'user.gender'=>['required'],
             
+            // Optional file uploads
+            'photo' => ['nullable', 'file', 'mimes:jpg,jpeg,png', 'max:2048'],
+            'cv' => ['nullable', 'file', 'mimes:pdf,doc,docx', 'max:5120'],
+            'diplomas' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:10240'],
+            
             // Optional assignment data
             'assignment' => ['nullable', 'array'],
             'assignment.subject_id' => ['required_with:assignment', 'integer', 'exists:subjects,id'],

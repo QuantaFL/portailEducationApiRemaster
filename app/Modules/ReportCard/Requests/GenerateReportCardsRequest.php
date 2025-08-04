@@ -9,8 +9,9 @@ class GenerateReportCardsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'class_model_id' => ['required', 'exists:class_models,id'],
-            'term_id' => ['required', 'exists:terms,id'],
+           // 'class_model_id' => ['required', 'exists:class_models,id'],
+            'class_model_id',
+          //  'term_id' => ['required', 'exists:terms,id'],
         ];
     }
 
