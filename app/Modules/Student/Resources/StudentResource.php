@@ -19,7 +19,12 @@ class StudentResource extends JsonResource
             'parent_model_id' => $this->parent_model_id,
             'user_model_id' => $this->user_model_id,
 
-            'latest_student_session' => new StudentSessionResource($this->whenLoaded('latestStudentSession')),
+            'latest_student_session' => $this->when(
+                $this->relationLoaded('latestStudentSession') && $this->latestStudentSession,
+                function () {
+                    return new StudentSessionResource($this->latestStudentSession);
+                }
+            ),
             'parentModel' => $this->whenLoaded('parentModel'),
             'userModel' => $this->whenLoaded('userModel'),
             'count'=> Student::all()->count(),

@@ -40,12 +40,15 @@ class GenerateReportCardPdfJob implements ShouldQueue
             $pdf = Pdf::loadView('reports.bulletin', $data);
 
             $fileName = 'bulletin_' . $data['student_info']['matricule'] . '_' . $data['term_info']['name'] . '.pdf';
-            $filePath = 'public/report_cards/' . $fileName;
 
-            $pdf->save(storage_path('app/' . $filePath));
+            $filePath = 'report_cards/' . $fileName;
+
+            \Storage::disk('public')->put($filePath, $pdf->output());
 
             $reportCard->path = $filePath;
             $reportCard->save();
+
+            Log::info("PDF generated successfully for ReportCard ID: {$this->reportCardId} at path: {$filePath}");
 
         } catch (\Throwable $e) {
             Log::error("Error generating PDF for ReportCard ID {$this->reportCardId}: " . $e->getMessage());

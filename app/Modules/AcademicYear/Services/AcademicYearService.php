@@ -21,55 +21,55 @@ class AcademicYearService
     public function getAcademicYearById(int $id): AcademicYear
     {
         $academicYear = AcademicYear::find($id);
-        
+
         if (!$academicYear) {
             throw AcademicYearException::academicYearNotFound();
         }
-        
+
         return $academicYear;
     }
 
     public function getCurrentAcademicYear(): AcademicYear
     {
-        $currentYear = AcademicYear::where('status', StatusAcademicYearEnum::EN_COURS->value)->first();
-        
+//        $currentYear = AcademicYear::where('status', StatusAcademicYearEnum::EN_COURS->value)->first();
+        $currentYear = AcademicYear::getCurrentAcademicYear();
         if (!$currentYear) {
             throw AcademicYearException::noCurrentAcademicYear();
         }
-        
+
         return $currentYear;
     }
 
     public function getActiveAcademicYears(): Collection
     {
         $activeYears = AcademicYear::where('status', 'active')->get();
-        
+
         if ($activeYears->isEmpty()) {
             throw AcademicYearException::noActiveAcademicYears();
         }
-        
+
         return $activeYears;
     }
 
     public function getTermsByAcademicYear(int $academicYearId): Collection
     {
         $academicYear = $this->getAcademicYearById($academicYearId);
-        
+
         return $academicYear->terms;
     }
 
     public function createAcademicYear(array $data): array
     {
         $this->validateAcademicYearData($data);
-        
+
         DB::beginTransaction();
-        
+
         try {
             // Set all previous academic years to finished
             DB::table('academic_years')->update([
                 'status' => StatusAcademicYearEnum::TERMINE->value
             ]);
-            
+
             // Create new academic year
             $label = $data['start_date'] . '-' . $data['end_date'];
             $academicYear = AcademicYear::create([
@@ -78,17 +78,17 @@ class AcademicYearService
                 'end_date' => $data['end_date'],
                 'status' => StatusAcademicYearEnum::EN_COURS->value
             ]);
-            
+
             // Create terms for the academic year
             $terms = $this->createTermsForAcademicYear($academicYear, $data);
-            
+
             DB::commit();
-            
+
             return [
                 'academic_year' => $academicYear,
                 'terms' => $terms
             ];
-            
+
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Failed to create academic year with terms: ' . $e->getMessage());
@@ -99,7 +99,7 @@ class AcademicYearService
     public function updateAcademicYear(AcademicYear $academicYear, array $data): AcademicYear
     {
         $academicYear->update($data);
-        
+
         return $academicYear;
     }
 
@@ -144,21 +144,21 @@ class AcademicYearService
     {
         $startDate = Carbon::parse($data['start_date'])->startOfDay();
         $endDate = Carbon::parse($data['end_date'])->startOfDay();
-        
+
         $term1 = Term::create([
             'name' => 'Semestre 1',
             'academic_year_id' => $academicYear->id,
             'start_date' => $startDate,
             'end_date' => $endDate
         ]);
-        
+
         $term2 = Term::create([
             'name' => 'Semestre 2',
             'academic_year_id' => $academicYear->id,
             'start_date' => $startDate,
             'end_date' => $endDate
         ]);
-        
+
         return [
             'term1' => $term1,
             'term2' => $term2

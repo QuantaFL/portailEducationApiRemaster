@@ -25,8 +25,9 @@ class ParentController extends Controller
         return response()->json(new ParentResource($parentModel));
     }
 
-    public function show(ParentModel $parent)
+    public function show($id)
     {
+        $parent = ParentModel::where('user_model_id', $id)->first();
         return response()->json(new ParentResource($parent));
     }
 
@@ -45,8 +46,9 @@ class ParentController extends Controller
         return response()->json();
     }
 
-    public function children(ParentModel $parent)
+    public function children($id)
     {
+        $parent = ParentModel::where('user_model_id', $id)->first();
         $children = $parent->children;
         return response()->json(StudentResource::collection($children));
     }
